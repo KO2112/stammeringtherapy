@@ -421,7 +421,7 @@ export default function DiaryPage() {
     const daysInMonth = lastDayOfMonth.getDate()
     const firstDayOfWeek = firstDayOfMonth.getDay() // 0 = Sunday, 1 = Monday, etc.
 
-    const today = new Date()
+    
 
     const days = []
 

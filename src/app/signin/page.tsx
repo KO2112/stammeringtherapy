@@ -403,8 +403,8 @@ export default function SignIn() {
             <div className="pt-12">
               <div className="p-4 bg-white/10 rounded-lg">
                 <p className="italic text-teal-50">
-                  "This app has transformed my confidence in speaking. I've made more progress in 3 months than in years
-                  of traditional therapy."
+                  This app has transformed my confidence in speaking. I have made more progress in 3 months than in years
+                  of traditional therapy.
                 </p>
                 <div className="mt-3 flex items-center">
                   <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-medium">
@@ -506,7 +506,7 @@ export default function SignIn() {
             <div className="mt-8 text-center text-slate-600">
               {formType === "signin" && (
                 <>
-                  Don't have an account?{" "}
+                  Do not have an account?{" "}
                   <button
                     type="button"
                     onClick={() => {
