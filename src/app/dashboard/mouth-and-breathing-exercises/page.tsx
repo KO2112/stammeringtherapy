@@ -445,9 +445,7 @@ export default function MouthAndBreathingExercises() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Vocal Development Exercises</h1>
-          <p className="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">
-            Improve your breathing control and mouth articulation with these specialized exercises
-          </p>
+          
         </div>
 
         {/* Tabs */}

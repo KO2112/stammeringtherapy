@@ -2,10 +2,10 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { auth, db } from "../../../../firebase"
 import { onAuthStateChanged } from "firebase/auth"
-import { User } from "firebase/auth"
+import type { User } from "firebase/auth"
 import {
   collection,
   addDoc,
@@ -36,6 +36,9 @@ import {
   ChevronDown,
   Moon,
   Sun,
+  ChevronLeft,
+  ChevronRight,
+  CalendarIcon,
 } from "lucide-react"
 
 interface DiaryEntry {
@@ -60,6 +63,18 @@ export default function DiaryPage() {
   } | null>(null)
   const [isFormVisible, setIsFormVisible] = useState(false)
   const [theme, setTheme] = useState<"light" | "dark">("light")
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date())
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false)
+  const calendarRef = useRef<HTMLDivElement>(null)
+  const contentRef = useRef<HTMLTextAreaElement>(null)
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.style.height = "200px"
+      contentRef.current.style.height = `${contentRef.current.scrollHeight}px`
+    }
+  }, [content])
 
   // Check authentication state
   useEffect(() => {
@@ -94,6 +109,20 @@ export default function DiaryPage() {
     }
   }, [theme])
 
+  // Handle clicks outside calendar
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (calendarRef.current && !calendarRef.current.contains(event.target as Node)) {
+        setIsCalendarOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
   // Toggle theme
   const toggleTheme = () => {
     setTheme(theme === "light" ? "dark" : "light")
@@ -118,38 +147,65 @@ export default function DiaryPage() {
     }).format(date)
   }
 
-  // Get today's date bounds
-  const getTodayBounds = () => {
-    const today = new Date()
-    const startOfDay = new Date(today)
+  // Get date bounds for the selected date
+  const getDateBounds = (date: Date) => {
+    const startOfDay = new Date(date)
     startOfDay.setHours(0, 0, 0, 0)
 
-    const endOfDay = new Date(today)
+    const endOfDay = new Date(date)
     endOfDay.setHours(23, 59, 59, 999)
 
     return { startOfDay, endOfDay }
   }
 
-  // Get formatted today's date for display
-  const getTodayFormatted = () => {
-    const today = new Date()
+  // Get formatted date for display
+  const getFormattedDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
       weekday: "long",
       year: "numeric",
       month: "long",
       day: "numeric",
     }
-    return today.toLocaleDateString("en-US", options)
+    return date.toLocaleDateString("en-US", options)
   }
 
-  // Fetch diary entries
+  // Check if date is today
+  const isToday = (date: Date) => {
+    const today = new Date()
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    )
+  }
+
+  // Navigate to previous day
+  const goToPreviousDay = () => {
+    const prevDay = new Date(selectedDate)
+    prevDay.setDate(prevDay.getDate() - 1)
+    setSelectedDate(prevDay)
+  }
+
+  // Navigate to next day
+  const goToNextDay = () => {
+    const nextDay = new Date(selectedDate)
+    nextDay.setDate(nextDay.getDate() + 1)
+    setSelectedDate(nextDay)
+  }
+
+  // Navigate to today
+  const goToToday = () => {
+    setSelectedDate(new Date())
+  }
+
+  // Fetch diary entries for the selected date
   useEffect(() => {
     if (!user) return
 
     const fetchEntries = async () => {
       try {
         setLoading(true)
-        const { startOfDay, endOfDay } = getTodayBounds()
+        const { startOfDay, endOfDay } = getDateBounds(selectedDate)
 
         const entriesQuery = query(
           collection(db, "users", user.uid, "diaryEntries"),
@@ -167,14 +223,14 @@ export default function DiaryPage() {
         setEntries(entriesData)
       } catch (error) {
         console.error("Error fetching entries:", error)
-        showNotification("Failed to load today's diary entries", "error")
+        showNotification("Failed to load diary entries", "error")
       } finally {
         setLoading(false)
       }
     }
 
     fetchEntries()
-  }, [user])
+  }, [user, selectedDate])
 
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
@@ -221,7 +277,7 @@ export default function DiaryPage() {
       setIsFormVisible(false)
 
       // Refresh entries
-      const { startOfDay, endOfDay } = getTodayBounds()
+      const { startOfDay, endOfDay } = getDateBounds(selectedDate)
 
       const entriesQuery = query(
         collection(db, "users", user.uid, "diaryEntries"),
@@ -354,6 +410,81 @@ export default function DiaryPage() {
     }
   }
 
+  // Generate calendar days
+  const generateCalendarDays = () => {
+    const year = selectedDate.getFullYear()
+    const month = selectedDate.getMonth()
+
+    const firstDayOfMonth = new Date(year, month, 1)
+    const lastDayOfMonth = new Date(year, month + 1, 0)
+
+    const daysInMonth = lastDayOfMonth.getDate()
+    const firstDayOfWeek = firstDayOfMonth.getDay() // 0 = Sunday, 1 = Monday, etc.
+
+    const today = new Date()
+
+    const days = []
+
+    // Add empty cells for days before the first day of the month
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      days.push(null)
+    }
+
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      const date = new Date(year, month, i)
+      days.push(date)
+    }
+
+    return days
+  }
+
+  // Format month and year for calendar
+  const formatMonthYear = (date: Date) => {
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+  }
+
+  // Navigate to previous month in calendar
+  const goToPreviousMonth = () => {
+    const prevMonth = new Date(selectedDate)
+    prevMonth.setMonth(prevMonth.getMonth() - 1)
+    setSelectedDate(prevMonth)
+  }
+
+  // Navigate to next month in calendar
+  const goToNextMonth = () => {
+    const nextMonth = new Date(selectedDate)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    setSelectedDate(nextMonth)
+  }
+
+  // Check if a date is the selected date
+  const isSelectedDate = (date: Date | null) => {
+    if (!date) return false
+    return (
+      date.getDate() === selectedDate.getDate() &&
+      date.getMonth() === selectedDate.getMonth() &&
+      date.getFullYear() === selectedDate.getFullYear()
+    )
+  }
+
+  // Check if a date is today
+  const isTodayDate = (date: Date | null) => {
+    if (!date) return false
+    const today = new Date()
+    return (
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
+    )
+  }
+
+  // Select a date from the calendar
+  const selectDate = (date: Date) => {
+    setSelectedDate(date)
+    setIsCalendarOpen(false)
+  }
+
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4 transition-colors duration-300">
@@ -424,7 +555,7 @@ export default function DiaryPage() {
             <div className="hidden sm:block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4" />
-                <span>{getTodayFormatted()}</span>
+                <span>{getFormattedDate(selectedDate)}</span>
               </div>
             </div>
 
@@ -440,10 +571,99 @@ export default function DiaryPage() {
       </header>
 
       <main className="max-w-6xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-6 sm:hidden">
-          <div className="flex items-center justify-center space-x-2 text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors duration-300">
-            <Calendar className="h-4 w-4" />
-            <span>{getTodayFormatted()}</span>
+        {/* Date Navigation */}
+        <div className="mb-8">
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              onClick={goToPreviousDay}
+              className="p-2 rounded-full hover:bg-white/30 dark:hover:bg-gray-800/50 transition-colors duration-200"
+              aria-label="Previous day"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
+
+            <div className="relative">
+              <button
+                onClick={() => setIsCalendarOpen(!isCalendarOpen)}
+                className="flex items-center space-x-2 px-4 py-2 bg-white/80 dark:bg-gray-800/80 rounded-lg shadow-sm hover:bg-white dark:hover:bg-gray-800 transition-colors duration-200"
+              >
+                <CalendarIcon className="w-4 h-4 text-teal-600 dark:text-teal-400" />
+                <span className="font-medium text-gray-800 dark:text-white">
+                  {isToday(selectedDate) ? "Today" : getFormattedDate(selectedDate)}
+                </span>
+              </button>
+
+              {isCalendarOpen && (
+                <div
+                  ref={calendarRef}
+                  className="absolute mt-2 p-3 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 z-20 w-72"
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <button
+                      onClick={goToPreviousMonth}
+                      className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                    <h3 className="font-medium text-gray-800 dark:text-white">{formatMonthYear(selectedDate)}</h3>
+                    <button
+                      onClick={goToNextMonth}
+                      className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1 mb-2">
+                    {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                      <div key={day} className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-1">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid grid-cols-7 gap-1">
+                    {generateCalendarDays().map((date, index) => (
+                      <div key={index} className="aspect-square">
+                        {date ? (
+                          <button
+                            onClick={() => selectDate(date)}
+                            className={`w-full h-full flex items-center justify-center text-sm rounded-full transition-colors duration-200 ${
+                              isSelectedDate(date)
+                                ? "bg-teal-500 text-white"
+                                : isTodayDate(date)
+                                  ? "bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200"
+                                  : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-200"
+                            }`}
+                          >
+                            {date.getDate()}
+                          </button>
+                        ) : (
+                          <div className="w-full h-full"></div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      onClick={goToToday}
+                      className="w-full py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-sm font-medium text-gray-800 dark:text-white transition-colors duration-200"
+                    >
+                      Today
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={goToNextDay}
+              className="p-2 rounded-full hover:bg-white/30 dark:hover:bg-gray-800/50 transition-colors duration-200"
+              aria-label="Next day"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700 dark:text-gray-300" />
+            </button>
           </div>
         </div>
 
@@ -584,7 +804,7 @@ export default function DiaryPage() {
         <div className="bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
-              Todays Journal
+              {isToday(selectedDate) ? "Today's Journal" : `Journal for ${getFormattedDate(selectedDate)}`}
             </h2>
             <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center transition-colors duration-300">
               <span className="hidden sm:inline mr-2">Sort by:</span>
@@ -608,16 +828,18 @@ export default function DiaryPage() {
                 <PenLine className="h-10 w-10 text-teal-600 dark:text-teal-300" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2 transition-colors duration-300">
-                Your journal awaits
+                {isToday(selectedDate) ? "Your journal awaits" : "No entries for this day"}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto transition-colors duration-300">
-                Capture your thoughts, feelings, and experiences. Start your journaling practice today.
+                {isToday(selectedDate)
+                  ? "Capture your thoughts, feelings, and experiences. Start your journaling practice today."
+                  : "Select a different date or create a new entry for this day."}
               </p>
               <button
                 onClick={() => setIsFormVisible(true)}
                 className="bg-gradient-to-r from-teal-500 to-purple-500 hover:from-teal-600 hover:to-purple-600 text-white font-medium py-3 px-8 rounded-xl transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1"
               >
-                Write Your First Entry
+                {isToday(selectedDate) ? "Write Your First Entry" : "Create Entry for This Day"}
               </button>
             </div>
           ) : (
