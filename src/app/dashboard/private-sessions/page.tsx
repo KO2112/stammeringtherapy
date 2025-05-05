@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+
 import { Calendar, Clock, CheckCircle, X, Star, Award, MessageSquare, BadgeCheck, CalendarDays } from "lucide-react"
 
 interface Specialist {

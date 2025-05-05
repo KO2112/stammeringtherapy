@@ -27,10 +27,14 @@ interface BaseExercise {
   benefits: string[]
 }
 
-interface BreathingExercise extends BaseExercise {}
+// Instead of an empty interface, use a type alias with a discriminator
+type BreathingExercise = BaseExercise & {
+  type: "breathing"
+}
 
 interface MouthExercise extends BaseExercise {
   practice: string
+  type: "mouth"
 }
 
 export default function MouthAndBreathingExercises() {
@@ -50,6 +54,7 @@ export default function MouthAndBreathingExercises() {
       duration: 60,
       steps: ["Inhale through nose (4s)", "Inflate stomach", "Exhale through mouth (6s)", "Empty lungs completely"],
       benefits: ["Reduces stress", "Improves focus", "Increases oxygen flow"],
+      type: "breathing",
     },
     {
       id: 2,
@@ -65,6 +70,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Strengthens diaphragm", "Improves breath control", "Enhances vocal stability"],
+      type: "breathing",
     },
     {
       id: 3,
@@ -80,6 +86,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Increases lung capacity", "Improves breath control", "Reduces anxiety"],
+      type: "breathing",
     },
     {
       id: 4,
@@ -95,6 +102,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Strengthens facial muscles", "Improves breath control", "Enhances articulation"],
+      type: "breathing",
     },
     {
       id: 5,
@@ -110,6 +118,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Increases CO2 tolerance", "Calms nervous system", "Improves focus and concentration"],
+      type: "breathing",
     },
     {
       id: 6,
@@ -125,6 +134,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Strengthens diaphragm", "Improves breath control", "Enhances vocal resonance"],
+      type: "breathing",
     },
     {
       id: 7,
@@ -140,6 +150,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Improves breath control", "Enhances rhythm perception", "Strengthens vocal muscles"],
+      type: "breathing",
     },
     {
       id: 8,
@@ -155,6 +166,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Strengthens vocal cords", "Improves breath control", "Enhances vocal projection"],
+      type: "breathing",
     },
     {
       id: 9,
@@ -170,6 +182,7 @@ export default function MouthAndBreathingExercises() {
         "Empty lungs completely",
       ],
       benefits: ["Improves articulation", "Enhances vocal range", "Strengthens breath control"],
+      type: "breathing",
     },
     {
       id: 10,
@@ -185,6 +198,7 @@ export default function MouthAndBreathingExercises() {
         "Continue for 30 seconds",
       ],
       benefits: ["Strengthens diaphragm", "Increases oxygen intake", "Energizes the body"],
+      type: "breathing",
     },
   ]
 
@@ -203,6 +217,7 @@ export default function MouthAndBreathingExercises() {
         "Repeat sequence",
       ],
       benefits: ["Improves vowel clarity", "Strengthens facial muscles", "Enhances articulation"],
+      type: "mouth",
     },
     {
       id: 2,
@@ -219,6 +234,7 @@ export default function MouthAndBreathingExercises() {
         "Complete the full sequence",
       ],
       benefits: ["Improves diction", "Strengthens articulation muscles", "Enhances speech clarity"],
+      type: "mouth",
     },
     {
       id: 3,
@@ -235,6 +251,7 @@ export default function MouthAndBreathingExercises() {
         "Complete the full sequence",
       ],
       benefits: ["Improves sibilant sounds", "Enhances speech clarity", "Strengthens tongue control"],
+      type: "mouth",
     },
     {
       id: 4,
@@ -251,6 +268,7 @@ export default function MouthAndBreathingExercises() {
         "Complete the full sequence",
       ],
       benefits: ["Improves consonant clarity", "Enhances speech rhythm", "Strengthens articulation"],
+      type: "mouth",
     },
     {
       id: 5,
@@ -268,6 +286,7 @@ export default function MouthAndBreathingExercises() {
         "Complete all three lines",
       ],
       benefits: ["Improves breath control", "Enhances speech rhythm", "Strengthens articulation muscles"],
+      type: "mouth",
     },
     {
       id: 6,
@@ -284,6 +303,7 @@ export default function MouthAndBreathingExercises() {
         "Complete both lines",
       ],
       benefits: ["Improves articulation", "Enhances speech clarity", "Strengthens facial muscles"],
+      type: "mouth",
     },
     {
       id: 7,
@@ -300,6 +320,7 @@ export default function MouthAndBreathingExercises() {
         "Complete both lines",
       ],
       benefits: ["Improves dental consonant clarity", "Enhances tongue placement", "Strengthens articulation"],
+      type: "mouth",
     },
     {
       id: 8,
@@ -320,6 +341,7 @@ export default function MouthAndBreathingExercises() {
         "Enhances back-of-mouth articulation",
         "Strengthens speech muscles",
       ],
+      type: "mouth",
     },
     {
       id: 9,
@@ -337,6 +359,7 @@ export default function MouthAndBreathingExercises() {
         "Complete all four lines",
       ],
       benefits: ["Improves consonant cluster clarity", "Enhances breath control", "Strengthens articulation muscles"],
+      type: "mouth",
     },
     {
       id: 10,
@@ -353,6 +376,7 @@ export default function MouthAndBreathingExercises() {
         "Complete the full alphabet",
       ],
       benefits: ["Strengthens jaw muscles", "Improves articulation", "Enhances mouth control"],
+      type: "mouth",
     },
   ]
 
@@ -421,7 +445,9 @@ export default function MouthAndBreathingExercises() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Vocal Development Exercises</h1>
-          
+          <p className="mt-3 text-lg text-slate-600 max-w-2xl mx-auto">
+            Improve your breathing control and mouth articulation with these specialized exercises
+          </p>
         </div>
 
         {/* Tabs */}

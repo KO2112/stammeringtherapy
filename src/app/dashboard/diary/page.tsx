@@ -5,6 +5,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { auth, db } from "../../../../firebase"
 import { onAuthStateChanged } from "firebase/auth"
+import { User } from "firebase/auth"
 import {
   collection,
   addDoc,
@@ -46,7 +47,7 @@ interface DiaryEntry {
 }
 
 export default function DiaryPage() {
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<User | null>(null)
   const [entries, setEntries] = useState<DiaryEntry[]>([])
   const [title, setTitle] = useState("")
   const [content, setContent] = useState("")
