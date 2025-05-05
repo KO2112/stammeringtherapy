@@ -13,7 +13,7 @@ export default function LayoutClientWrapper({
   const pathname = usePathname();
 
   const hideLayout = ["/signin", "/signup", "/auth/signin", "/auth/signup","/dashboard", "/dashboard/mouth-and-breathing-exercises","/dashboard/diary","/dashboard/profile"
-    ,"/dashboard/private-sessions","/dashboard/stories"].includes(pathname);
+    ,"/dashboard/private-sessions","/dashboard/stories","/dashboard/support"].includes(pathname);
 
   return (
     <>
