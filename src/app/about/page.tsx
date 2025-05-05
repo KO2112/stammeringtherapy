@@ -40,7 +40,7 @@ export default function AboutPage() {
                 Our collaborative effort brings together dozens of Audiology and Speech Disorders Specialists, stammering therapists, and speech therapists from Eastern Europe, Western Europe, and North America.
               </p>
               <p className="text-lg text-gray-700">
-                With over 23 years of combined experience in the field, we've helped more than 10,000 people worldwide overcome stammering challenges and gain speech confidence.
+                With over 23 years of combined experience in the field, we have helped more than 10,000 people worldwide overcome stammering challenges and gain speech confidence.
               </p>
             </div>
             

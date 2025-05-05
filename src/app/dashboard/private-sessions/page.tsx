@@ -28,7 +28,7 @@ export default function PrivateSessions() {
     preferredContact: "email",
     message: "",
   })
-  const router = useRouter()
+ 
 
   const specialists: Specialist[] = [
     {
@@ -251,7 +251,7 @@ export default function PrivateSessions() {
                 <div className="flex items-start">
                   <MessageSquare className="h-5 w-5 text-slate-500 mt-0.5 mr-3 flex-shrink-0" />
                   <p className="text-slate-600 text-sm">
-                    Fill out the form below to request a session. We'll contact you to confirm availability and finalize
+                    Fill out the form below to request a session. We will contact you to confirm availability and finalize
                     your appointment.
                   </p>
                 </div>
@@ -406,7 +406,7 @@ export default function PrivateSessions() {
             <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
               <h3 className="text-lg font-semibold text-slate-900 mb-2">How long are the therapy sessions?</h3>
               <p className="text-slate-600">
-                Our standard sessions are 45 minutes long, which we've found to be the optimal duration for effective
+                Our standard sessions are 45 minutes long, which we have found to be the optimal duration for effective
                 therapy without causing fatigue.
               </p>
             </div>

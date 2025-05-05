@@ -313,7 +313,7 @@ export default function SignIn() {
             </div>
             
             <div className="pt-6">
-              <p className="text-indigo-200 italic">"Find your voice with confidence"</p>
+              <p className="text-indigo-200 italic">Find your voice with confidence</p>
             </div>
           </div>
         </div>
@@ -412,7 +412,7 @@ export default function SignIn() {
             <div className="mt-6 text-center text-sm text-gray-600">
               {formType === 'signin' && (
                 <>
-                  Don't have an account?{' '}
+                  Do not have an account?{' '}
                   <button 
                     type="button"
                     onClick={() => {

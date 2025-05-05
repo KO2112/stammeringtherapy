@@ -824,7 +824,7 @@ export default function ProfilePage() {
 
                       <div className="pt-4 border-t border-slate-200">
                         <h3 className="text-sm font-medium text-slate-700 mb-3">Login Sessions</h3>
-                        <p className="text-slate-600 text-sm">You're currently logged in on these devices:</p>
+                        <p className="text-slate-600 text-sm">You are currently logged in on these devices:</p>
 
                         <div className="mt-3 space-y-3">
                           <div className="p-3 bg-slate-50 rounded-lg flex justify-between items-center">

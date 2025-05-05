@@ -4,14 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const AboutUs = () => {
-  const [activeRegion, setActiveRegion] = useState('all');
   
-  const regions = [
-    { id: 'all', name: 'All Regions' },
-    { id: 'eastern', name: 'Eastern Europe' },
-    { id: 'western', name: 'Western Europe' },
-    { id: 'north', name: 'North America' }
-  ];
   
   return (
     <section className="py-24 bg-gradient-to-b from-blue-50 to-white">

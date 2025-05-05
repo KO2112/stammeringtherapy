@@ -583,7 +583,7 @@ export default function DiaryPage() {
         <div className="bg-white dark:bg-gray-800 bg-opacity-90 dark:bg-opacity-90 backdrop-blur-sm rounded-2xl shadow-xl p-6 border border-gray-100 dark:border-gray-700 transition-colors duration-300">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
-              Today's Journal
+              Todays Journal
             </h2>
             <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center transition-colors duration-300">
               <span className="hidden sm:inline mr-2">Sort by:</span>

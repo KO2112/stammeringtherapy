@@ -64,7 +64,7 @@ const StammeringTherapyTechniques = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-6">How Does It Work?</h2>
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
             <p className="text-gray-700 text-lg leading-relaxed">
-              Our comprehensive stammering therapy program combines multiple evidence-based techniques tailored to your specific needs. Through consistent practice and expert guidance, you'll develop strategies that address both the physical aspects of speech production and psychological factors that impact fluency.
+              Our comprehensive stammering therapy program combines multiple evidence-based techniques tailored to your specific needs. Through consistent practice and expert guidance, you will develop strategies that address both the physical aspects of speech production and psychological factors that impact fluency.
             </p>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">

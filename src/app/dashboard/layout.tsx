@@ -16,14 +16,12 @@ import {
   Calendar,
   PenLine,
   User,
-  Settings,
   LogOut,
   Menu,
   X,
   ChevronRight,
   HelpCircle,
   Bell,
-  BarChart2,
 } from "lucide-react"
 
 interface LayoutProps {
