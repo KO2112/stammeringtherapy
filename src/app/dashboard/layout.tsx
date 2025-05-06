@@ -22,6 +22,7 @@ import {
   ChevronRight,
   HelpCircle,
   Bell,
+  Speech,
 } from "lucide-react"
 
 interface LayoutProps {
@@ -153,6 +154,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       name: "Diary",
       href: "/dashboard/diary",
       icon: <PenLine className="h-5 w-5" />,
+    },
+    {
+      name: "Read Out Loud",
+      href: "/dashboard/Read-Out-Loud",
+      icon: <Speech className="h-5 w-5" />,
     },
     
   ]
@@ -362,7 +368,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
       >
         {/* Page content */}
         <main
-          className={`flex-1 overflow-y-auto ${pathname === "/dashboard/diary" ? "p-0" : "py-6 px-4 sm:px-6 lg:px-8"}`}
+          className={`flex-1 overflow-y-auto ${pathname === "/dashboard" ? "p-0" : "py-0 px-4 sm:px-6 lg:px-1"}`}
         >
           {children}
         </main>
