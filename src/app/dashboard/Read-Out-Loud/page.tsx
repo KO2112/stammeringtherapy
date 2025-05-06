@@ -45,9 +45,7 @@ export default function ReadOutLoudPage() {
      }
   // Function to highlight the first vowel in each word
   const highlightFirstVowel = (text: string) => {
-    <div className="hidden">
-         {highlightFirstVowel("This is some sample text.")}
-       </div>
+    
     // Split the text into words
     return text.split(/\b/).map((word, index) => {
       if (word.trim() === "") return word
@@ -495,7 +493,9 @@ And that was its own kind of victory.`,
                   </div>
                 </div>
               </div>
-
+<div className="hidden">
+         {highlightFirstVowel("This is some sample text.")}
+       </div>
               {/* Reading Controls */}
               {showControls && (
                 <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-4">
