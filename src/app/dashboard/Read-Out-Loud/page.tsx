@@ -45,6 +45,9 @@ export default function ReadOutLoudPage() {
      }
   // Function to highlight the first vowel in each word
   const highlightFirstVowel = (text: string) => {
+    <div className="hidden">
+         {highlightFirstVowel("This is some sample text.")}
+       </div>
     // Split the text into words
     return text.split(/\b/).map((word, index) => {
       if (word.trim() === "") return word
