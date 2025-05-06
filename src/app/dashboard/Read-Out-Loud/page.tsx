@@ -37,6 +37,38 @@ export default function ReadOutLoudPage() {
   const [showControls, setShowControls] = useState(true)
   const [isPracticing, setIsPracticing] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
+  const [highlightVowels, setHighlightVowels] = useState(true)
+
+
+  const toggleVowelHighlighting = () => {
+  setHighlightVowels(!highlightVowels)
+     }
+  // Function to highlight the first vowel in each word
+  const highlightFirstVowel = (text: string) => {
+    // Split the text into words
+    return text.split(/\b/).map((word, index) => {
+      if (word.trim() === "") return word
+
+      // Find the first vowel in the word
+      const vowelMatch = word.match(/[aeiouAEIOU]/)
+      if (!vowelMatch) return word
+
+      const vowelIndex = vowelMatch.index as number
+      const beforeVowel = word.substring(0, vowelIndex)
+      const vowel = word[vowelIndex]
+      const afterVowel = word.substring(vowelIndex + 1)
+
+      return (
+        <span key={index}>
+          {beforeVowel}
+          <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
+            {vowel}
+          </span>
+          {afterVowel}
+        </span>
+      )
+    })
+  }
 
   // Sample stories - in a real app, these would come from a database
   const stories: Story[] = [
@@ -317,7 +349,47 @@ And that was its own kind of victory.`,
     }
   }
 
+  // Function to render story content with highlighted first vowels
+  const renderStoryContent = (content: string) => {
+  return content.split("\n\n").map((paragraph, index) => (
+    <p key={index} className="mb-6 leading-relaxed">
+      {highlightVowels 
+        ? paragraph.split(" ").map((word, wordIndex) => {
+            // Skip empty words
+            if (!word) return " "
+
+            // Find the first vowel in the word
+            const vowelMatch = word.match(/[aeiouAEIOU]/)
+
+            if (!vowelMatch) {
+              return <span key={wordIndex}>{word} </span>
+            }
+
+            const vowelIndex = vowelMatch.index as number
+            const beforeVowel = word.substring(0, vowelIndex)
+            const vowel = word[vowelIndex]
+            const afterVowel = word.substring(vowelIndex + 1)
+
+            return (
+              <span key={wordIndex}>
+                {beforeVowel}
+                <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
+                  {vowel}
+                </span>
+                {afterVowel}{" "}
+              </span>
+            )
+          })
+        : paragraph.split(" ").map((word, wordIndex) => (
+            <span key={wordIndex}>{word} </span>
+          ))
+      }
+    </p>
+  ))
+}
+
   return (
+    
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-10 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300 w-full">
@@ -387,6 +459,7 @@ And that was its own kind of victory.`,
             </div>
           </div>
         ) : (
+          
           /* Reading View */
           <div className="space-y-6">
             {/* Back to selection button */}
@@ -456,6 +529,17 @@ And that was its own kind of victory.`,
                       {bookmarked ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
                     </button>
 
+                       <button
+                          onClick={toggleVowelHighlighting}
+                             className={`p-1.5 rounded-md ${
+                             highlightVowels
+                             ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
+                             : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+                              }`}
+                             aria-label={highlightVowels ? "Turn off vowel highlighting" : "Turn on vowel highlighting"}
+                               >
+                             <Type className="h-4 w-4" />
+                          </button>
                     {!isPracticing && !completed ? (
                       <button
                         onClick={startPractice}
@@ -496,11 +580,7 @@ And that was its own kind of victory.`,
                 style={{ fontSize: `${fontSize}px` }}
               >
                 <div className="prose prose-lg dark:prose-invert max-w-none">
-                  {selectedStory.content.split("\n\n").map((paragraph, index) => (
-                    <p key={index} className="mb-6 leading-relaxed">
-                      {paragraph}
-                    </p>
-                  ))}
+                  {renderStoryContent(selectedStory.content)}
                 </div>
               </div>
             </div>
