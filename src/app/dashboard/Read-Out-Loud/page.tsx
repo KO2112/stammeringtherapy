@@ -533,16 +533,25 @@ And that was its own kind of victory.`,
                     </button>
 
                        <button
-                          onClick={toggleVowelHighlighting}
-                             className={`p-1.5 rounded-md ${
-                             highlightVowels
-                             ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300"
-                             : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
-                              }`}
-                             aria-label={highlightVowels ? "Turn off vowel highlighting" : "Turn on vowel highlighting"}
-                               >
-                             <Type className="h-4 w-4" />
-                          </button>
+  onClick={toggleVowelHighlighting}
+  className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium ${
+    highlightVowels
+      ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
+      : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
+  }`}
+  aria-label={highlightVowels ? "Turn off vowel highlighting" : "Turn on vowel highlighting"}
+>
+  <span className="flex items-center justify-center">
+    <span className="inline-flex items-center justify-center mr-1.5 text-center font-bold text-xs">
+      <span className={`${
+        highlightVowels 
+          ? "bg-purple-200 dark:bg-purple-800 px-1 rounded" 
+          : ""
+      }`}>A</span>
+    </span>
+    <span className="leading-none">{highlightVowels ? "Hide Vowels" : "Highlight Vowels"}</span>
+  </span>
+</button>
                     {!isPracticing && !completed ? (
                       <button
                         onClick={startPractice}

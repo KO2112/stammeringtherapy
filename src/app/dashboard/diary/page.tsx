@@ -86,7 +86,7 @@ export default function DiaryPage() {
     return () => unsubscribe()
   }, [])
 
-  // Check user's preferred theme
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
       const savedTheme = localStorage.getItem("diary-theme") as "light" | "dark" | null
@@ -718,7 +718,7 @@ export default function DiaryPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors duration-300"
-                  placeholder="What's on your mind today?"
+                  placeholder="What is on your mind today?"
                   required
                 />
               </div>
@@ -735,7 +735,7 @@ export default function DiaryPage() {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 transition-colors duration-300 min-h-[200px] resize-y"
-                  placeholder="Write freely about your day, thoughts, feelings, or anything you'd like to remember..."
+                  placeholder="Write freely about your day, thoughts, feelings, or anything you would like to remember..."
                   required
                 />
               </div>

@@ -64,7 +64,7 @@ const TryTheAppNow = () => {
               onMouseLeave={() => setIsHovered(false)}
             >
               <Link 
-                href="/e-stammering" 
+                href="/signin" 
                 className={`inline-flex items-center px-6 py-3 text-lg font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 ${
                   isHovered ? 'shadow-lg transform -translate-y-1' : 'shadow'
                 }`}

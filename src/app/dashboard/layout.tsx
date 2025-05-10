@@ -160,7 +160,6 @@ export default function DashboardLayout({ children }: LayoutProps) {
       href: "/dashboard/Read-Out-Loud",
       icon: <Speech className="h-5 w-5" />,
     },
-    
   ]
 
   const secondaryNavItems = [
@@ -207,27 +206,30 @@ export default function DashboardLayout({ children }: LayoutProps) {
       >
         {/* Logo section */}
         <div className="p-5 flex items-center justify-between border-b border-slate-100">
-          <div className="flex items-center space-x-3">
-            <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-10 w-auto" />
+          <div className="flex items-center">
+            <div className="flex-shrink-0 w-10">
+              <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-10 w-auto" />
+            </div>
             {!isSidebarCollapsed && (
-              <span className="text-xl font-bold text-teal-900 whitespace-nowrap">Stammering Therapy</span>
+              <span className="ml-0 text-xl font-bold text-teal-900 whitespace-nowrap">Stammering Therapy</span>
             )}
           </div>
-          <button
-            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="text-slate-400 hover:text-slate-600 hidden lg:block"
-          >
-            
-            <ChevronRight
-              className={`h-5 w-5 transition-transform duration-300 ${isSidebarCollapsed ? "rotate-180" : ""}`}
-            />
-          </button>
-          <button
-            onClick={() => setIsMobileSidebarOpen(false)}
-            className="text-slate-400 hover:text-slate-600 lg:hidden"
-          >
-            <X className="h-5 w-5" />
-          </button>
+          <div className="flex-shrink-0">
+            <button
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              className="text-slate-400 hover:text-slate-600 hidden lg:block"
+            >
+              <ChevronRight
+                className={`h-5 w-5 transition-transform duration-300 ${isSidebarCollapsed ? "rotate-180" : ""}`}
+              />
+            </button>
+            <button
+              onClick={() => setIsMobileSidebarOpen(false)}
+              className="text-slate-400 hover:text-slate-600 lg:hidden"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation Links - Make scrollable if needed */}
@@ -280,7 +282,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           {isSidebarCollapsed ? (
             <div className="relative cursor-pointer">
               {userData?.photoURL ? (
-                <div className="h-10 w-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+                <div className="h-11 w-11 rounded-full overflow-hidden border-2 border-white shadow-sm">
                   <img
                     src={userData.photoURL || "/placeholder.svg"}
                     alt="Profile"
@@ -288,11 +290,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
                   />
                 </div>
               ) : (
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
+                <div className="h-11 w-11 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
                   <span className="text-white font-medium text-sm">{getInitials()}</span>
                 </div>
               )}
-              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-white"></span>
+              <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
             </div>
           ) : (
             <>
@@ -367,9 +369,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
         } transition-all duration-300 ease-in-out pt-16 lg:pt-0`}
       >
         {/* Page content */}
-        <main
-          className={`flex-1 overflow-y-auto ${pathname === "/dashboard" ? "p-0" : "py-0 px-4 sm:px-6 lg:px-1"}`}
-        >
+        <main className={`flex-1 overflow-y-auto ${pathname === "/dashboard" ? "p-0" : "py-0 px-4 sm:px-6 lg:px-1"}`}>
           {children}
         </main>
       </div>

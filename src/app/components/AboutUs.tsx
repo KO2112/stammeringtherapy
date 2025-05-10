@@ -133,7 +133,7 @@ const AboutUs = () => {
               </p>
               <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                 <Link 
-                  href="/e-stammering" 
+                  href="/signin" 
                   className="inline-flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg bg-white text-blue-700 hover:bg-blue-50 transition-all duration-300 shadow hover:shadow-lg"
                 >
                   Try the App

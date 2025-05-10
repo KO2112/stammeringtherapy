@@ -1,142 +1,165 @@
 "use client"
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import Image from "next/image"
+import { usePathname } from "next/navigation"
+import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from "lucide-react"
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const pathname = usePathname();
-  const isHomePage = pathname === '/';
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHomePage = pathname === "/"
 
-  // Handle scroll event to detect when page is scrolled
+  // Navigation items with icons
+  const navItems = [
+    { name: "Home", path: "/", icon: <Home className="w-5 h-5" /> },
+    { name: "Services", path: "/services", icon: <Mic className="w-5 h-5" /> },
+    { name: "Articles", path: "/articles", icon: <BookOpen className="w-5 h-5" /> },
+    { name: "About Us", path: "/about", icon: <Users className="w-5 h-5" /> },
+    { name: "Contact Us", path: "/contact", icon: <MessageSquare className="w-5 h-5" /> },
+  ]
+
+  
+
+  // Close mobile menu on route change
   useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+    setIsMenuOpen(false)
+  }, [pathname])
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Determine navbar background style based on page and scroll position
-  const navbarBackground = isHomePage && !isScrolled
-    ? 'bg-transparent' 
-    : 'bg-blue-900 shadow-lg';
+  // Check if a link is active
+  const isActive = (path: string) => {
+    if (path === "/") return pathname === "/"
+    return pathname.startsWith(path)
+  }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${navbarBackground}`}>
-      {/* Invisible H1 for SEO */}
-      <h1 className="sr-only">Stammering Therapy App</h1>
-      
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex justify-between items-center h-24">
-          {/* Logo - Larger size */}
-          <div>
-            <Link href="/">
-              <Image 
-                src="/StammeringTherapy.png" 
-                alt="Stammering Therapy Logo" 
-                width={250} 
-                height={60} 
-                className="h-20 w-auto" 
-                priority
-              />
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? "py-2 bg-white shadow-lg"
+          : isHomePage
+            ? "py-4 bg-blue-900/90 backdrop-blur-sm"
+            : "py-4 bg-blue-900"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <Link href="/" className="block">
+              <div className="relative h-18 w-56">
+                <Image
+                  src="/StammeringTherapy.png"
+                  alt="Stammering Therapy Logo"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
             </Link>
           </div>
-          
+
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-6">
-            <Link href="/" className="text-white hover:text-blue-300 px-3 py-2 relative group">
-              Home
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-300 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link href="/services" className="text-white hover:text-blue-300 px-3 py-2 relative group">
-              Services
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-300 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link href="/articles" className="text-white hover:text-blue-300 px-3 py-2 relative group">
-              Articles
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-300 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link href="/about" className="text-white hover:text-blue-300 px-3 py-2 relative group">
-              About Us
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-300 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link href="/contact" className="text-white hover:text-blue-300 px-3 py-2 relative group">
-              Contact Us
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-300 group-hover:w-full transition-all duration-300"></span>
-            </Link>
-            <Link 
-              href="signin" 
-              className="text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 
-                        px-6 py-3 rounded-lg font-medium transition-all duration-300 
-                        transform hover:scale-105 hover:shadow-xl shadow-md
-                        border border-blue-400 flex items-center space-x-2"
+          <div className="hidden lg:flex items-center space-x-1">
+            <div className={`flex items-center rounded-full px-11 py-1 ${isScrolled ? "bg-blue-50" : "bg-blue-800/70"}`}>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`relative flex items-center px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 ${
+                    isActive(item.path)
+                      ? isScrolled
+                        ? "bg-white text-blue-700 shadow-sm"
+                        : "bg-blue-700 text-white"
+                      : isScrolled
+                        ? "text-blue-700 hover:bg-white/80"
+                        : "text-white hover:bg-blue-700/50"
+                  }`}
+                >
+                  <span className="mr-1.5">{item.icon}</span>
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+
+            {/* App Button */}
+            <Link
+              href="/signin"
+              className={`relative overflow-hidden rounded-full px-6 py-4 font-medium transition-all duration-300 ${
+                isScrolled
+                  ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:shadow-lg"
+                  : "bg-white text-blue-700 hover:bg-blue-50"
+              }`}
             >
-              <span>E-Stammering App</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
+              <span className="flex items-center">
+                <span className="mr-2">Stammering Therapy App</span>
+                <ChevronRight className="w-4 h-4" />
+              </span>
             </Link>
           </div>
-          
+
           {/* Mobile menu button */}
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="text-white hover:text-blue-300 focus:outline-none transition-transform duration-200 hover:scale-110"
+              className={`p-2 rounded-full transition-colors duration-300 ${
+                isScrolled ? "bg-blue-100 text-blue-700" : "bg-white/20 text-white"
+              }`}
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle menu"
             >
-              <svg className="h-8 w-8" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {!isMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                )}
-              </svg>
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
+      {/* Mobile Navigation Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-blue-900 bg-opacity-90 backdrop-blur-sm">
-          <div className="px-2 py-4 space-y-2">
-            <Link href="/" className="block text-white hover:bg-blue-800 hover:text-blue-200 px-4 py-3 rounded-lg transition-all duration-200">
-              Home
-            </Link>
-            <Link href="/services" className="block text-white hover:bg-blue-800 hover:text-blue-200 px-4 py-3 rounded-lg transition-all duration-200">
-              Services
-            </Link>
-            <Link href="/articles" className="block text-white hover:bg-blue-800 hover:text-blue-200 px-4 py-3 rounded-lg transition-all duration-200">
-              Articles
-            </Link>
-            <Link href="/about" className="block text-white hover:bg-blue-800 hover:text-blue-200 px-4 py-3 rounded-lg transition-all duration-200">
-              About Us
-            </Link>
-            <Link href="/contact" className="block text-white hover:bg-blue-800 hover:text-blue-200 px-4 py-3 rounded-lg transition-all duration-200">
-              Contact Us
-            </Link>
-            <Link 
-              href="/e-stammering" 
-              className="block text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 px-4 py-3 mt-3 rounded-lg font-medium transition-all duration-200 shadow-md flex items-center space-x-2"
-            >
-              <span>E-Stammering App</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </Link>
+        <div className="lg:hidden">
+          <div className={`px-4 py-5 space-y-3 ${isScrolled ? "bg-white" : "bg-blue-900"}`}>
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`flex items-center justify-between p-3 rounded-xl ${
+                  isActive(item.path)
+                    ? isScrolled
+                      ? "bg-blue-600 text-white"
+                      : "bg-blue-700 text-white"
+                    : isScrolled
+                      ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
+                      : "bg-blue-800/60 text-white hover:bg-blue-800"
+                }`}
+              >
+                <div className="flex items-center">
+                  <span className={`p-2 rounded-lg mr-3 ${isScrolled ? "bg-blue-100" : "bg-white/20"}`}>
+                    {item.icon}
+                  </span>
+                  <span className="font-medium">{item.name}</span>
+                </div>
+                <ChevronRight className="h-5 w-5 opacity-50" />
+              </Link>
+            ))}
+
+            <div className="pt-2">
+              <Link
+                href="/signin"
+                className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg"
+              >
+                <span className="font-medium">Stammering Therapy App</span>
+                <span className="bg-white/20 p-1.5 rounded-lg">
+                  <ChevronRight className="h-5 w-5" />
+                </span>
+              </Link>
+            </div>
           </div>
         </div>
       )}
-    </nav>
-  );
-};
+    </header>
+  )
+}
 
-export default Navbar;
+export default Navbar
