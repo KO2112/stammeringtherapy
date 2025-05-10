@@ -6,8 +6,6 @@ import {
   ArrowLeft,
   Clock,
   Calendar,
-  Share2,
-  Bookmark,
   Wind,
   TreesIcon as Lungs,
   List,

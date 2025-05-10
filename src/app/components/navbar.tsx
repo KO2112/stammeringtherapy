@@ -8,7 +8,7 @@ import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
 

@@ -6,8 +6,6 @@ import {
   ArrowLeft,
   Clock,
   Calendar,
-  Share2,
-  Bookmark,
   HelpCircle,
   Activity,
   List,
@@ -73,8 +71,8 @@ export default function WhatIsStammeringArticle() {
             </div>
             <p className="text-gray-700 leading-relaxed">
               Disfluency is defined as interruptions in the continuity of speech production (Starkweather, 1987).
-              According to Silverman (2004), disfluent speech can include adding sounds between syllables (like "um" or
-              "uh"), repeating the first syllable or word, making pronunciation errors, or correcting mistakes. If the
+              According to Silverman (2004), disfluent speech can include adding sounds between syllables (like um or
+              uh), repeating the first syllable or word, making pronunciation errors, or correcting mistakes. If the
               listener does not recognize these as signs of a fluency disorder, they may not even notice them.
             </p>
           </div>
@@ -87,8 +85,8 @@ export default function WhatIsStammeringArticle() {
               <h2 className="text-2xl font-bold text-gray-900">Defining Stammering</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              Traditionally, stammering is defined as a "disorder where the rhythm or fluency of speech is disrupted by
-              interruptions and blocks" (Bloodstein and Ratner, 2008). According to the American Psychiatric Association
+              Traditionally, stammering is defined as a disorder where the rhythm or fluency of speech is disrupted by
+              interruptions and blocks (Bloodstein and Ratner, 2008). According to the American Psychiatric Association
               (DSM-IV-TR, 2000), the main characteristic of stammering is a disruption in the fluency and timing of
               speech that is not appropriate for the persons age.
             </p>
@@ -133,7 +131,7 @@ export default function WhatIsStammeringArticle() {
               </li>
               <li className="flex items-start">
                 <span className="text-blue-600 mr-2">•</span>
-                <span>Repeating single-syllable words (like "I-I-I saw him")</span>
+                <span>Repeating single-syllable words (like I-I-I saw him)</span>
               </li>
             </ul>
           </div>

@@ -6,8 +6,6 @@ import {
   ArrowLeft,
   Clock,
   Calendar,
-  Share2,
-  Bookmark,
   BookOpen,
   History,
   MessageSquare,
@@ -83,7 +81,7 @@ export default function DefinitionsOfStutteringArticle() {
             </div>
             <p className="text-gray-700 leading-relaxed">
               One of the earliest definitions came from Johnson and his colleagues in the 1940s and 1950s. They
-              described stuttering as an "unpleasant, anxious, hypertonic avoidance reaction." In other words, they
+              described stuttering as an unpleasant, anxious, hypertonic avoidance reaction. In other words, they
               believed stuttering was what a speaker did when they expected stuttering to occur, felt fearful, became
               tense, and tried to avoid the situation (as cited in Manning, 2010). However, this definition was limited
               because it ignored cases where stuttering occurred without noticeable fear or tension (Silverman, 2004).
@@ -135,7 +133,7 @@ export default function DefinitionsOfStutteringArticle() {
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <p className="text-gray-700 leading-relaxed">
-                Wingate (1964) offered a "standard" definition of stuttering, breaking it into three main parts:
+                Wingate (1964) offered a standard definition of stuttering, breaking it into three main parts:
               </p>
               <ol className="mt-4 space-y-3">
                 <li className="flex items-start">
