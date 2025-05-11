@@ -7,7 +7,7 @@ import LayoutClientWrapper from "@/app/components/LayoutClientWrapper";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Stammering Therapy | Expert Speech Therapy Services",
+  title: "Stammering Therapy | Speech Therapy App",
   description: "Professional stammering therapy services providing expert speech therapy for fluency control and communication skills improvement.",
 };
 

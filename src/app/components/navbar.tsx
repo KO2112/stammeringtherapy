@@ -11,6 +11,7 @@ const Navbar = () => {
   const [isScrolled] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
+  const [isHovered, setIsHovered] = useState(false)
 
   // Navigation items with icons
   const navItems = [
@@ -20,8 +21,6 @@ const Navbar = () => {
     { name: "About Us", path: "/about", icon: <Users className="w-5 h-5" /> },
     { name: "Contact Us", path: "/contact", icon: <MessageSquare className="w-5 h-5" /> },
   ]
-
-  
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -63,7 +62,9 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-1">
-            <div className={`flex items-center rounded-full px-11 py-1 ${isScrolled ? "bg-blue-50" : "bg-blue-800/70"}`}>
+            <div
+              className={`flex items-center rounded-full px-11 py-1 ${isScrolled ? "bg-blue-50" : "bg-blue-800/70"}`}
+            >
               {navItems.map((item) => (
                 <Link
                   key={item.path}
@@ -84,19 +85,47 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* App Button */}
+            {/* Enhanced App Button */}
             <Link
               href="/signin"
-              className={`relative overflow-hidden rounded-full px-6 py-4 font-medium transition-all duration-300 ${
+              className={`relative overflow-hidden rounded-full px-6 py-3 font-medium transition-all duration-300 group ${
                 isScrolled
-                  ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:shadow-lg"
+                  ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:shadow-xl"
                   : "bg-white text-blue-700 hover:bg-blue-50"
               }`}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
             >
-              <span className="flex items-center">
-                <span className="mr-2">Stammering Therapy App</span>
-                <ChevronRight className="w-4 h-4" />
+              {/* Animated background effect */}
+              <span
+                className={`absolute inset-0 w-full h-full ${
+                  isScrolled ? "bg-gradient-to-r from-blue-500 to-blue-700" : "bg-blue-100"
+                } transform scale-x-0 origin-left transition-transform duration-500 group-hover:scale-x-100`}
+              ></span>
+
+              {/* Pulse effect */}
+              <span
+                className={`absolute inset-0 rounded-full ${
+                  isScrolled ? "bg-blue-400" : "bg-blue-200"
+                } opacity-0 group-hover:animate-pulse`}
+              ></span>
+
+              {/* Button content */}
+              <span className="flex items-center justify-between relative z-10">
+                <span className="mr-2 font-semibold">Stammering Therapy App</span>
+                <span
+                  className={`flex items-center justify-center w-6 h-6 rounded-full ${
+                    isScrolled ? "bg-white/30 group-hover:bg-white/50" : "bg-blue-200 group-hover:bg-blue-300"
+                  } transition-all duration-300 transform group-hover:translate-x-1`}
+                >
+                  <ChevronRight className={`w-4 h-4 ${isScrolled ? "text-white" : "text-blue-700"}`} />
+                </span>
               </span>
+
+              {/* Shine effect */}
+              <span
+                className={`absolute top-0 left-0 w-20 h-full bg-white opacity-0 transform rotate-30 translate-x-[-100%] group-hover:translate-x-[200%] group-hover:opacity-20 transition-all duration-1000`}
+              ></span>
             </Link>
           </div>
 
@@ -144,15 +173,23 @@ const Navbar = () => {
               </Link>
             ))}
 
+            {/* Enhanced Mobile App Button */}
             <div className="pt-2">
               <Link
                 href="/signin"
-                className="flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg"
+                className="relative overflow-hidden flex items-center justify-between p-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg group"
               >
-                <span className="font-medium">Stammering Therapy App</span>
-                <span className="bg-white/20 p-1.5 rounded-lg">
+                {/* Animated background */}
+                <span className="absolute inset-0 bg-gradient-to-r from-blue-500 to-blue-700 opacity-0 group-active:opacity-100 transition-opacity duration-300"></span>
+
+                {/* Button content */}
+                <span className="font-medium relative z-10">Stammering Therapy App</span>
+                <span className="relative z-10 bg-white/20 p-2 rounded-lg transform transition-transform duration-300 group-active:scale-95 group-active:bg-white/30">
                   <ChevronRight className="h-5 w-5" />
                 </span>
+
+                {/* Ripple effect */}
+                <span className="absolute inset-0 scale-0 rounded-xl bg-white/10 group-active:animate-ripple"></span>
               </Link>
             </div>
           </div>
