@@ -4,14 +4,15 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from "lucide-react"
+import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from 'lucide-react'
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
-  const [isHovered, setIsHovered] = useState(false)
+  
+  // Removed the unused isHovered state
 
   // Navigation items with icons
   const navItems = [
@@ -93,8 +94,7 @@ const Navbar = () => {
                   ? "bg-gradient-to-r from-blue-600 to-blue-800 text-white hover:shadow-xl"
                   : "bg-white text-blue-700 hover:bg-blue-50"
               }`}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
+              // Removed the onMouseEnter and onMouseLeave handlers
             >
               {/* Animated background effect */}
               <span
