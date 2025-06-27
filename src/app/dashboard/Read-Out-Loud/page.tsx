@@ -67,9 +67,9 @@ export default function ReadOutLoudPage() {
   })
   const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null)
   const [fontSize, setFontSize] = useState(18)
-  const [bookmarked, setBookmarked] = useState(false)
+  
   const [completed, setCompleted] = useState(false)
-  const [showControls, setShowControls] = useState(true)
+  const [showControls] = useState(true)
   const [isPracticing, setIsPracticing] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
   const [highlightVowels, setHighlightVowels] = useState(false)
@@ -288,7 +288,7 @@ export default function ReadOutLoudPage() {
   // Reset reading state when changing stories
   const resetReading = () => {
     setCompleted(false)
-    setBookmarked(false)
+    
     setIsPracticing(false)
     if (contentRef.current) {
       contentRef.current.scrollTop = 0
