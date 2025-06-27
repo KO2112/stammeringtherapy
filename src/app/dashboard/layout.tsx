@@ -9,21 +9,7 @@ import { signOut } from "firebase/auth"
 import { auth, db } from "../../../firebase"
 import { useRouter } from "next/navigation"
 import { doc, getDoc } from "firebase/firestore"
-import {
-  Home,
-  Wind,
-  BookOpen,
-  Calendar,
-  PenLine,
-  User,
-  LogOut,
-  Menu,
-  X,
-  ChevronRight,
-  HelpCircle,
-  Bell,
-  Speech,
-} from "lucide-react"
+import { Home, Wind, BookOpen, Calendar, PenLine, User, LogOut, Menu, X, ChevronRight, HelpCircle, Bell, Speech, ShieldIcon as ShieldUser } from 'lucide-react'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -35,6 +21,7 @@ interface UserData {
   email?: string
   photoURL?: string
   location?: string
+  role?: string
 }
 
 export default function DashboardLayout({ children }: LayoutProps) {
@@ -160,6 +147,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
       href: "/dashboard/Read-Out-Loud",
       icon: <Speech className="h-5 w-5" />,
     },
+    
   ]
 
   const secondaryNavItems = [
@@ -173,6 +161,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       href: "/dashboard/support",
       icon: <HelpCircle className="h-5 w-5" />,
     },
+    ...(userData?.role === "admin" ? [{
+      name: "Admin",
+      href: "/dashboard/Admin",
+      icon: <ShieldUser className="h-5 w-5" />,
+    }] : []),
   ]
 
   if (loading) {

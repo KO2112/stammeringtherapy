@@ -10,11 +10,13 @@ import {
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth"
-import { auth } from "../../../firebase"
+import { collection, query, where, getDocs } from "firebase/firestore"
+import { auth, db } from "../../../firebase"
 import { useRouter } from "next/navigation"
-import { AtSign, Lock, AlertCircle, CheckCircle, Loader2, ArrowRight } from "lucide-react"
+import { User, Lock, AlertCircle, CheckCircle, Loader2, ArrowRight, AtSign } from "lucide-react"
 
 export default function SignIn() {
+  const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -24,13 +26,42 @@ export default function SignIn() {
   const [successMessage, setSuccessMessage] = useState("")
   const router = useRouter()
 
-  const handleEmailSignIn = async (e: React.FormEvent) => {
+  // Function to get email from username
+  const getEmailFromUsername = async (username: string): Promise<string | null> => {
+    try {
+      const usersRef = collection(db, "users") // Adjust collection name as needed
+      const q = query(usersRef, where("username", "==", username))
+      const querySnapshot = await getDocs(q)
+
+      if (querySnapshot.empty) {
+        return null
+      }
+
+      const userDoc = querySnapshot.docs[0]
+      return userDoc.data().email || null
+    } catch (error) {
+      console.error("Error fetching user email:", error)
+      return null
+    }
+  }
+
+  const handleUsernameSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError("")
 
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      // First, get the email associated with the username
+      const userEmail = await getEmailFromUsername(username)
+
+      if (!userEmail) {
+        setError("Username not found. Please check your username and try again.")
+        setLoading(false)
+        return
+      }
+
+      // Use the retrieved email to sign in with Firebase Auth
+      await signInWithEmailAndPassword(auth, userEmail, password)
       router.push("/dashboard") // Redirect after sign-in
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
@@ -98,24 +129,24 @@ export default function SignIn() {
   const renderForm = () => {
     if (formType === "signin") {
       return (
-        <form onSubmit={handleEmailSignIn} className="mt-6 space-y-5">
+        <form onSubmit={handleUsernameSignIn} className="mt-6 space-y-5">
           <div className="space-y-1">
-            <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-              Email address
+            <label htmlFor="username" className="block text-sm font-medium text-slate-700">
+              Username
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <AtSign className="h-5 w-5 text-slate-400" />
+                <User className="h-5 w-5 text-slate-400" />
               </div>
               <input
-                id="email"
-                name="email"
-                type="email"
+                id="username"
+                name="username"
+                type="text"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="pl-10 block w-full rounded-lg border border-slate-200 bg-slate-50 py-3 px-4 text-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                placeholder="you@example.com"
+                placeholder="username"
               />
             </div>
           </div>
@@ -403,8 +434,9 @@ export default function SignIn() {
             <div className="pt-12">
               <div className="p-4 bg-white/10 rounded-lg">
                 <p className="italic text-teal-50">
-                  This app has transformed my confidence in speaking. I have made more progress in 3 months than in years
-                  of traditional therapy.
+                  {
+                    "This app has transformed my confidence in speaking. I have made more progress in 3 months than in years of traditional therapy."
+                  }
                 </p>
                 <div className="mt-3 flex items-center">
                   <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-medium">
@@ -506,7 +538,7 @@ export default function SignIn() {
             <div className="mt-8 text-center text-slate-600">
               {formType === "signin" && (
                 <>
-                  Do not have an account?{" "}
+                  {"Do not have an account? "}
                   <button
                     type="button"
                     onClick={() => {
@@ -522,7 +554,7 @@ export default function SignIn() {
               )}
               {formType === "signup" && (
                 <>
-                  Already have an account?{" "}
+                  {"Already have an account? "}
                   <button
                     type="button"
                     onClick={() => {
