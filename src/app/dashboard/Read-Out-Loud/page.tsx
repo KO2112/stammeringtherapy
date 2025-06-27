@@ -6,13 +6,12 @@ import {
   ChevronLeft,
   ChevronRight,
   BookOpen,
-  Type,
+  
   Minus,
   Plus,
   Clock,
   CheckCircle,
-  Bookmark,
-  BookmarkCheck,
+  
   Share2,
   Volume2,
   Play,
@@ -48,7 +47,7 @@ interface Story {
   completed?: boolean
   bookmarked?: boolean
   image?: string
-  createdAt?: any
+  createdAt?: unknown
 }
 
 interface AdminCheck {
@@ -330,15 +329,9 @@ export default function ReadOutLoudPage() {
     }
   }
 
-  // Toggle bookmarked state
-  const toggleBookmark = () => {
-    setBookmarked(!bookmarked)
-  }
+  
 
-  // Toggle controls visibility
-  const toggleControls = () => {
-    setShowControls(!showControls)
-  }
+ 
 
   
 
