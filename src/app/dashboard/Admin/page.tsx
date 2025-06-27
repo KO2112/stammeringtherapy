@@ -4,7 +4,7 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { auth, db } from "../../../../firebase"
 import { onAuthStateChanged } from "firebase/auth"
-import { collection, getDocs, doc, updateDoc, query, orderBy, getDoc } from "firebase/firestore"
+import { collection, getDocs, doc, updateDoc, query, orderBy, getDoc, type Timestamp } from "firebase/firestore"
 import { Search, Plus, Shield, ShieldCheck, Trash2, Users, UserPlus, AlertCircle, CheckCircle, X } from "lucide-react"
 import { deleteUserComplete } from "../../../../lib/actions/delete-user-action"
 
@@ -15,7 +15,7 @@ interface User {
   firstName?: string
   lastName?: string
   role?: string
-  createdAt?: any
+  createdAt?: Timestamp | Date
 }
 
 interface AlertState {
@@ -194,7 +194,6 @@ export default function AdminPage() {
 
       console.log("Response status:", response.status)
       console.log("Response headers:", response.headers)
-
       const contentType = response.headers.get("content-type")
       if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text()
@@ -213,9 +212,10 @@ export default function AdminPage() {
       } else {
         showAlert("error", result.message)
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error adding user:", error)
-      showAlert("error", `Failed to add user: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      showAlert("error", `Failed to add user: ${errorMessage}`)
     } finally {
       setActionLoading(null)
     }
@@ -245,19 +245,18 @@ export default function AdminPage() {
     }
 
     setActionLoading(userId)
-
     try {
       const result = await deleteUserComplete(userId)
-
       if (result.success) {
         showAlert("success", result.message)
         fetchUsers()
       } else {
         showAlert("error", result.message)
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error deleting user:", error)
-      showAlert("error", `Failed to delete user: ${error.message}`)
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
+      showAlert("error", `Failed to delete user: ${errorMessage}`)
     } finally {
       setActionLoading(null)
     }
@@ -500,7 +499,6 @@ export default function AdminPage() {
                 <Users className="h-6 w-6 text-teal-600" />
                 <h2 className="text-xl font-semibold text-slate-900">User Management</h2>
               </div>
-
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
@@ -558,7 +556,6 @@ export default function AdminPage() {
                         </div>
                       </div>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       {user.username ? (
                         <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">@{user.username}</span>
@@ -566,9 +563,7 @@ export default function AdminPage() {
                         <span className="text-slate-400 italic">No username</span>
                       )}
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.email}</td>
-
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -588,7 +583,6 @@ export default function AdminPage() {
                         )}
                       </span>
                     </td>
-
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <button

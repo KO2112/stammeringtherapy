@@ -3,11 +3,18 @@ import { adminAuth } from "../../../../lib/firebase-admin"
 import { db } from "../../../../firebase" // Use client SDK for Firestore
 import { doc, setDoc } from "firebase/firestore"
 
+interface CreateUserRequest {
+  email: string
+  password: string
+  username: string
+  firstName?: string
+  lastName?: string
+}
+
 export async function POST(request: NextRequest) {
   try {
     console.log("API route called - creating user")
-
-    const body = await request.json()
+    const body: CreateUserRequest = await request.json()
     console.log("Request body:", body)
 
     const { email, password, username, firstName, lastName } = body
@@ -51,24 +58,27 @@ export async function POST(request: NextRequest) {
       message: `User ${email} created successfully!`,
       userId: userRecord.uid,
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error("API Error:", error)
 
     // Handle specific Firebase errors
-    if (error.code === "auth/email-already-exists") {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "A user with this email already exists",
-        },
-        { status: 400 },
-      )
+    if (error && typeof error === "object" && "code" in error) {
+      if (error.code === "auth/email-already-exists") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "A user with this email already exists",
+          },
+          { status: 400 },
+        )
+      }
     }
 
+    const errorMessage = error instanceof Error ? error.message : "Failed to create user"
     return NextResponse.json(
       {
         success: false,
-        message: error.message || "Failed to create user",
+        message: errorMessage,
       },
       { status: 500 },
     )
