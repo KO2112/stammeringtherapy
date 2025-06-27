@@ -329,9 +329,9 @@ export default function AdminPage() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Shield className="h-8 w-8 text-teal-600" />
-            <h1 className="text-3xl font-bold text-slate-900">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-slate-900">Yönetici paneli</h1>
           </div>
-          <p className="text-slate-600">Manage users, roles, and system settings</p>
+          <p className="text-slate-600">Kullanıcıları, rolleri ve sistem ayarlarını yönetin</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -341,7 +341,7 @@ export default function AdminPage() {
                 <Users className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Total Users</p>
+                <p className="text-sm font-medium text-slate-600">Kullanıcı sayısı</p>
                 <p className="text-2xl font-bold text-slate-900">{users.length}</p>
               </div>
             </div>
@@ -353,7 +353,7 @@ export default function AdminPage() {
                 <ShieldCheck className="h-6 w-6 text-teal-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Admin Users</p>
+                <p className="text-sm font-medium text-slate-600">Admin sayısı</p>
                 <p className="text-2xl font-bold text-slate-900">
                   {users.filter((user) => user.role === "admin").length}
                 </p>
@@ -367,7 +367,7 @@ export default function AdminPage() {
                 <UserPlus className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Regular Users</p>
+                <p className="text-sm font-medium text-slate-600">Kullanıcı Sayısı</p>
                 <p className="text-2xl font-bold text-slate-900">
                   {users.filter((user) => user.role !== "admin").length}
                 </p>
@@ -381,14 +381,14 @@ export default function AdminPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <UserPlus className="h-6 w-6 text-teal-600" />
-                <h2 className="text-xl font-semibold text-slate-900">Add New User</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Kullanıcı Ekle</h2>
               </div>
               <button
                 onClick={() => setShowAddUserForm(!showAddUserForm)}
                 className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
               >
                 <Plus className="h-4 w-4" />
-                Add User
+                Kullanıcı Ekle
               </button>
             </div>
           </div>
@@ -407,11 +407,11 @@ export default function AdminPage() {
                       setNewUser({ ...newUser, username })
                     }}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                    placeholder="kemalorhan (no spaces)"
+                    placeholder="kemalorhan (Boşluk Olmadan)"
                     minLength={3}
                   />
                   <p className="text-xs text-slate-500 mt-1">
-                    Username must be at least 3 characters, no spaces allowed
+                    Username must be at least 6 characters, no spaces allowed
                   </p>
                 </div>
 
@@ -435,7 +435,7 @@ export default function AdminPage() {
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                    placeholder="Minimum 6 characters"
+                    placeholder="Minimum 3 characters"
                     minLength={6}
                   />
                 </div>
@@ -497,13 +497,13 @@ export default function AdminPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
                 <Users className="h-6 w-6 text-teal-600" />
-                <h2 className="text-xl font-semibold text-slate-900">User Management</h2>
+                <h2 className="text-xl font-semibold text-slate-900">Kullanıcı Yönetimi</h2>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
-                  placeholder="Search users..."
+                  placeholder="Kullanıcı ara..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent w-full sm:w-64"
@@ -517,19 +517,19 @@ export default function AdminPage() {
               <thead className="bg-slate-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    User
+                    Kullanıcı
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Username
+                    Kullanıcı Adı
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Role
+                    Rol
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Actions
+                    Eylemler
                   </th>
                 </tr>
               </thead>

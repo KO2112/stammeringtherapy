@@ -118,17 +118,17 @@ export default function DashboardLayout({ children }: LayoutProps) {
 
   const navigationItems = [
     {
-      name: "Home",
+      name: "Anasayfa",
       href: "/dashboard",
       icon: <Home className="h-5 w-5" />,
     },
     {
-      name: "Mouth & Breathing",
+      name: "Nefes & Ağız Çalışmaları",
       href: "/dashboard/mouth-and-breathing-exercises",
       icon: <Wind className="h-5 w-5" />,
     },
     {
-      name: "Stories",
+      name: "Hikayeler",
       href: "/dashboard/stories",
       icon: <BookOpen className="h-5 w-5" />,
     },
@@ -138,12 +138,12 @@ export default function DashboardLayout({ children }: LayoutProps) {
       icon: <Calendar className="h-5 w-5" />,
     },
     {
-      name: "Diary",
+      name: "Günlük",
       href: "/dashboard/diary",
       icon: <PenLine className="h-5 w-5" />,
     },
     {
-      name: "Read Out Loud",
+      name: "Kendin Oku",
       href: "/dashboard/Read-Out-Loud",
       icon: <Speech className="h-5 w-5" />,
     },
@@ -152,7 +152,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
 
   const secondaryNavItems = [
     {
-      name: "Profile",
+      name: "Profil",
       href: "/dashboard/profile",
       icon: <User className="h-5 w-5" />,
     },
@@ -322,7 +322,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
                 className="w-full flex items-center justify-center px-4 py-2.5 border border-transparent rounded-xl text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-colors"
               >
                 <LogOut className="h-4 w-4 mr-2" />
-                Sign out
+                Çıkış Yap
               </button>
             </>
           )}

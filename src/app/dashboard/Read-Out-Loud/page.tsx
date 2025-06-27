@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useRef } from "react"
+import type React from "react"
+import { useState, useRef, useEffect } from "react"
 import {
   ChevronLeft,
   ChevronRight,
@@ -16,20 +17,55 @@ import {
   Volume2,
   Play,
   ArrowRight,
+  X,
+  Save,
+  Edit,
+  Trash2,
+  Loader2,
 } from "lucide-react"
+import { db } from "../../../../firebase"
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  orderBy,
+  query,
+  serverTimestamp,
+  getDoc,
+} from "firebase/firestore"
+import { onAuthStateChanged, type User } from "firebase/auth"
+import { auth } from "../../../../firebase"
 
 interface Story {
   id: string
   title: string
   content: string
-  difficulty: "beginner" | "intermediate" | "advanced"
+  
   estimatedMinutes: number
   completed?: boolean
   bookmarked?: boolean
   image?: string
+  createdAt?: any
+}
+
+interface AdminCheck {
+  isAdmin: boolean
+  loading: boolean
+  error: string | null
 }
 
 export default function ReadOutLoudPage() {
+  const [user, setUser] = useState<User | null>(null)
+  const [authLoading, setAuthLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
+  const [adminCheck, setAdminCheck] = useState<AdminCheck>({
+    isAdmin: false,
+    loading: true,
+    error: null,
+  })
   const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null)
   const [fontSize, setFontSize] = useState(18)
   const [bookmarked, setBookmarked] = useState(false)
@@ -37,255 +73,224 @@ export default function ReadOutLoudPage() {
   const [showControls, setShowControls] = useState(true)
   const [isPracticing, setIsPracticing] = useState(false)
   const contentRef = useRef<HTMLDivElement>(null)
-  const [highlightVowels, setHighlightVowels] = useState(true)
+  const [highlightVowels, setHighlightVowels] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [editingStory, setEditingStory] = useState<Story | null>(null)
+  const [newStoryTitle, setNewStoryTitle] = useState("")
+  const [newStoryContent, setNewStoryContent] = useState("")
+  const [newStoryMinutes, setNewStoryMinutes] = useState<number>(3)
+  
+  const [stories, setStories] = useState<Story[]>([])
+  const [storiesLoading, setStoriesLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
 
+  // Listen to authentication state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        setUser(user)
+        setAuthLoading(false)
+        setAuthError(null)
+      },
+      (error) => {
+        console.error("Auth error:", error)
+        setAuthError(error.message)
+        setAuthLoading(false)
+      },
+    )
 
-  const toggleVowelHighlighting = () => {
-  setHighlightVowels(!highlightVowels)
-     }
-  // Function to highlight the first vowel in each word
-  const highlightFirstVowel = (text: string) => {
-    
-    // Split the text into words
-    return text.split(/\b/).map((word, index) => {
-      if (word.trim() === "") return word
+    return () => unsubscribe()
+  }, [])
 
-      // Find the first vowel in the word
-      const vowelMatch = word.match(/[aeiouAEIOU]/)
-      if (!vowelMatch) return word
+  // Check if user is admin
+  useEffect(() => {
+    const checkAdminRole = async () => {
+      if (authLoading) return
 
-      const vowelIndex = vowelMatch.index as number
-      const beforeVowel = word.substring(0, vowelIndex)
-      const vowel = word[vowelIndex]
-      const afterVowel = word.substring(vowelIndex + 1)
+      if (!user) {
+        setAdminCheck({
+          isAdmin: false,
+          loading: false,
+          error: "User not authenticated",
+        })
+        return
+      }
 
-      return (
-        <span key={index}>
-          {beforeVowel}
-          <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
-            {vowel}
-          </span>
-          {afterVowel}
-        </span>
-      )
-    })
+      try {
+        const currentUserDoc = await getDoc(doc(db, "users", user.uid))
+
+        if (!currentUserDoc.exists()) {
+          setAdminCheck({
+            isAdmin: false,
+            loading: false,
+            error: "User profile not found",
+          })
+          return
+        }
+
+        const userData = currentUserDoc.data()
+        setAdminCheck({
+          isAdmin: userData.role === "admin",
+          loading: false,
+          error: null,
+        })
+      } catch (error) {
+        console.error("Error checking admin role:", error)
+        setAdminCheck({
+          isAdmin: false,
+          loading: false,
+          error: "Failed to check user role",
+        })
+      }
+    }
+
+    checkAdminRole()
+  }, [user, authLoading])
+
+  // Load stories from Firebase on component mount
+  useEffect(() => {
+    loadStories()
+  }, [])
+
+  const loadStories = async () => {
+    try {
+      setStoriesLoading(true)
+      const storiesRef = collection(db, "stories")
+      const q = query(storiesRef, orderBy("createdAt", "desc"))
+      const querySnapshot = await getDocs(q)
+      const storiesData: Story[] = []
+
+      querySnapshot.forEach((doc) => {
+        storiesData.push({
+          id: doc.id,
+          ...doc.data(),
+        } as Story)
+      })
+
+      setStories(storiesData)
+    } catch (error) {
+      console.error("Error loading stories:", error)
+    } finally {
+      setStoriesLoading(false)
+    }
   }
 
-  // Sample stories - in a real app, these would come from a database
-  const stories: Story[] = [
-    {
-      id: "story-1",
-      title: "The Unexpected Journey",
-      content: `Jamie never meant to leave the city that weekend.
-
-He liked routines. He liked silence.
-He did not like surprises, crowds, or having to talk to new people. Especially not when he stammered. Especially not when their faces twisted with impatience or confusion.
-
-But that Friday, everything snapped.
-His boss had yelled at him for something stupid.
-He missed the bus.
-His dinner burned.
-And then his upstairs neighbor started playing drums.
-
-Loud, messy drums.
-
-Jamie threw a few clothes into a backpack, got in his car, and started driving. No map. No destination. Just away.
-
-By sunset, he was on a long highway lined with pine trees. The stress began to fade. The stammer did not matter when there was no one to talk to.
-
-He found a little roadside motel near a town he would never heard of. It had a faded sign and a cat sitting on the front desk.
-
-"Room for one?" he asked, quietly.
-
-The woman at the desk smiled. "Of course, hon. You here for the festival?"
-
-Jamie blinked. "F-festival?"
-
-She laughed. "Tomorrow. Big music festival downtown. Half the town shows up."
-
-He thought about checking out the next morning. Just keep driving. But instead, he stayed. Partly because the room had warm lighting and soft sheets. Mostly because, for once, no one seemed to care how he spoke.
-
-The next day, the town was alive. People filled the streets — laughing, eating, dancing. Jamie wandered through the crowd like a ghost. He did not know how to jump in. Did not know how to say hello.
-
-Then he saw the record stall.
-
-Rows of old vinyl. Soul. Jazz. Indie rock. His favorite things in one place. He picked up a dusty Miles Davis album and smiled to himself.
-
-"Great choice," said a voice beside him.
-
-Jamie turned. A guy around his age stood there, hands in his hoodie pockets. Big curly hair, wide grin. "You into this stuff?"
-
-Jamies throat locked up.
-
-He nodded, unsure what to say.
-
-The guy waited, patient. Not judging. Just... waiting.
-
-"I… I l-like the horns," Jamie managed to say. "Th-the way they cut th-through everything."
-
-The guy lit up. "Yeah! Like they are punching through the noise, right?"
-
-Jamie laughed. Just a little. It surprised even him.
-
-They talked for twenty minutes. About music. About road trips. About nothing important and everything at once.
-
-He stammered. He paused. He repeated himself.
-
-But none of it mattered.
-
-That night, Jamie sat on the hood of his car, watching the stars. The town buzzed behind him.
-
-He had not fixed anything in his life.
-He would still struggle to speak.
-But today, he had not been quiet.
-
-And that felt like a beginning.`,
-      difficulty: "intermediate",
-      estimatedMinutes: 5,
-      image: "/Stammering-Therapy-logo.png",
-    },
-    {
-      id: "story-2",
-      title: "The Interview",
-      content: `Sarah checked her reflection one last time. 
-
-Professional suit. Neat hair. Confident smile.
-But inside, her heart was racing.
-
-This job interview meant everything. It was perfect for her skills. The company was amazing. The salary would change her life.
-
-There was just one problem.
-
-Her stammer.
-
-It always got worse when she was nervous. And right now, she was terrified.
-
-"You have prepared for this," she whispered to herself. "You know what to say."
-
-The receptionist called her name. Sarah took a deep breath and walked into the interview room.
-
-Three people sat at a long table. They smiled politely as she entered.
-
-"Good morning, Sarah," said the woman in the middle. "I am Elena, the department head. These are my colleagues, Marcus and Priya."
-
-"G-good morning," Sarah replied, shaking their hands. "Th-thank you for having me today."
-
-She saw the flicker in Elenas eyes. That moment of recognition. Of noticing.
-
-Sarah sat down, hands clasped tightly in her lap.
-
-"So," Elena began, "tell us about your experience in digital marketing."
-
-This was the question Sarah had practiced most. She knew exactly what to say. But as she opened her mouth, the words jammed.
-
-"I... I have w-worked in d-d-digital marketing for s-six years," she began. The stammer was worse than usual. Each blocked word felt like an eternity.
-
-Marcus glanced at his watch.
-
-Sarah felt her face grow hot. She tried to speed up, which only made the stammer worse.
-
-Then Priya leaned forward. "Take your time," she said gently. "We are interested in your thoughts, not how quickly you can share them."
-
-Something in her voice was so genuine that Sarah felt her shoulders relax slightly.
-
-She took another breath. Slowed down. Used the techniques her speech therapist had taught her.
-
-"For the p-past three years, I have led campaigns that increased client engagement by forty percent," she continued. The words came a little easier now.
-
-As the interview progressed, Sarah found her rhythm. Yes, she stammered. Yes, there were awkward pauses. But she also shared smart ideas. Asked thoughtful questions. Demonstrated her expertise.
-
-When it was over, Elena walked her to the door.
-
-"Thank you for coming in today," she said. Then, more quietly: "My brother has a stammer too. He is one of the smartest people I know."
-
-Sarah smiled. "It is just one p-part of who I am."
-
-A week later, Sarah got the call.
-
-She got the job.
-
-Not because they pitied her. Not despite her stammer.
-But because she was the best person for the position.
-
-As she hung up the phone, Sarah realized something important: her voice might shake, but her value never did.`,
-      difficulty: "intermediate",
-      estimatedMinutes: 4,
-      image: "/Stammering-Therapy-logo.png",
-    },
-    {
-      id: "story-3",
-      title: "The Presentation",
-      content: `Michael stood backstage, clutching his notecards.
-
-In exactly seven minutes, he would walk out and give a presentation to over two hundred people. His colleagues. His boss. Industry experts.
-
-His mouth was dry. His palms were sweaty.
-
-"You do not have to do this," whispered a voice in his head. "Tell them you are sick. Walk away."
-
-It would be so easy. No one would blame him. After all, public speaking was hard for anyone. For someone with a stammer, it seemed impossible.
-
-But Michael had worked too hard to back out now.
-
-For six weeks, he had practiced this presentation. In front of his mirror. With his speech therapist. For his patient girlfriend who listened to every version.
-
-He knew the material inside out. He believed in the research his team had done. He deserved to be the one presenting it.
-
-"Two minutes," said the event coordinator, giving him a thumbs up.
-
-Michael nodded. He closed his eyes and did the breathing exercise his therapist had taught him. In through the nose for four counts. Hold for seven. Out through the mouth for eight.
-
-Then he heard his name announced. Applause rippled through the room.
-
-It was time.
-
-Michael walked onto the stage. The lights were bright. The audience was a blur.
-
-"G-good morning," he began. His voice shook slightly. "I am M-Michael Chen, and I am here to talk about our f-findings on sustainable urban planning."
-
-He saw a few people shift in their seats. Someone whispered to their neighbor.
-
-For a moment, panic threatened to overwhelm him. But then he remembered what his therapist always said: "Focus on the message, not the messenger."
-
-He took another breath and continued.
-
-As he moved through his presentation, something unexpected happened. The audience began to lean forward. They were listening—really listening—to what he was saying, not how he was saying it.
-
-When he showed the data visualizations his team had created, there were murmurs of appreciation. When he explained their innovative approach, people nodded with interest.
-
-Yes, he stammered. Yes, some words took longer to come out than others. But his passion for the subject shone through every sentence.
-
-By the end, Michael felt a strange sense of calm. He had done it. Not perfectly, but authentically.
-
-"I will now t-take any questions you might have," he said.
-
-Hands shot up across the room.
-
-Later, as people came up to discuss his presentation, no one mentioned his stammer. Instead, they wanted to talk about his ideas, his research, his vision.
-
-As he packed up his materials, his boss approached.
-
-"That was excellent, Michael," she said. "The client was impressed. They want you to lead the follow-up meeting next month."
-
-Michael smiled. "I would be h-happy to."
-
-Walking out of the conference center, he realized something important: his stammer had not disappeared today. It never would. But it also had not stopped him from being heard.
-
-And that was its own kind of victory.`,
-      difficulty: "advanced",
-      estimatedMinutes: 5,
-      image: "/Stammering-Therapy-logo.png",
-    },
-  ]
+  const toggleVowelHighlighting = () => {
+    setHighlightVowels(!highlightVowels)
+  }
 
   const selectedStory = selectedStoryId ? stories.find((story) => story.id === selectedStoryId) : null
+
+  const handleAddStory = async () => {
+    if (!newStoryTitle.trim() || !newStoryContent.trim()) return
+
+    setSaving(true)
+    try {
+      const storyData = {
+        title: newStoryTitle.trim(),
+        content: newStoryContent.trim(),
+        
+        estimatedMinutes: newStoryMinutes,
+        createdAt: serverTimestamp(),
+      }
+
+      const docRef = await addDoc(collection(db, "stories"), storyData)
+
+      // Add to local state immediately
+      const newStory: Story = {
+        id: docRef.id,
+        ...storyData,
+        createdAt: new Date(),
+      }
+
+      setStories([newStory, ...stories])
+      setNewStoryTitle("")
+      setNewStoryContent("")
+      setNewStoryMinutes(3)
+      
+      setShowAddModal(false)
+    } catch (error) {
+      console.error("Error adding story:", error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleEditStory = (story: Story) => {
+    setEditingStory(story)
+    setNewStoryTitle(story.title)
+    setNewStoryContent(story.content)
+    setNewStoryMinutes(story.estimatedMinutes)
+    
+    setShowAddModal(true)
+  }
+
+  const handleUpdateStory = async () => {
+    if (!editingStory || !newStoryTitle.trim() || !newStoryContent.trim()) return
+
+    setSaving(true)
+    try {
+      const storyRef = doc(db, "stories", editingStory.id)
+      const updateData = {
+        title: newStoryTitle.trim(),
+        content: newStoryContent.trim(),
+       
+        estimatedMinutes: newStoryMinutes,
+      }
+
+      await updateDoc(storyRef, updateData)
+
+      // Update local state
+      setStories(stories.map((story) => (story.id === editingStory.id ? { ...story, ...updateData } : story)))
+
+      setEditingStory(null)
+      setNewStoryTitle("")
+      setNewStoryContent("")
+      setNewStoryMinutes(3)
+      
+      setShowAddModal(false)
+    } catch (error) {
+      console.error("Error updating story:", error)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleDeleteStory = async (storyId: string) => {
+    if (!confirm("Are you sure you want to delete this story?")) return
+
+    try {
+      await deleteDoc(doc(db, "stories", storyId))
+      // Update local state
+      setStories(stories.filter((story) => story.id !== storyId))
+      if (selectedStoryId === storyId) {
+        setSelectedStoryId(null)
+      }
+    } catch (error) {
+      console.error("Error deleting story:", error)
+    }
+  }
+
+  const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      const textarea = e.currentTarget
+      const start = textarea.selectionStart
+      const end = textarea.selectionEnd
+      const newContent = newStoryContent.substring(0, start) + "\n\n" + newStoryContent.substring(end)
+      setNewStoryContent(newContent)
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 2
+      }, 0)
+    }
+  }
 
   // Reset reading state when changing stories
   const resetReading = () => {
     setCompleted(false)
     setBookmarked(false)
     setIsPracticing(false)
-    // Scroll to top of content
     if (contentRef.current) {
       contentRef.current.scrollTop = 0
     }
@@ -300,7 +305,6 @@ And that was its own kind of victory.`,
   // Start practice session
   const startPractice = () => {
     setIsPracticing(true)
-    // Scroll to top of content
     if (contentRef.current) {
       contentRef.current.scrollTop = 0
     }
@@ -336,61 +340,73 @@ And that was its own kind of victory.`,
     setShowControls(!showControls)
   }
 
-  // Get difficulty badge color
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "beginner":
-        return "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300"
-      case "intermediate":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
-      case "advanced":
-        return "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300"
-      default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300"
-    }
-  }
+  
 
   // Function to render story content with highlighted first vowels
   const renderStoryContent = (content: string) => {
-  return content.split("\n\n").map((paragraph, index) => (
-    <p key={index} className="mb-6 leading-relaxed">
-      {highlightVowels 
-        ? paragraph.split(" ").map((word, wordIndex) => {
-            // Skip empty words
-            if (!word) return " "
+    return content.split("\n\n").map((paragraph, index) => (
+      <p key={index} className="mb-6 leading-relaxed">
+        {highlightVowels
+          ? paragraph.split(" ").map((word, wordIndex) => {
+              if (!word) return " "
 
-            // Find the first vowel in the word
-            const vowelMatch = word.match(/[aeiouAEIOU]/)
+              const vowelMatch = word.match(/[aeıioöuüAEIİOÖUÜ]/)
+              if (!vowelMatch) {
+                return <span key={wordIndex}>{word} </span>
+              }
 
-            if (!vowelMatch) {
-              return <span key={wordIndex}>{word} </span>
-            }
+              const vowelIndex = vowelMatch.index as number
+              const beforeVowel = word.substring(0, vowelIndex)
+              const vowel = word[vowelIndex]
+              const afterVowel = word.substring(vowelIndex + 1)
 
-            const vowelIndex = vowelMatch.index as number
-            const beforeVowel = word.substring(0, vowelIndex)
-            const vowel = word[vowelIndex]
-            const afterVowel = word.substring(vowelIndex + 1)
-
-            return (
-              <span key={wordIndex}>
-                {beforeVowel}
-                <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
-                  {vowel}
+              return (
+                <span key={wordIndex}>
+                  {beforeVowel}
+                  <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
+                    {vowel}
+                  </span>
+                  {afterVowel}{" "}
                 </span>
-                {afterVowel}{" "}
-              </span>
-            )
-          })
-        : paragraph.split(" ").map((word, wordIndex) => (
-            <span key={wordIndex}>{word} </span>
-          ))
-      }
-    </p>
-  ))
-}
+              )
+            })
+          : paragraph.split(" ").map((word, wordIndex) => <span key={wordIndex}>{word} </span>)}
+      </p>
+    ))
+  }
+
+  if (authLoading || adminCheck.loading || storiesLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-12 w-12 animate-spin text-teal-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-400">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (authError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 dark:text-red-400">Authentication error: {authError}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 dark:text-gray-400">Please log in to access this page.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    
     <div className="min-h-screen bg-gradient-to-br from-teal-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-10 backdrop-blur-md bg-white/70 dark:bg-gray-900/70 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300 w-full">
@@ -400,19 +416,11 @@ And that was its own kind of victory.`,
               <BookOpen className="h-5 w-5 text-teal-600 dark:text-teal-300" />
             </div>
             <h1 className="text-xl font-bold text-gray-800 dark:text-white transition-colors duration-300">
-              Read Out Loud
+              Sesli Okuma
             </h1>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={toggleControls}
-              className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
-              aria-label="Toggle controls"
-            >
-              <Type className="w-5 h-5 text-gray-700 dark:text-gray-300" />
-            </button>
-          </div>
+          
         </div>
       </header>
 
@@ -420,47 +428,105 @@ And that was its own kind of victory.`,
         {!selectedStory ? (
           /* Story Selection Grid */
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Select a Story to Read</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {stories.map((story) => (
-                <div
-                  key={story.id}
-                  onClick={() => handleSelectStory(story.id)}
-                  className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:-translate-y-1"
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Hikaye seçin</h2>
+              {adminCheck.isAdmin && (
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg transition-colors"
                 >
-                  <div className="h-40 bg-gray-200 dark:bg-gray-700 relative">
-                    <img
-                      src={story.image || "/placeholder.svg?height=200&width=300&text=Story"}
-                      alt={story.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                      <div className="flex justify-between items-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(story.difficulty)}`}
-                        >
-                          {story.difficulty.charAt(0).toUpperCase() + story.difficulty.slice(1)}
-                        </span>
-                        <span className="flex items-center text-white text-sm">
-                          <Clock className="h-4 w-4 mr-1" />
-                          {story.estimatedMinutes} min
-                        </span>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Hikaye Ekle
+                </button>
+              )}
+            </div>
+
+            {adminCheck.error && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <p className="text-yellow-800 dark:text-yellow-200">
+                  <strong>Note:</strong> {adminCheck.error}
+                </p>
+              </div>
+            )}
+
+            {stories.length === 0 ? (
+              <div className="text-center py-12">
+                <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-gray-600 dark:text-gray-400 mb-2">No stories yet</h3>
+                <p className="text-gray-500 dark:text-gray-500">
+                  {adminCheck.isAdmin
+                    ? "Click 'Add Story' to create your first story!"
+                    : "Stories will appear here once they're added."}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {stories.map((story) => (
+                  <div
+                    key={story.id}
+                    className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 relative group"
+                  >
+                    {adminCheck.isAdmin && (
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <div className="flex space-x-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleEditStory(story)
+                            }}
+                            className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                            aria-label="Edit story"
+                          >
+                            <Edit className="h-3 w-3" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleDeleteStory(story.id)
+                            }}
+                            className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                            aria-label="Delete story"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    <div onClick={() => handleSelectStory(story.id)}>
+                      <div className="h-40 bg-gray-200 dark:bg-gray-700 relative">
+                        <img
+                          src={story.image || "/Stammering-Therapy-logo.png"}
+                          alt={story.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                          <div className="flex justify-between items-center">
+                            
+                            <span className="flex items-center text-white text-sm">
+                              <Clock className="h-4 w-4 mr-1" />
+                              {story.estimatedMinutes} dakika
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-5">
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{story.title}</h3>
+                        <p className="text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">
+                          {story.content.split("\n")[0]}
+                        </p>
+                        <button className="flex items-center text-teal-600 dark:text-teal-400 font-medium hover:text-teal-700 dark:hover:text-teal-300">
+                          Okumaya Başla <ArrowRight className="ml-1 h-4 w-4" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{story.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">{story.content.split("\n")[0]}</p>
-                    <button className="flex items-center text-teal-600 dark:text-teal-400 font-medium hover:text-teal-700 dark:hover:text-teal-300">
-                      Start Reading <ArrowRight className="ml-1 h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : (
-          
           /* Reading View */
           <div className="space-y-6">
             {/* Back to selection button */}
@@ -481,21 +547,15 @@ And that was its own kind of victory.`,
                     {selectedStory.title}
                   </h2>
                   <div className="flex items-center space-x-3">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyColor(selectedStory.difficulty)}`}
-                    >
-                      {selectedStory.difficulty.charAt(0).toUpperCase() + selectedStory.difficulty.slice(1)}
-                    </span>
+                    
                     <span className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                       <Clock className="h-4 w-4 mr-1" />
-                      {selectedStory.estimatedMinutes} min
+                      {selectedStory.estimatedMinutes} dakika
                     </span>
                   </div>
                 </div>
               </div>
-<div className="hidden">
-         {highlightFirstVowel("This is some sample text.")}
-       </div>
+
               {/* Reading Controls */}
               {showControls && (
                 <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex flex-wrap items-center justify-between gap-4">
@@ -520,38 +580,27 @@ And that was its own kind of victory.`,
                   </div>
 
                   <div className="flex items-center space-x-3">
+                   
+
                     <button
-                      onClick={toggleBookmark}
-                      className={`p-1.5 rounded-md ${
-                        bookmarked
-                          ? "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300"
+                      onClick={toggleVowelHighlighting}
+                      className={`flex items-center px-8 py-3 rounded-md text-sm font-medium ${
+                        highlightVowels
+                          ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
                           : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
                       }`}
-                      aria-label={bookmarked ? "Remove bookmark" : "Bookmark this story"}
+                      aria-label={highlightVowels ? "Turn off vowel highlighting" : "Turn on vowel highlighting"}
                     >
-                      {bookmarked ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+                      <span className="flex items-center justify-center">
+                        <span className="inline-flex items-center justify-center mr-2.5 text-center font-bold text-xs">
+                          <span className={`${highlightVowels ? "bg-purple-200 dark:bg-purple-800 px-1 rounded" : ""}`}>
+                            A
+                          </span>
+                        </span>
+                        <span className="leading-none">{highlightVowels ? "Sesli harfleri gizle" : "Sesli harfleri göster"}</span>
+                      </span>
                     </button>
 
-                       <button
-  onClick={toggleVowelHighlighting}
-  className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium ${
-    highlightVowels
-      ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300"
-      : "bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600"
-  }`}
-  aria-label={highlightVowels ? "Turn off vowel highlighting" : "Turn on vowel highlighting"}
->
-  <span className="flex items-center justify-center">
-    <span className="inline-flex items-center justify-center mr-1.5 text-center font-bold text-xs">
-      <span className={`${
-        highlightVowels 
-          ? "bg-purple-200 dark:bg-purple-800 px-1 rounded" 
-          : ""
-      }`}>A</span>
-    </span>
-    <span className="leading-none">{highlightVowels ? "Hide Vowels" : "Highlight Vowels"}</span>
-  </span>
-</button>
                     {!isPracticing && !completed ? (
                       <button
                         onClick={startPractice}
@@ -664,6 +713,119 @@ And that was its own kind of victory.`,
           </div>
         )}
       </main>
+
+      {/* Add/Edit Story Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                {editingStory ? "Edit Story" : "Add New Story"}
+              </h2>
+              <button
+                onClick={() => {
+                  setShowAddModal(false)
+                  setEditingStory(null)
+                  setNewStoryTitle("")
+                  setNewStoryContent("")
+                  setNewStoryMinutes(3)
+                  
+                }}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+              <div>
+                <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Story Title
+                </label>
+                <input
+                  type="text"
+                  id="title"
+                  value={newStoryTitle}
+                  onChange={(e) => setNewStoryTitle(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Enter story title..."
+                />
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+
+                <div>
+                  <label htmlFor="minutes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Estimated Reading Time (minutes)
+                  </label>
+                  <input
+                    type="number"
+                    id="minutes"
+                    min="1"
+                    max="60"
+                    value={newStoryMinutes}
+                    onChange={(e) => setNewStoryMinutes(Number.parseInt(e.target.value) || 1)}
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    placeholder="3"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  Story Content
+                </label>
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  Press Enter to create paragraph breaks. Use Shift+Enter for single line breaks.
+                </div>
+                <textarea
+                  id="content"
+                  value={newStoryContent}
+                  onChange={(e) => setNewStoryContent(e.target.value)}
+                  onKeyDown={handleTextareaKeyDown}
+                  rows={20}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none"
+                  placeholder="Enter your story content here. Press Enter to create new paragraphs..."
+                />
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <button
+                  onClick={() => {
+                    setShowAddModal(false)
+                    setEditingStory(null)
+                    setNewStoryTitle("")
+                    setNewStoryContent("")
+                    setNewStoryMinutes(3)
+                    
+                  }}
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={editingStory ? handleUpdateStory : handleAddStory}
+                  disabled={!newStoryTitle.trim() || !newStoryContent.trim() || saving}
+                  className="flex items-center px-4 py-2 bg-teal-600 hover:bg-teal-700 disabled:bg-teal-400 text-white rounded-lg transition-colors"
+                >
+                  {saving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {editingStory ? "Updating..." : "Saving..."}
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      {editingStory ? "Update Story" : "Save Story"}
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
