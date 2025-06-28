@@ -339,7 +339,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
         </button>
         <div className="flex items-center space-x-3">
           <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-8 w-auto" />
-          <span className="text-lg font-bold text-teal-900">E-Kekemelikk</span>
+          <span className="text-lg font-bold text-teal-900">E-Kekemelik</span>
         </div>
         <div className="relative">
           {userData?.photoURL ? (
