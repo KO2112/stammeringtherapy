@@ -15,6 +15,7 @@ import {
   Smile,
   ArrowRight,
   Repeat,
+  PlayCircle,
 } from "lucide-react"
 
 // Define types for our exercises
@@ -37,7 +38,7 @@ interface MouthExercise extends BaseExercise {
   type: "mouth"
 }
 
-export default function MouthAndBreathingExercises() {
+export default function TurkishVocalExercises() {
   const [activeTab, setActiveTab] = useState("breathing")
   const [activeExercise, setActiveExercise] = useState<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
@@ -48,156 +49,161 @@ export default function MouthAndBreathingExercises() {
   const breathingExercises: BreathingExercise[] = [
     {
       id: 1,
-      title: "Basic Breath Control",
+      title: "Temel Nefes Kontrolü",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale slowly through your mouth until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi ağzımızdan yavaşça, ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 60,
-      steps: ["Inhale through nose (4s)", "Inflate stomach", "Exhale through mouth (6s)", "Empty lungs completely"],
-      benefits: ["Reduces stress", "Improves focus", "Increases oxygen flow"],
+      steps: [
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "Ağzınızdan nefes verin (6s)",
+        "Ciğerlerinizi tamamen boşaltın",
+      ],
+      benefits: ["Stresi azaltır", "Odaklanmayı artırır", "Oksijen akışını artırır"],
       type: "breathing",
     },
     {
       id: 2,
-      title: "Segmented Exhale",
+      title: "Bölümlü Nefes Verme",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale slowly through your mouth in 5 separate breaths until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi ağzımızdan yavaşça, ciğerlerimizde hava kalmayana kadar 5 seferde veriyoruz.",
       duration: 60,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Exhale in 5 segments",
-        "Pause briefly between each exhale",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "5 bölümde nefes verin",
+        "Her verme arasında kısa durun",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Strengthens diaphragm", "Improves breath control", "Enhances vocal stability"],
+      benefits: ["Diyaframı güçlendirir", "Nefes kontrolünü geliştirir", "Vokal stabilitesini artırır"],
       type: "breathing",
     },
     {
       id: 3,
-      title: "Segmented Inhale",
+      title: "Bölümlü Nefes Alma",
       description:
-        "Calmly inhale through your nose in 5 separate breaths and fully inflate your stomach. Exhale slowly through your mouth until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi 5 seferde alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi ağzımızdan yavaşça ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 60,
       steps: [
-        "Inhale in 5 segments",
-        "Pause briefly between each inhale",
-        "Inflate stomach fully",
-        "Exhale through mouth (6s)",
-        "Empty lungs completely",
+        "5 bölümde nefes alın",
+        "Her alma arasında kısa durun",
+        "Karnınızı tamamen şişirin",
+        "Ağzınızdan nefes verin (6s)",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Increases lung capacity", "Improves breath control", "Reduces anxiety"],
+      benefits: ["Akciğer kapasitesini artırır", "Nefes kontrolünü geliştirir", "Kaygıyı azaltır"],
       type: "breathing",
     },
     {
       id: 4,
-      title: "Puffed Cheeks",
+      title: "Şişik Yanaklar",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale by puffing your cheeks as if you were blowing out candles on a cake.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi sanki pastanın üstündeki mumları söndürürmüş gibi yanaklarımızı şişirip üfleyerek veriyoruz.",
       duration: 45,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Puff cheeks fully",
-        "Exhale in controlled bursts",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "Yanaklarınızı tamamen şişirin",
+        "Kontrollü patlamalar halinde nefes verin",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Strengthens facial muscles", "Improves breath control", "Enhances articulation"],
+      benefits: ["Yüz kaslarını güçlendirir", "Nefes kontrolünü geliştirir", "Artikülasyonu artırır"],
       type: "breathing",
     },
     {
       id: 5,
-      title: "Breath Retention",
+      title: "Nefes Tutma",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Hold your breath for 6 seconds and then exhale slowly through your mouth until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi 6 saniye tutuyoruz ve ağzımızdan yavaşça, ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 75,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Hold breath (6s)",
-        "Exhale through mouth (6s)",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "Nefesi tutun (6s)",
+        "Ağzınızdan nefes verin (6s)",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Increases CO2 tolerance", "Calms nervous system", "Improves focus and concentration"],
+      benefits: ["CO2 toleransını artırır", "Sinir sistemini sakinleştirir", "Odaklanma ve konsantrasyonu geliştirir"],
       type: "breathing",
     },
     {
       id: 6,
-      title: "Hissing Breath",
+      title: "Tıslama Nefesi",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale making a 'Hissssssss' sound until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi verirken 'Tıssssssssss' sesi çıkaracak şekilde ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 45,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Exhale with 'Hissssssss' sound",
-        "Maintain consistent sound",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "'Tıssssssssss' sesi ile nefes verin",
+        "Tutarlı ses çıkarın",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Strengthens diaphragm", "Improves breath control", "Enhances vocal resonance"],
+      benefits: ["Diyaframı güçlendirir", "Nefes kontrolünü geliştirir", "Vokal rezonansı artırır"],
       type: "breathing",
     },
     {
       id: 7,
-      title: "Rhythmic Hissing",
+      title: "Ritmik Tıslama",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale making a 'Hiss - Hiss - Hiss...' sound until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi verirken 'Tısss – Tısss – Tısss …' sesi çıkaracak şekilde ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 45,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Exhale with rhythmic 'Hiss - Hiss - Hiss'",
-        "Maintain consistent rhythm",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "Ritmik 'Tısss – Tısss – Tısss' sesi ile nefes verin",
+        "Tutarlı ritim koruyun",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Improves breath control", "Enhances rhythm perception", "Strengthens vocal muscles"],
+      benefits: ["Nefes kontrolünü geliştirir", "Ritim algısını artırır", "Vokal kasları güçlendirir"],
       type: "breathing",
     },
     {
       id: 8,
-      title: "Vocal 'A' Breath",
+      title: "Vokal 'A' Nefesi",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale making a clear 'AAAAAAAA' sound until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi net bir 'AAAAAAAA' sesi çıkararak ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 45,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Exhale with 'AAAAAAAA' sound",
-        "Maintain consistent pitch",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "'AAAAAAAA' sesi ile nefes verin",
+        "Tutarlı ton koruyun",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Strengthens vocal cords", "Improves breath control", "Enhances vocal projection"],
+      benefits: ["Ses tellerini güçlendirir", "Nefes kontrolünü geliştirir", "Vokal projeksiyonu artırır"],
       type: "breathing",
     },
     {
       id: 9,
-      title: "Vowel Sequence",
+      title: "Sesli Harf Dizisi",
       description:
-        "Calmly inhale through your nose and fully inflate your stomach. Exhale making the 'A - E - I - O - U' sounds until your lungs are completely empty.",
+        "Burnumuzdan sakince nefesi alıyoruz ve karnımızı iyice şişiriyoruz. Nefesi 'A – E – İ – O – U' seslerini çıkararak ciğerlerimizde hava kalmayana kadar veriyoruz.",
       duration: 60,
       steps: [
-        "Inhale through nose (4s)",
-        "Inflate stomach",
-        "Exhale with 'A - E - I - O - U' sounds",
-        "Pronounce each vowel clearly",
-        "Empty lungs completely",
+        "Burnunuzdan nefes alın (4s)",
+        "Karnınızı şişirin",
+        "'A – E – İ – O – U' sesleri ile nefes verin",
+        "Her sesli harfi net telaffuz edin",
+        "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Improves articulation", "Enhances vocal range", "Strengthens breath control"],
+      benefits: ["Artikülasyonu geliştirir", "Vokal aralığını artırır", "Nefes kontrolünü güçlendirir"],
       type: "breathing",
     },
     {
       id: 10,
-      title: "Dog Panting",
+      title: "Köpek Soluması",
       description:
-        "In this exercise, known as dog panting, stick your tongue out and take rapid breaths in and out using your diaphragm.",
+        "Köpek soluması olarak adlandırdığımız bu egzersizde dilimizi dışarı çıkarıyoruz ve diyaframımıza seri şekilde nefesler alıp veriyoruz.",
       duration: 30,
       steps: [
-        "Stick tongue out slightly",
-        "Breathe rapidly in and out",
-        "Use diaphragm for breathing",
-        "Maintain consistent rhythm",
-        "Continue for 30 seconds",
+        "Dilinizi hafifçe dışarı çıkarın",
+        "Hızlı bir şekilde nefes alıp verin",
+        "Diyaframınızı kullanın",
+        "Tutarlı ritim koruyun",
+        "30 saniye devam edin",
       ],
-      benefits: ["Strengthens diaphragm", "Increases oxygen intake", "Energizes the body"],
+      benefits: ["Diyaframı güçlendirir", "Oksijen alımını artırır", "Vücudu enerjiler"],
       type: "breathing",
     },
   ]
@@ -205,177 +211,171 @@ export default function MouthAndBreathingExercises() {
   const mouthExercises: MouthExercise[] = [
     {
       id: 1,
-      title: "Vowel Articulation",
-      description: "Say the following letters using diaphragm breathing and opening your mouth in an exaggerated way:",
-      practice: "U I",
+      title: "Sesli Harf Artikülasyonu",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki harfleri söyleyiniz:",
+      practice: "U İ",
       duration: 30,
       steps: [
-        "Inhale deeply",
-        "Pronounce 'U' with exaggerated mouth opening",
-        "Inhale again",
-        "Pronounce 'I' with exaggerated mouth opening",
-        "Repeat sequence",
+        "Derin nefes alın",
+        "'U' harfini abartılı ağız açışı ile telaffuz edin",
+        "Tekrar nefes alın",
+        "'İ' harfini abartılı ağız açışı ile telaffuz edin",
+        "Diziyi tekrarlayın",
       ],
-      benefits: ["Improves vowel clarity", "Strengthens facial muscles", "Enhances articulation"],
+      benefits: ["Sesli harf netliğini geliştirir", "Yüz kaslarını güçlendirir", "Artikülasyonu artırır"],
       type: "mouth",
     },
     {
       id: 2,
-      title: "Syllable Repetition",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
+      title: "Hece Tekrarı",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "Manamana Menemene Minimini Monomono Munumunu",
       duration: 45,
       steps: [
-        "Inhale deeply",
-        "Pronounce each syllable clearly",
-        "Exaggerate mouth movements",
-        "Maintain consistent rhythm",
-        "Complete the full sequence",
+        "Derin nefes alın",
+        "Her heceyi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "Tutarlı ritim koruyun",
+        "Tam diziyi tamamlayın",
       ],
-      benefits: ["Improves diction", "Strengthens articulation muscles", "Enhances speech clarity"],
+      benefits: ["Diksiyonu geliştirir", "Artikülasyon kaslarını güçlendirir", "Konuşma netliğini artırır"],
       type: "mouth",
     },
     {
       id: 3,
-      title: "Sibilant Sounds",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
-      practice: "Sa Sha Za Se She Ze Si Shi Zi So Sho Zo Su Shu Zu",
+      title: "Sibilant Sesler",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      practice: "Sa Şa Za Se Şe Ze Si Şi Zi So Şo Zo Su Şu Zu",
       duration: 60,
       steps: [
-        "Inhale deeply",
-        "Pronounce each sound clearly",
-        "Exaggerate mouth movements",
-        "Focus on the 's', 'sh', and 'z' sounds",
-        "Complete the full sequence",
+        "Derin nefes alın",
+        "Her sesi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "'s', 'ş', ve 'z' seslerine odaklanın",
+        "Tam diziyi tamamlayın",
       ],
-      benefits: ["Improves sibilant sounds", "Enhances speech clarity", "Strengthens tongue control"],
+      benefits: ["Sibilant sesleri geliştirir", "Konuşma netliğini artırır", "Dil kontrolünü güçlendirir"],
       type: "mouth",
     },
     {
       id: 4,
-      title: "Consonant Combinations",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
-      practice: "O Pi Kap Bu Pi Kap Shu Pi Kap",
+      title: "Ünsüz Kombinasyonları",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      practice: "O Pi Kap Bu Pi Kap Şu Pi Kap",
       duration: 45,
       steps: [
-        "Inhale deeply",
-        "Pronounce each syllable clearly",
-        "Exaggerate mouth movements",
-        "Focus on the transitions between sounds",
-        "Complete the full sequence",
+        "Derin nefes alın",
+        "Her heceyi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "Sesler arası geçişlere odaklanın",
+        "Tam diziyi tamamlayın",
       ],
-      benefits: ["Improves consonant clarity", "Enhances speech rhythm", "Strengthens articulation"],
+      benefits: ["Ünsüz netliğini geliştirir", "Konuşma ritmini artırır", "Artikülasyonu güçlendirir"],
       type: "mouth",
     },
     {
       id: 5,
-      title: "Compound Sounds",
+      title: "Bileşik Sesler",
       description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way. Each line should be read in one breath:",
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz. Her satır bir nefeste okunmalıdır:",
       practice:
         "ping-pong ping-pong ping-pong ping-pong\nding-dong ding-dong ding-dong ding-dong\nking-kong king-kong king-kong king-kong",
       duration: 60,
       steps: [
-        "Inhale deeply",
-        "Read each line in one breath",
-        "Exaggerate mouth movements",
-        "Maintain consistent rhythm",
-        "Complete all three lines",
+        "Derin nefes alın",
+        "Her satırı tek nefeste okuyun",
+        "Ağız hareketlerini abartın",
+        "Tutarlı ritim koruyun",
+        "Üç satırı da tamamlayın",
       ],
-      benefits: ["Improves breath control", "Enhances speech rhythm", "Strengthens articulation muscles"],
+      benefits: ["Nefes kontrolünü geliştirir", "Konuşma ritmini artırır", "Artikülasyon kaslarını güçlendirir"],
       type: "mouth",
     },
     {
       id: 6,
-      title: "Consonant-Vowel Pairs",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
+      title: "Ünsüz-Sesli Harf Çiftleri",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "pa-pe pi-po-ba-be-bi-bo-ma-me-mi-mo\nPap-pep-pip-pop-bab-beb-bib-bob-mam-mem-mim-mom",
       duration: 60,
       steps: [
-        "Inhale deeply",
-        "Pronounce each syllable clearly",
-        "Exaggerate mouth movements",
-        "Focus on the consonant-vowel transitions",
-        "Complete both lines",
+        "Derin nefes alın",
+        "Her heceyi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "Ünsüz-sesli harf geçişlerine odaklanın",
+        "Her iki satırı da tamamlayın",
       ],
-      benefits: ["Improves articulation", "Enhances speech clarity", "Strengthens facial muscles"],
+      benefits: ["Artikülasyonu geliştirir", "Konuşma netliğini artırır", "Yüz kaslarını güçlendirir"],
       type: "mouth",
     },
     {
       id: 7,
-      title: "Dental Consonants",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
+      title: "Diş Ünsüzleri",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "Da-de-di-do-na-ne-ni-no-ta-te-ti-to\nDad-ded-did-dod-nan-nen-nin-non-tat-tet-tit-tot",
       duration: 60,
       steps: [
-        "Inhale deeply",
-        "Pronounce each syllable clearly",
-        "Exaggerate mouth movements",
-        "Focus on the 'd', 'n', and 't' sounds",
-        "Complete both lines",
+        "Derin nefes alın",
+        "Her heceyi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "'d', 'n', ve 't' seslerine odaklanın",
+        "Her iki satırı da tamamlayın",
       ],
-      benefits: ["Improves dental consonant clarity", "Enhances tongue placement", "Strengthens articulation"],
+      benefits: ["Diş ünsüzü netliğini geliştirir", "Dil yerleşimini artırır", "Artikülasyonu güçlendirir"],
       type: "mouth",
     },
     {
       id: 8,
-      title: "Velar Consonants",
-      description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way:",
-      practice: "Kah-keh-kih-kih-koh-koh-kuh-kuh",
+      title: "Velar Ünsüzler",
+      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      practice: "Kah-keh-kıh-kih-koh-köh-kuh-küh",
       duration: 45,
       steps: [
-        "Inhale deeply",
-        "Pronounce each syllable clearly",
-        "Exaggerate mouth movements",
-        "Focus on the 'k' sound at the back of the mouth",
-        "Complete the full sequence",
+        "Derin nefes alın",
+        "Her heceyi net telaffuz edin",
+        "Ağız hareketlerini abartın",
+        "Ağzın arkasındaki 'k' sesine odaklanın",
+        "Tam diziyi tamamlayın",
       ],
       benefits: [
-        "Improves velar consonant clarity",
-        "Enhances back-of-mouth articulation",
-        "Strengthens speech muscles",
+        "Velar ünsüz netliğini geliştirir",
+        "Ağız arkası artikülasyonunu artırır",
+        "Konuşma kaslarını güçlendirir",
       ],
       type: "mouth",
     },
     {
       id: 9,
-      title: "Final Consonant Clusters",
+      title: "Son Ünsüz Kümeleri",
       description:
-        "Read the following exercise using diaphragm breathing and opening your mouth in an exaggerated way. Each line should be read in one breath:",
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz. Her satır bir nefeste okunmalıdır:",
       practice:
-        "ark-erk-irk-irk-ork-ork-urk-urk\nart-ert-irt-irt-ort-ort-urt-urt\nars-ers-irs-irs-ors-ors-urs-urs\narf-erf-irf-irf-orf-orf-urf-urf",
+        "ark-erk-ırk-irk-ork-örk-urk-ürk\nart-ert-ırt-irt-ort-ört-urt-ürt\nars-ers-ırs-irs-ors-örs-urs-ürs\narf-erf-ırf-irf-orf-örf-urf-ürf",
       duration: 75,
       steps: [
-        "Inhale deeply",
-        "Read each line in one breath",
-        "Exaggerate mouth movements",
-        "Focus on the final consonant clusters",
-        "Complete all four lines",
+        "Derin nefes alın",
+        "Her satırı tek nefeste okuyun",
+        "Ağız hareketlerini abartın",
+        "Son ünsüz kümelerine odaklanın",
+        "Dört satırı da tamamlayın",
       ],
-      benefits: ["Improves consonant cluster clarity", "Enhances breath control", "Strengthens articulation muscles"],
+      benefits: ["Ünsüz küme netliğini geliştirir", "Nefes kontrolünü artırır", "Artikülasyon kaslarını güçlendirir"],
       type: "mouth",
     },
     {
       id: 10,
-      title: "Resistance Training",
+      title: "Direnç Antrenmanı",
       description:
-        "Make a fist with your hand and place it under your chin. Try to read the alphabet with your mouth opened in an exaggerated way while your fist applies pressure to your chin and tries to prevent your mouth from opening.",
-      practice: "A-B-C-D-E-F-G-H-I-J-K-L-M-N-O-P-Q-R-S-T-U-V-W-X-Y-Z",
+        "Elinizi yumruk yapın ve çenenizin altına yerleştirin. Ağzını çok abartılı bir şekilde açarak alfabeyi okumaya çalışırken yumruğunuz çenenize baskı uygulasın ve ağzınızı açtırmamaya çalıştırsın.",
+      practice: "A-B-C-Ç-D-E-F-G-H-I-İ-J-K-L-M-N-O-Ö-P-R-S-Ş-T-U-Ü-V-Y-Z",
       duration: 90,
       steps: [
-        "Place fist under chin",
-        "Apply gentle resistance",
-        "Open mouth against resistance",
-        "Pronounce each letter clearly",
-        "Complete the full alphabet",
+        "Yumruğunuzu çenenizin altına yerleştirin",
+        "Hafif direnç uygulayın",
+        "Dirence karşı ağzınızı açın",
+        "Her harfi net telaffuz edin",
+        "Tüm alfabeyi tamamlayın",
       ],
-      benefits: ["Strengthens jaw muscles", "Improves articulation", "Enhances mouth control"],
+      benefits: ["Çene kaslarını güçlendirir", "Artikülasyonu geliştirir", "Ağız kontrolünü artırır"],
       type: "mouth",
     },
   ]
@@ -392,10 +392,8 @@ export default function MouthAndBreathingExercises() {
     if (timerRef.current) {
       clearInterval(timerRef.current)
     }
-
     setIsPlaying(true)
     setTimer(0)
-
     timerRef.current = setInterval(() => {
       setTimer((prev) => {
         if (prev >= maxTime) {
@@ -441,10 +439,10 @@ export default function MouthAndBreathingExercises() {
   const activeExerciseData = currentExercises.find((ex) => ex.id === activeExercise)
 
   return (
-    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-5 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Vocal Development Exercises</h1>
+          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Vokal Gelişim Egzersizleri</h1>
           
         </div>
 
@@ -462,7 +460,7 @@ export default function MouthAndBreathingExercises() {
               }`}
             >
               <Wind className="h-4 w-4 mr-2" />
-              Breathing Exercises
+              Nefes Egzersizleri
             </button>
             <button
               onClick={() => {
@@ -475,7 +473,7 @@ export default function MouthAndBreathingExercises() {
               }`}
             >
               <MessageSquare className="h-4 w-4 mr-2" />
-              Mouth Development
+              Ağız Gelişim Uygulamaları
             </button>
           </div>
         </div>
@@ -492,12 +490,12 @@ export default function MouthAndBreathingExercises() {
                 {activeTab === "breathing" ? (
                   <span className="flex items-center text-teal-800">
                     <Lungs className="h-5 w-5 mr-2" />
-                    Breathing Exercises
+                    Nefes Egzersizleri
                   </span>
                 ) : (
                   <span className="flex items-center text-purple-800">
                     <Smile className="h-5 w-5 mr-2" />
-                    Mouth Development
+                    Ağız Gelişim Uygulamaları
                   </span>
                 )}
               </h2>
@@ -553,7 +551,7 @@ export default function MouthAndBreathingExercises() {
                         activeTab === "breathing" ? "text-teal-800" : "text-purple-800"
                       }`}
                     >
-                      Exercise {activeExerciseData?.id}: {activeExerciseData?.title}
+                      Egzersiz {activeExerciseData?.id}: {activeExerciseData?.title}
                     </h2>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-1 text-slate-500" />
@@ -563,14 +561,14 @@ export default function MouthAndBreathingExercises() {
 
                   <div className="p-6">
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Description</h3>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Açıklama</h3>
                       <p className="text-slate-700">{activeExerciseData?.description}</p>
                     </div>
 
                     {activeTab === "mouth" && activeExerciseData && "practice" in activeExerciseData && (
                       <div className="mb-6">
                         <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
-                          Practice Text
+                          Uygulama Metni
                         </h3>
                         <div
                           className={`p-4 rounded-lg bg-purple-50 border border-purple-100 text-center font-medium text-purple-800 whitespace-pre-line`}
@@ -581,7 +579,7 @@ export default function MouthAndBreathingExercises() {
                     )}
 
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Steps</h3>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Adımlar</h3>
                       <div className="space-y-2">
                         {activeExerciseData?.steps.map((step, index) => (
                           <div
@@ -604,7 +602,7 @@ export default function MouthAndBreathingExercises() {
                     </div>
 
                     <div className="mb-8">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Benefits</h3>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Faydalar</h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {activeExerciseData?.benefits.map((benefit, index) => (
                           <div
@@ -625,12 +623,13 @@ export default function MouthAndBreathingExercises() {
                     {/* Timer */}
                     <div className="mt-8">
                       <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Exercise Timer</h3>
+                        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+                          Egzersiz Zamanlayıcısı
+                        </h3>
                         <div className="text-sm text-slate-500">
                           {formatTime(timer)} / {formatTime(maxTime)}
                         </div>
                       </div>
-
                       <div className="w-full bg-slate-200 rounded-full h-2.5 mb-4">
                         <div
                           className={`h-2.5 rounded-full ${
@@ -639,7 +638,6 @@ export default function MouthAndBreathingExercises() {
                           style={{ width: `${(timer / maxTime) * 100}%` }}
                         ></div>
                       </div>
-
                       <div className="flex justify-center space-x-4">
                         {!isPlaying ? (
                           <button
@@ -651,7 +649,7 @@ export default function MouthAndBreathingExercises() {
                             }`}
                           >
                             <Play className="h-4 w-4 mr-2" />
-                            Start Exercise
+                            Egzersizi Başlat
                           </button>
                         ) : (
                           <button
@@ -659,16 +657,15 @@ export default function MouthAndBreathingExercises() {
                             className="px-6 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg flex items-center font-medium text-white"
                           >
                             <Pause className="h-4 w-4 mr-2" />
-                            Pause
+                            Duraklat
                           </button>
                         )}
-
                         <button
                           onClick={resetTimer}
                           className="px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center font-medium text-slate-700"
                         >
                           <Repeat className="h-4 w-4 mr-2" />
-                          Reset
+                          Sıfırla
                         </button>
                       </div>
                     </div>
@@ -694,9 +691,9 @@ export default function MouthAndBreathingExercises() {
                       <MessageSquare className="h-10 w-10 text-purple-600" />
                     )}
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 mb-2">Select an Exercise</h3>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-2">Bir Egzersiz Seçin</h3>
                   <p className="text-slate-600 text-center mb-6 max-w-md">
-                    Choose an exercise from the list to view details and start practicing
+                    Detayları görüntülemek ve pratik yapmaya başlamak için listeden bir egzersiz seçin
                   </p>
                   <div
                     className={`flex items-center text-sm ${
@@ -706,8 +703,8 @@ export default function MouthAndBreathingExercises() {
                     <Info className="h-4 w-4 mr-2" />
                     <span>
                       {activeTab === "breathing"
-                        ? "Breathing exercises help improve vocal control and reduce tension"
-                        : "Mouth exercises enhance articulation and speech clarity"}
+                        ? "Nefes egzersizleri vokal kontrolü geliştirmeye ve gerginliği azaltmaya yardımcı olur"
+                        : "Ağız egzersizleri artikülasyonu ve konuşma netliğini artırır"}
                     </span>
                   </div>
                 </motion.div>
@@ -716,15 +713,60 @@ export default function MouthAndBreathingExercises() {
           </div>
         </div>
 
+        {/* Video Section */}
+        <div className="mt-12 bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
+          <div className="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-teal-50 to-purple-50">
+            <h2 className="text-lg font-semibold text-slate-800 flex items-center">
+              <PlayCircle className="h-5 w-5 mr-2 text-slate-600" />
+              Eğitim Videoları
+            </h2>
+            <p className="text-sm text-slate-600 mt-1">
+              Egzersizleri doğru şekilde yapmayı öğrenmek için bu videoları izleyin
+            </p>
+          </div>
+          <div className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
+                  <video controls className="w-full h-full object-cover">
+                    <source src="/armoni-nefes2.mp4" type="video/mp4" />
+                    Tarayıcınız video oynatmayı desteklemiyor.
+                  </video>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-slate-700">Nefes Egzersizleri Rehberi</h3>
+                  <p className="text-sm text-slate-500">
+                    Doğru nefes tekniklerini öğrenin ve diyafram nefesini nasıl kullanacağınızı keşfedin
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
+                  <video controls className="w-full h-full object-cover">
+                    <source src="/armoni-agiz-proje2.mp4" type="video/mp4" />
+                    Tarayıcınız video oynatmayı desteklemiyor.
+                  </video>
+                </div>
+                <div className="space-y-2">
+                  <h3 className="font-medium text-slate-700">Ağız Gelişim Teknikleri</h3>
+                  <p className="text-sm text-slate-500">
+                    Artikülasyon egzersizlerini nasıl yapacağınızı ve ağız kaslarınızı nasıl güçlendireceğinizi öğrenin
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Tips Section */}
         <div className="mt-12 bg-white rounded-2xl shadow-md overflow-hidden border border-slate-200">
           <div className="px-6 py-4 border-b border-slate-200 bg-slate-50">
             <h2 className="text-lg font-semibold text-slate-800 flex items-center">
               <Info className="h-5 w-5 mr-2 text-slate-600" />
-              Tips for Effective Practice
+              Etkili Pratik İçin İpuçları
             </h2>
           </div>
-
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="flex">
@@ -732,49 +774,46 @@ export default function MouthAndBreathingExercises() {
                   <Wind className="h-6 w-6 text-teal-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Breathing Technique</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">Nefes Tekniği</h3>
                   <p className="text-slate-600">
-                    Always breathe from your diaphragm, not your chest. Your stomach should expand when you inhale, not
-                    your shoulders rising.
+                    Her zaman diyaframınızdan nefes alın, göğsünüzden değil. Nefes aldığınızda karnınız şişmeli,
+                    omuzlarınız yükselmemeli.
                   </p>
                 </div>
               </div>
-
               <div className="flex">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mr-4">
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Consistent Practice</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">Düzenli Pratik</h3>
                   <p className="text-slate-600">
-                    Practice these exercises for 10-15 minutes daily. Consistency is more important than duration for
-                    developing proper technique.
+                    Bu egzersizleri günde 10-15 dakika pratik edin. Doğru tekniği geliştirmek için süreklilik süreden
+                    daha önemlidir.
                   </p>
                 </div>
               </div>
-
               <div className="flex">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center mr-4">
                   <Smile className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Relaxed Posture</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">Rahat Duruş</h3>
                   <p className="text-slate-600">
-                    Keep your jaw, neck, and shoulders relaxed while performing these exercises. Tension will restrict
-                    proper airflow and articulation.
+                    Bu egzersizleri yaparken çenenizi, boynunuzu ve omuzlarınızı rahat tutun. Gerginlik doğru hava
+                    akışını ve artikülasyonu kısıtlar.
                   </p>
                 </div>
               </div>
-
               <div className="flex">
                 <div className="flex-shrink-0 h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center mr-4">
                   <ArrowRight className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Progressive Difficulty</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">Aşamalı Zorluk</h3>
                   <p className="text-slate-600">
-                    Start with simpler exercises and gradually increase difficulty. Master the basics before moving to
-                    more complex patterns.
+                    Basit egzersizlerle başlayın ve zorluğu kademeli olarak artırın. Daha karmaşık kalıplara geçmeden
+                    önce temelleri öğrenin.
                   </p>
                 </div>
               </div>

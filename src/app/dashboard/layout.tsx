@@ -204,7 +204,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
               <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-10 w-auto" />
             </div>
             {!isSidebarCollapsed && (
-              <span className="ml-0 text-xl font-bold text-teal-900 whitespace-nowrap">Stammering Therapy</span>
+              <span className="ml-0 text-xl font-bold text-teal-900 whitespace-nowrap">E-Kekemelik</span>
             )}
           </div>
           <div className="flex-shrink-0">
@@ -339,7 +339,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
         </button>
         <div className="flex items-center space-x-3">
           <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-8 w-auto" />
-          <span className="text-lg font-bold text-teal-900">Stammering Therapy</span>
+          <span className="text-lg font-bold text-teal-900">E-Kekemelik</span>
         </div>
         <div className="relative">
           {userData?.photoURL ? (
