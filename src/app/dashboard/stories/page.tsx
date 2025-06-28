@@ -1,126 +1,215 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
-import {
-  Play,
-  Pause,
-  Clock,
-  BookOpen,
-  Volume2,
-  BarChart2,
-  Award,
-  CheckCircle,
-  Download,
-  Bookmark,
-  BookmarkCheck,
-} from "lucide-react"
+import { useState, useEffect } from "react"
+import Link from "next/link"
+import { Clock, BookOpen, BarChart2, CheckCircle, Bookmark, BookmarkCheck, ChevronRight } from "lucide-react"
 
 interface Story {
   id: string
   title: string
   description: string
-  audioSrc: string
-  imageUrl: string
-  level: 1 | 2 | 3
-  durationMinutes: number
+  level: 1 | 2 | 3 | 4
+  readingTimeMinutes: number
   completed?: boolean
   bookmarked?: boolean
 }
 
-export default function StoriesPage() {
-  const [activeLevel, setActiveLevel] = useState<1 | 2 | 3>(1)
-  const [playingStoryId, setPlayingStoryId] = useState<string | null>(null)
-  const [progress, setProgress] = useState<{ [key: string]: number }>({})
+export default function HikayelerPage() {
+  const [activeLevel, setActiveLevel] = useState<1 | 2 | 3 | 4>(1)
   const [bookmarkedStories, setBookmarkedStories] = useState<string[]>([])
   const [completedStories, setCompletedStories] = useState<string[]>([])
   const [activeFilter, setActiveFilter] = useState<"all" | "bookmarked" | "completed">("all")
-  const audioRefs = useRef<{ [key: string]: HTMLAudioElement | null }>({})
 
-  // Sample stories data - replace with actual data from your API/database
+  // Turkish stories data
   const stories: Story[] = [
-    // Level 1
+    // 1. Seviye
     {
-      id: "l1-1",
-      title: "The Morning Routine",
-      description: "A simple story about morning habits that practices basic breathing techniques.",
-      audioSrc: "/stories/level1/morning-routine.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Morning+Routine",
+      id: "kir-zincilerini",
+      title: "Kır Zincilerini",
+      description: "Özgürlük ve cesaret hakkında ilham verici bir hikaye. Kendi sınırlarınızı aşmanın gücünü keşfedin.",
       level: 1,
-      durationMinutes: 3,
+      readingTimeMinutes: 5,
     },
     {
-      id: "l1-2",
-      title: "A Walk in the Park",
-      description: "Gentle pacing exercises through a story set in nature.",
-      audioSrc: "/stories/level1/walk-in-park.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Walk+in+Park",
+      id: "bir-balikci-hikayesi",
+      title: "Bir Balıkçı Hikayesi",
+      description: "Sabır ve azmin gücünü anlatan hikaye. Hayatta başarının gerçek anlamını öğrenin.",
       level: 1,
-      durationMinutes: 4,
+      readingTimeMinutes: 4,
     },
     {
-      id: "l1-3",
-      title: "Meeting New Friends",
-      description: "Practice introductions and short sentences in social settings.",
-      audioSrc: "/stories/level1/meeting-friends.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Meeting+Friends",
+      id: "gurultu",
+      title: "Gürültü",
+      description: "İç ses ve dış dünya arasındaki dengeyi keşfeden hikaye. Sessizliğin değerini anlayın.",
       level: 1,
-      durationMinutes: 3,
+      readingTimeMinutes: 3,
     },
-    // Level 2
     {
-      id: "l2-1",
-      title: "The Important Interview",
-      description: "Navigate challenging professional conversations with confidence.",
-      audioSrc: "/stories/level2/important-interview.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Important+Interview",
+      id: "iyi-ornek-olmak",
+      title: "İyi Örnek Olmak",
+      description: "Rol model olmanın önemini vurgulayan hikaye. Başkalarına ilham vermenin gücü.",
+      level: 1,
+      readingTimeMinutes: 4,
+    },
+    {
+      id: "ozgur-kuslar",
+      title: "Özgür Kuşlar",
+      description: "Özgürlük ve doğallık üzerine düşündüren hikaye. Gerçek özgürlüğün ne olduğunu keşfedin.",
+      level: 1,
+      readingTimeMinutes: 5,
+    },
+    {
+      id: "semsiye-tamircisi",
+      title: "Şemsiye Tamircisi",
+      description: "Yardımlaşma ve iyilik yapmanın değerini anlatan hikaye. Küçük jestlerin büyük etkisi.",
+      level: 1,
+      readingTimeMinutes: 6,
+    },
+
+    // 2. Seviye
+    {
+      id: "kim-fark-eder",
+      title: "Kim Fark Eder",
+      description: "Öz değer ve kendini kabul etme üzerine hikaye. Her bireyin değerli olduğunu hatırlatan hikaye.",
       level: 2,
-      durationMinutes: 5,
+      readingTimeMinutes: 6,
     },
     {
-      id: "l2-2",
-      title: "Ordering at a Restaurant",
-      description: "Practice handling time pressure in common social scenarios.",
-      audioSrc: "/stories/level2/restaurant-ordering.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Restaurant",
+      id: "zehir",
+      title: "Zehir",
+      description: "Olumsuz düşüncelerin etkisini anlatan hikaye. Zihinsel sağlığın önemini vurgular.",
       level: 2,
-      durationMinutes: 4,
+      readingTimeMinutes: 5,
     },
     {
-      id: "l2-3",
-      title: "The Phone Call",
-      description: "Master techniques for clarity and confidence during phone conversations.",
-      audioSrc: "/stories/level2/phone-call.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Phone+Call",
+      id: "hemen-mi-olecegim",
+      title: "Hemen Mi Öleceğim",
+      description: "Kaygı ve korku yönetimi hakkında hikaye. Endişelerin üstesinden gelme yolları.",
       level: 2,
-      durationMinutes: 5,
-    },
-    // Level 3
-    {
-      id: "l3-1",
-      title: "Public Speaking",
-      description: "Advanced techniques for delivering speeches and presentations.",
-      audioSrc: "/stories/level3/public-speaking.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Public+Speaking",
-      level: 3,
-      durationMinutes: 6,
+      readingTimeMinutes: 4,
     },
     {
-      id: "l3-2",
-      title: "Job Interview",
-      description: "Complex conversation scenarios with techniques to manage stress.",
-      audioSrc: "/stories/level3/job-interview.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Job+Interview",
-      level: 3,
-      durationMinutes: 7,
+      id: "sirkin-kapisindan-dondugum-gece",
+      title: "Sirkin Kapısından Döndüğüm Gece",
+      description: "Cesareti bulma ve fırsatları değerlendirme hikayesi. Hayattaki ikinci şanslar.",
+      level: 2,
+      readingTimeMinutes: 7,
     },
     {
-      id: "l3-3",
-      title: "Networking Event",
-      description: "Practice fluent conversation in fast-paced social environments.",
-      audioSrc: "/stories/level3/networking-event.mp3",
-      imageUrl: "/placeholder.svg?height=300&width=400&text=Networking",
+      id: "bambu-agaci",
+      title: "Bambu Ağacı",
+      description: "Sabır, büyüme ve gelişim sürecini anlatan hikaye. Zamanın iyileştirici gücü.",
+      level: 2,
+      readingTimeMinutes: 5,
+    },
+    {
+      id: "affetmenin-hafifligi",
+      title: "Affetmenin Hafifliği",
+      description: "Bağışlama ve iç huzur bulma hikayesi. Affetmenin ruhsal faydaları.",
+      level: 2,
+      readingTimeMinutes: 6,
+    },
+
+    // 3. Seviye
+    {
+      id: "garson-kiz",
+      title: "Garson Kız",
+      description: "Empati ve anlayış geliştirme hikayesi. İnsanları yargılamadan anlamanın önemi.",
       level: 3,
-      durationMinutes: 6,
+      readingTimeMinutes: 8,
+    },
+    {
+      id: "kisilik",
+      title: "Kişilik",
+      description: "Kimlik ve öz farkındalık üzerine derin hikaye. Gerçek benliğinizi keşfetme yolculuğu.",
+      level: 3,
+      readingTimeMinutes: 7,
+    },
+    {
+      id: "kavak-agaci-ile-kabak",
+      title: "Kavak Ağacı ile Kabak",
+      description: "Karşılaştırma ve öz değer hakkında hikaye. Her bireyin kendine özgü değeri.",
+      level: 3,
+      readingTimeMinutes: 6,
+    },
+    {
+      id: "on-yargi",
+      title: "Ön Yargı",
+      description: "Önyargıları aşma ve açık fikirlilik hikayesi. Farklılıkları kucaklama.",
+      level: 3,
+      readingTimeMinutes: 7,
+    },
+    {
+      id: "profesyonel-yardim",
+      title: "Profesyonel Yardım",
+      description: "Yardım alma ve destek bulma hikayesi. Güçlü olmak için yardım istemenin önemi.",
+      level: 3,
+      readingTimeMinutes: 8,
+    },
+    {
+      id: "hayallerinizden-vazgecmeyin",
+      title: "Hayallerinizden Vazgeçmeyin",
+      description: "Hedeflere ulaşma ve azim gösterme hikayesi. Hayallerin gerçekleşme gücü.",
+      level: 3,
+      readingTimeMinutes: 9,
+    },
+    {
+      id: "zeka-ozurluler-sinifi",
+      title: "Zeka Özürlüler Sınıfı",
+      description: "Farklılıkları kabul etme ve anlayış geliştirme hikayesi. Herkesin değerli olduğu gerçeği.",
+      level: 3,
+      readingTimeMinutes: 8,
+    },
+
+    // 4. Seviye
+    {
+      id: "akilli-deli",
+      title: "Akıllı Deli",
+      description: "Zeka ve bilgelik arasındaki farkı anlatan hikaye. Gerçek zekanın ne olduğunu keşfedin.",
+      level: 4,
+      readingTimeMinutes: 10,
+    },
+    {
+      id: "elimden-gelen-cabayi-gosterecegim",
+      title: "Elimden Gelen Çabayı Göstereceğim",
+      description: "Azim ve kararlılık üzerine güçlü hikaye. Başarının sırrı olan sebat.",
+      level: 4,
+      readingTimeMinutes: 9,
+    },
+    {
+      id: "einstein-ve-soforu",
+      title: "Einstein ve Şoförü",
+      description: "Bilgi ve deneyim arasındaki dengeyi anlatan hikaye. Farklı zeka türlerinin değeri.",
+      level: 4,
+      readingTimeMinutes: 8,
+    },
+    {
+      id: "firtina-ciktiginda-uyuyabilirim",
+      title: "Fırtına Çıktığında Uyuyabilirim",
+      description: "İç huzur ve güven bulma hikayesi. Zorluklara karşı sakin kalmanın sırrı.",
+      level: 4,
+      readingTimeMinutes: 7,
+    },
+    {
+      id: "bir-hayir-vardir",
+      title: "Bir Hayır Vardır",
+      description: "Olumlu bakış açısı geliştirme hikayesi. Her zorluğun içindeki fırsatı görme.",
+      level: 4,
+      readingTimeMinutes: 8,
+    },
+    {
+      id: "stanford-universitesi",
+      title: "Stanford Üniversitesi",
+      description: "Başarı ve sebat üzerine ilham verici hikaye. Hayallerin peşinden gitmenin gücü.",
+      level: 4,
+      readingTimeMinutes: 9,
+    },
+    {
+      id: "bagislamanin-yuceligi",
+      title: "Bağışlamanın Yüceliği",
+      description: "Affetme ve ruhsal gelişim üzerine derin hikaye. Bağışlamanın transformatif gücü.",
+      level: 4,
+      readingTimeMinutes: 10,
     },
   ]
 
@@ -128,11 +217,9 @@ export default function StoriesPage() {
   useEffect(() => {
     const savedBookmarks = localStorage.getItem("bookmarkedStories")
     const savedCompleted = localStorage.getItem("completedStories")
-
     if (savedBookmarks) {
       setBookmarkedStories(JSON.parse(savedBookmarks))
     }
-
     if (savedCompleted) {
       setCompletedStories(JSON.parse(savedCompleted))
     }
@@ -147,52 +234,6 @@ export default function StoriesPage() {
     localStorage.setItem("completedStories", JSON.stringify(completedStories))
   }, [completedStories])
 
-  const handlePlayPause = (storyId: string) => {
-    if (playingStoryId === storyId) {
-      // Pause currently playing story
-      audioRefs.current[storyId]?.pause()
-      setPlayingStoryId(null)
-    } else {
-      // Pause any currently playing audio
-      if (playingStoryId && audioRefs.current[playingStoryId]) {
-        audioRefs.current[playingStoryId]?.pause()
-      }
-
-      // Play the new story
-      audioRefs.current[storyId]?.play()
-      setPlayingStoryId(storyId)
-    }
-  }
-
-  const handleTimeUpdate = (storyId: string) => {
-    const audio = audioRefs.current[storyId]
-    if (audio) {
-      const progressPercent = (audio.currentTime / audio.duration) * 100
-      setProgress((prev) => ({
-        ...prev,
-        [storyId]: progressPercent,
-      }))
-
-      // Mark as completed when reaching 90% of the audio
-      if (progressPercent > 90 && !completedStories.includes(storyId)) {
-        setCompletedStories((prev) => [...prev, storyId])
-      }
-    }
-  }
-
-  const handleAudioEnded = (storyId: string) => {
-    setPlayingStoryId(null)
-    setProgress((prev) => ({
-      ...prev,
-      [storyId]: 0,
-    }))
-
-    // Mark as completed
-    if (!completedStories.includes(storyId)) {
-      setCompletedStories((prev) => [...prev, storyId])
-    }
-  }
-
   const toggleBookmark = (storyId: string) => {
     if (bookmarkedStories.includes(storyId)) {
       setBookmarkedStories((prev) => prev.filter((id) => id !== storyId))
@@ -200,19 +241,6 @@ export default function StoriesPage() {
       setBookmarkedStories((prev) => [...prev, storyId])
     }
   }
-
-  useEffect(() => {
-    // Clean up audio elements when component unmounts
-    return () => {
-      Object.values(audioRefs.current).forEach((audio) => {
-        if (audio) {
-          audio.pause()
-          audio.removeEventListener("timeupdate", () => {})
-          audio.removeEventListener("ended", () => {})
-        }
-      })
-    }
-  }, [])
 
   // Filter stories based on level and active filter
   const filteredStories = stories
@@ -231,22 +259,52 @@ export default function StoriesPage() {
   ).length
   const progressPercentage = totalStoriesCount > 0 ? Math.round((completedStoriesCount / totalStoriesCount) * 100) : 0
 
+  const getLevelColor = (level: number) => {
+    switch (level) {
+      case 1:
+        return "from-emerald-500 to-teal-500"
+      case 2:
+        return "from-blue-500 to-indigo-500"
+      case 3:
+        return "from-purple-500 to-pink-500"
+      case 4:
+        return "from-amber-500 to-orange-500"
+      default:
+        return "from-gray-500 to-slate-500"
+    }
+  }
+
+  const getLevelBadgeColor = (level: number) => {
+    switch (level) {
+      case 1:
+        return "bg-emerald-100 text-emerald-800"
+      case 2:
+        return "bg-blue-100 text-blue-800"
+      case 3:
+        return "bg-purple-100 text-purple-800"
+      case 4:
+        return "bg-amber-100 text-amber-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
   return (
     <div className="w-full max-w-full h-full">
       {/* Page Header */}
       <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white px-8 py-10 rounded-2xl shadow-lg mb-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Practice Stories</h1>
+            <h1 className="text-3xl font-bold">Terapi Hikayeleri</h1>
             <p className="mt-2 text-teal-50 max-w-2xl">
-              Listen to these stories and practice speaking along with them to improve your fluency. Each level offers
-              progressively challenging scenarios.
+              Kekemelik terapisi sürecinizde size rehberlik edecek, ilham verecek ve motivasyon sağlayacak hikayeler.
+              Her seviye kendi içinde özenle seçilmiş hikayeler içerir.
             </p>
           </div>
           <div className="mt-6 md:mt-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-center">
             <div className="mr-4">
-              <div className="text-xs text-teal-100 uppercase tracking-wide font-medium mb-1">Your Progress</div>
-              <div className="text-2xl font-bold">{progressPercentage}%</div>
+              <div className="text-xs text-teal-100 uppercase tracking-wide font-medium mb-1">İlerlemeniz</div>
+              <div className="text-2xl font-bold">%{progressPercentage}</div>
             </div>
             <div className="w-16 h-16 relative">
               <svg className="w-full h-full" viewBox="0 0 36 36">
@@ -275,10 +333,10 @@ export default function StoriesPage() {
 
       {/* Level Tabs */}
       <div className="flex flex-wrap mb-8 border-b border-slate-200">
-        {[1, 2, 3].map((level) => (
+        {[1, 2, 3, 4].map((level) => (
           <button
             key={level}
-            onClick={() => setActiveLevel(level as 1 | 2 | 3)}
+            onClick={() => setActiveLevel(level as 1 | 2 | 3 | 4)}
             className={`px-6 py-3 text-lg font-medium border-b-2 transition-colors ${
               activeLevel === level
                 ? "border-teal-600 text-teal-600"
@@ -286,8 +344,7 @@ export default function StoriesPage() {
             }`}
           >
             <div className="flex items-center">
-              
-              <span>Level {level}</span>
+              <span>{level}. Seviye</span>
             </div>
           </button>
         ))}
@@ -301,7 +358,7 @@ export default function StoriesPage() {
             activeFilter === "all" ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-600 hover:bg-slate-200"
           }`}
         >
-          All Stories
+          Tüm Hikayeler
         </button>
         <button
           onClick={() => setActiveFilter("bookmarked")}
@@ -312,7 +369,7 @@ export default function StoriesPage() {
           }`}
         >
           <Bookmark className="h-4 w-4 mr-1.5" />
-          Bookmarked
+          Favoriler
         </button>
         <button
           onClick={() => setActiveFilter("completed")}
@@ -323,129 +380,77 @@ export default function StoriesPage() {
           }`}
         >
           <CheckCircle className="h-4 w-4 mr-1.5" />
-          Completed
+          Tamamlanan
         </button>
       </div>
 
-      {/* Stories Grid */}
+      {/* Stories List */}
       {filteredStories.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 px-2">
-          {filteredStories.map((story) => (
-            <div
-              key={story.id}
-              className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col h-full border border-slate-100"
-            >
-              {/* Story Image */}
-              <div className="relative h-48 w-full bg-slate-100">
-                <img
-                  src={story.imageUrl || "/placeholder.svg"}
-                  alt={story.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-
-                {/* Bookmark button */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleBookmark(story.id)
-                  }}
-                  className="absolute top-3 right-3 p-2 rounded-full bg-white/80 hover:bg-white transition-colors"
-                >
-                  {bookmarkedStories.includes(story.id) ? (
-                    <BookmarkCheck className="h-5 w-5 text-amber-500" fill="#f59e0b" />
-                  ) : (
-                    <Bookmark className="h-5 w-5 text-slate-600" />
-                  )}
-                </button>
-
-                <div className="absolute bottom-0 left-0 p-4 flex items-center gap-2">
-                  <span className="bg-teal-600 text-white px-2.5 py-1 rounded-lg text-xs font-medium flex items-center">
-                    <Award className="h-3.5 w-3.5 mr-1" />
-                    Level {story.level}
-                  </span>
-                  <span className="bg-slate-800/80 text-white px-2.5 py-1 rounded-lg text-xs font-medium flex items-center">
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    {story.durationMinutes} min
-                  </span>
-                  {completedStories.includes(story.id) && (
-                    <span className="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-xs font-medium flex items-center">
-                      <CheckCircle className="h-3.5 w-3.5 mr-1" />
-                      Completed
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Story Content */}
-              <div className="p-5 flex-grow">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{story.title}</h3>
-                <p className="text-slate-600 mb-4 text-sm">{story.description}</p>
-
-                {/* Audio Player */}
-                <div className="mt-auto">
-                  <audio
-                    ref={(el) => {
-                      audioRefs.current[story.id] = el
-                    }}
-                    src={story.audioSrc}
-                    onTimeUpdate={() => handleTimeUpdate(story.id)}
-                    onEnded={() => handleAudioEnded(story.id)}
-                    preload="metadata"
-                  />
-
-                  <div className="flex items-center">
-                    <button
-                      onClick={() => handlePlayPause(story.id)}
-                      className={`flex items-center justify-center h-12 w-12 rounded-full text-white focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-                        playingStoryId === story.id
-                          ? "bg-amber-500 hover:bg-amber-600 focus:ring-amber-500"
-                          : "bg-teal-600 hover:bg-teal-700 focus:ring-teal-500"
-                      }`}
-                      aria-label={playingStoryId === story.id ? "Pause" : "Play"}
-                    >
-                      {playingStoryId === story.id ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-                    </button>
-
-                    <div className="ml-4 flex-grow">
-                      <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full transition-all duration-300 ${
-                            playingStoryId === story.id ? "bg-amber-500" : "bg-teal-600"
-                          }`}
-                          style={{ width: `${progress[story.id] || 0}%` }}
-                        ></div>
-                      </div>
-                      <div className="flex justify-between mt-1 text-xs text-slate-500">
-                        <span>
-                          {playingStoryId === story.id ? (
-                            <span className="flex items-center text-amber-600">
-                              <Volume2 className="h-3 w-3 mr-1" />
-                              Playing...
-                            </span>
-                          ) : (
-                            "Click to play"
-                          )}
+        <div className="space-y-4">
+          {filteredStories.map((story, index) => (
+            <Link key={story.id} href={`stories/${story.id}`} className="block group">
+              <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-200 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <span
+                          className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelBadgeColor(story.level)}`}
+                        >
+                          {story.level}. Seviye
                         </span>
-                        <span>{story.durationMinutes}:00</span>
+                        <div className="flex items-center text-slate-500 text-sm">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {story.readingTimeMinutes} dk okuma
+                        </div>
+                        {completedStories.includes(story.id) && (
+                          <span className="bg-emerald-100 text-emerald-800 px-2 py-1 rounded-full text-xs font-medium flex items-center">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Tamamlandı
+                          </span>
+                        )}
                       </div>
+
+                      <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">
+                        {story.title}
+                      </h3>
+
+                      <p className="text-slate-600 text-sm leading-relaxed mb-4">{story.description}</p>
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center text-slate-500 text-sm">
+                          <BookOpen className="h-4 w-4 mr-1" />
+                          <span>Hikaye #{index + 1}</span>
+                        </div>
+                        <div className="flex items-center text-teal-600 text-sm font-medium group-hover:text-teal-700 transition-colors">
+                          <span>Hikayeyi Oku</span>
+                          <ChevronRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="ml-4 flex flex-col items-end gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          toggleBookmark(story.id)
+                        }}
+                        className="p-2 rounded-full hover:bg-slate-100 transition-colors"
+                      >
+                        {bookmarkedStories.includes(story.id) ? (
+                          <BookmarkCheck className="h-5 w-5 text-amber-500" fill="#f59e0b" />
+                        ) : (
+                          <Bookmark className="h-5 w-5 text-slate-400 hover:text-slate-600" />
+                        )}
+                      </button>
+
+                      <div className={`w-1 h-16 rounded-full bg-gradient-to-b ${getLevelColor(story.level)}`}></div>
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Story Footer */}
-              <div className="px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center">
-                <div className="flex items-center text-xs text-slate-500">
-                  <BookOpen className="h-3.5 w-3.5 mr-1.5" />
-                  <span>Practice story</span>
-                </div>
-                <button className="text-teal-600 hover:text-teal-700 flex items-center text-sm font-medium">
-                  <Download className="h-4 w-4 mr-1" />
-                  <span className="sr-only md:not-sr-only">Download</span>
-                </button>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       ) : (
@@ -453,53 +458,53 @@ export default function StoriesPage() {
           <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <BookOpen className="h-8 w-8 text-slate-400" />
           </div>
-          <h3 className="text-xl font-semibold text-slate-800 mb-2">No stories found</h3>
+          <h3 className="text-xl font-semibold text-slate-800 mb-2">Hikaye bulunamadı</h3>
           <p className="text-slate-600 mb-6">
             {activeFilter === "bookmarked"
-              ? "You haven't bookmarked any stories at this level yet."
+              ? "Bu seviyede henüz favori hikayeniz yok."
               : activeFilter === "completed"
-                ? "You haven't completed any stories at this level yet."
-                : "There are no stories available at this level."}
+                ? "Bu seviyede henüz tamamladığınız hikaye yok."
+                : "Bu seviyede mevcut hikaye bulunmuyor."}
           </p>
           <button
             onClick={() => setActiveFilter("all")}
             className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
           >
-            View all stories
+            Tüm hikayeleri görüntüle
           </button>
         </div>
       )}
 
-      {/* Practice Tips */}
+      {/* Reading Tips */}
       <div className="mt-12 bg-teal-50 p-6 rounded-xl border border-teal-100">
         <h3 className="text-xl font-semibold text-teal-800 mb-4 flex items-center">
-          <Volume2 className="h-5 w-5 mr-2 text-teal-600" />
-          Practice Tips
+          <BookOpen className="h-5 w-5 mr-2 text-teal-600" />
+          Okuma İpuçları
         </h3>
         <ul className="space-y-3 text-teal-800">
           <li className="flex items-start">
             <div className="flex-shrink-0 h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-4 w-4 text-teal-600" />
             </div>
-            <span>Listen to the entire story first, then practice speaking along with it</span>
+            <span>Hikayeyi önce sessizce okuyun, sonra yüksek sesle tekrarlayın</span>
           </li>
           <li className="flex items-start">
             <div className="flex-shrink-0 h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-4 w-4 text-teal-600" />
             </div>
-            <span>Focus on your breathing techniques while reading aloud</span>
+            <span>Yüksek sesle okurken nefes tekniklerinize odaklanın</span>
           </li>
           <li className="flex items-start">
             <div className="flex-shrink-0 h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-4 w-4 text-teal-600" />
             </div>
-            <span>Record yourself for comparison and to track your progress</span>
+            <span>Zorlandığınız kelimeleri işaretleyin ve tekrar edin</span>
           </li>
           <li className="flex items-start">
             <div className="flex-shrink-0 h-6 w-6 rounded-full bg-teal-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-4 w-4 text-teal-600" />
             </div>
-            <span>Practice each story multiple times until you feel comfortable with the pacing</span>
+            <span>Her hikayeyi rahat okuyabilene kadar birkaç kez tekrarlayın</span>
           </li>
         </ul>
       </div>
