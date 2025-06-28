@@ -521,17 +521,7 @@ export default function KirZincirleriniPage() {
     setIsPlaying(!isPlaying)
   }
 
-  const handleReset = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0
-      setCurrentTime(0)
-      setActiveIndex(-1)
-    }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current)
-    }
-    setIsPlaying(false)
-  }
+  
 
   const handleSkipForward = () => {
     if (audioRef.current) {
