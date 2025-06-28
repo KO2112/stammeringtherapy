@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Play, Pause, RotateCcw, Volume2, ArrowLeft, SkipForward, SkipBack, Menu } from "lucide-react"
+import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack} from "lucide-react"
 import Link from "next/link"
 
 interface TextSegment {
@@ -17,7 +17,7 @@ export default function KirZincirleriniPage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [activeIndex, setActiveIndex] = useState(-1)
-  const [showControls, setShowControls] = useState(false)
+ 
   const audioRef = useRef<HTMLAudioElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
