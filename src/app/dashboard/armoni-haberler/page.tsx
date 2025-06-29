@@ -91,15 +91,6 @@ interface MediaCarouselState {
   }
 }
 
-interface HaberUpdateData {
-  title?: string
-  content?: string
-  updatedAt?: Date
-  imageUrls?: string[]
-  videoUrls?: string[]
-  [key: string]: any // Add index signature for Firestore compatibility
-}
-
 export default function ArmoniHaberlerPage() {
   const [haberler, setHaberler] = useState<Haber[]>([])
   const [filteredHaberler, setFilteredHaberler] = useState<Haber[]>([])
@@ -417,7 +408,7 @@ export default function ArmoniHaberlerPage() {
         try {
           const mediaRef = ref(storage, url)
           await deleteObject(mediaRef)
-        } catch (_error) {
+        } catch {
           console.log("Media file not found or already deleted")
         }
       }
