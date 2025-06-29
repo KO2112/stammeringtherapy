@@ -66,7 +66,7 @@ const getProfilePictureUrl = async (uid: string): Promise<string | null> => {
     const profilePicRef = ref(storage, `profile_pictures/${uid}`)
     const url = await getDownloadURL(profilePicRef)
     return url
-  } catch (error) {
+  } catch {
     console.log(`No profile picture found for user ${uid}`)
     return null
   }
