@@ -110,21 +110,7 @@ export default function SignIn() {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true)
-    setError("")
-
-    try {
-      const provider = new GoogleAuthProvider()
-      await signInWithPopup(auth, provider)
-      router.push("/dashboard") // Redirect after sign-in
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "An unknown error occurred"
-      setError(errorMessage)
-    } finally {
-      setLoading(false)
-    }
-  }
+  
 
   const renderForm = () => {
     if (formType === "signin") {
