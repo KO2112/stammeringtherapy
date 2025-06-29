@@ -9,7 +9,7 @@ import { signOut } from "firebase/auth"
 import { auth, db } from "../../../firebase"
 import { useRouter } from "next/navigation"
 import { doc, getDoc } from "firebase/firestore"
-import { Home, Wind, BookOpen, Calendar, PenLine, User, LogOut, Menu, X, ChevronRight, HelpCircle, Bell, Speech, ShieldIcon as ShieldUser } from 'lucide-react'
+import { Home, Wind, BookOpen, PenLine, User, LogOut, Menu, X, ChevronRight, HelpCircle, Bell, Speech, ShieldIcon as ShieldUser, Newspaper } from 'lucide-react'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -123,31 +123,30 @@ export default function DashboardLayout({ children }: LayoutProps) {
       icon: <Home className="h-5 w-5" />,
     },
     {
-      name: "Nefes & Ağız Çalışmaları",
-      href: "/dashboard/mouth-and-breathing-exercises",
-      icon: <Wind className="h-5 w-5" />,
-    },
-    {
       name: "Hikayeler",
       href: "/dashboard/stories",
       icon: <BookOpen className="h-5 w-5" />,
     },
     {
-      name: "Private Sessions",
-      href: "/dashboard/private-sessions",
-      icon: <Calendar className="h-5 w-5" />,
-    },
-    {
-      name: "Günlük",
-      href: "/dashboard/diary",
-      icon: <PenLine className="h-5 w-5" />,
+      name: "Nefes & Ağız Çalışmaları",
+      href: "/dashboard/mouth-and-breathing-exercises",
+      icon: <Wind className="h-5 w-5" />,
     },
     {
       name: "Kendin Oku",
       href: "/dashboard/Read-Out-Loud",
       icon: <Speech className="h-5 w-5" />,
     },
-    
+    {
+      name: "Armoni Haberler",
+      href: "/dashboard/armoni-haberler",
+      icon: <Newspaper className="h-5 w-5" />,
+    },
+    {
+      name: "Günlük",
+      href: "/dashboard/diary",
+      icon: <PenLine className="h-5 w-5" />,
+    },
   ]
 
   const secondaryNavItems = [
