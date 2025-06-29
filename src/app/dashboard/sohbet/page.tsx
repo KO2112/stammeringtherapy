@@ -871,7 +871,6 @@ export default function SohbetPage() {
                 Adminler ({admins.length})
               </div>
               {admins.map((admin) => {
-                const adminChatId = [currentUser.uid, admin.uid].sort().join("_")
                 const adminUnreadCount = unreadCounts[`admin_${admin.uid}`] || 0
 
                 return (
