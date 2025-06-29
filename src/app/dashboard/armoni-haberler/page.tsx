@@ -18,6 +18,7 @@ import {
   limit,
   startAfter,
   type QueryDocumentSnapshot,
+  type UpdateData, // Add this import
 } from "firebase/firestore"
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage"
 import {
@@ -34,7 +35,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
-  Newspaper
+  Newspaper,
 } from "lucide-react"
 
 interface Haber {
@@ -47,6 +48,15 @@ interface Haber {
   updatedAt?: Timestamp | Date
   authorId: string
   authorName: string
+}
+
+interface User {
+  uid: string
+  firstName?: string
+  lastName?: string
+  username?: string
+  email?: string
+  role?: string
 }
 
 interface AlertState {
@@ -81,6 +91,15 @@ interface MediaCarouselState {
   }
 }
 
+interface HaberUpdateData {
+  title?: string
+  content?: string
+  updatedAt?: Date
+  imageUrls?: string[]
+  videoUrls?: string[]
+  [key: string]: any // Add index signature for Firestore compatibility
+}
+
 export default function ArmoniHaberlerPage() {
   const [haberler, setHaberler] = useState<Haber[]>([])
   const [filteredHaberler, setFilteredHaberler] = useState<Haber[]>([])
@@ -108,14 +127,12 @@ export default function ArmoniHaberlerPage() {
     type: "image",
   })
   const [mediaCarousel, setMediaCarousel] = useState<MediaCarouselState>({})
-
   const [newHaber, setNewHaber] = useState({
     title: "",
     content: "",
     mediaFiles: [] as File[],
   })
-
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -144,7 +161,7 @@ export default function ArmoniHaberlerPage() {
         }
 
         const currentUserData = currentUserDoc.data()
-        setCurrentUser({ uid: user.uid, ...currentUserData })
+        setCurrentUser({ uid: user.uid, ...currentUserData } as User)
 
         if (currentUserData.role === "admin") {
           setAdminCheck({
@@ -206,7 +223,6 @@ export default function ArmoniHaberlerPage() {
 
       const querySnapshot = await getDocs(q)
       const haberlerList: Haber[] = []
-
       querySnapshot.forEach((doc) => {
         haberlerList.push({
           id: doc.id,
@@ -279,7 +295,6 @@ export default function ArmoniHaberlerPage() {
     const files = Array.from(e.target.files || [])
     if (files.length > 0) {
       const validFiles = files.filter((file) => file.type.startsWith("image/") || file.type.startsWith("video/"))
-
       if (validFiles.length !== files.length) {
         showAlert("error", "Some files were skipped. Please select only image or video files.")
       }
@@ -288,7 +303,6 @@ export default function ArmoniHaberlerPage() {
         ...newHaber,
         mediaFiles: [...newHaber.mediaFiles, ...validFiles],
       })
-
       e.target.value = ""
     }
   }
@@ -302,7 +316,6 @@ export default function ArmoniHaberlerPage() {
     const timestamp = Date.now()
     const fileName = `${timestamp}_${file.name}`
     const storageRef = ref(storage, `haberler/${fileName}`)
-
     await uploadBytes(storageRef, file)
     return await getDownloadURL(storageRef)
   }
@@ -312,7 +325,6 @@ export default function ArmoniHaberlerPage() {
     if (!currentUser) return
 
     setActionLoading("add-haber")
-
     try {
       const imageUrls: string[] = []
       const videoUrls: string[] = []
@@ -336,11 +348,10 @@ export default function ArmoniHaberlerPage() {
         authorName:
           currentUser.firstName && currentUser.lastName
             ? `${currentUser.firstName} ${currentUser.lastName}`
-            : currentUser.username || currentUser.email,
+            : currentUser.username || currentUser.email || "Unknown User",
       }
 
       await addDoc(collection(db, "haberler"), haberData)
-
       showAlert("success", "Haber successfully added!")
       setNewHaber({ title: "", content: "", mediaFiles: [] })
       setShowAddHaberForm(false)
@@ -358,7 +369,6 @@ export default function ArmoniHaberlerPage() {
     if (!editingHaber || !currentUser) return
 
     setActionLoading("edit-haber")
-
     try {
       const imageUrls: string[] = [...(editingHaber.imageUrls || [])]
       const videoUrls: string[] = [...(editingHaber.videoUrls || [])]
@@ -372,7 +382,7 @@ export default function ArmoniHaberlerPage() {
         }
       }
 
-      const updateData: any = {
+      const updateData: UpdateData<Haber> = {
         title: newHaber.title,
         content: newHaber.content,
         updatedAt: new Date(),
@@ -382,7 +392,6 @@ export default function ArmoniHaberlerPage() {
       if (videoUrls.length > 0) updateData.videoUrls = videoUrls
 
       await updateDoc(doc(db, "haberler", editingHaber.id), updateData)
-
       showAlert("success", "Haber successfully updated!")
       setEditingHaber(null)
       setNewHaber({ title: "", content: "", mediaFiles: [] })
@@ -402,14 +411,13 @@ export default function ArmoniHaberlerPage() {
     }
 
     setActionLoading(haberId)
-
     try {
       const allUrls = [...(imageUrls || []), ...(videoUrls || [])]
       for (const url of allUrls) {
         try {
           const mediaRef = ref(storage, url)
           await deleteObject(mediaRef)
-        } catch (error) {
+        } catch (_error) {
           console.log("Media file not found or already deleted")
         }
       }
@@ -501,7 +509,6 @@ export default function ArmoniHaberlerPage() {
             >
               <X className="h-6 w-6 text-white" />
             </button>
-
             {fullscreen.type === "image" ? (
               <img
                 src={fullscreen.url || "/placeholder.svg"}
@@ -545,6 +552,7 @@ export default function ArmoniHaberlerPage() {
                 <p className="text-slate-600 text-sm md:text-base">Armoni topluluğundan en son haberler</p>
               </div>
             </div>
+
             {adminCheck.isAdmin && (
               <button
                 onClick={() => setShowAddHaberForm(!showAddHaberForm)}
@@ -579,6 +587,7 @@ export default function ArmoniHaberlerPage() {
                 {editingHaber ? "Haber Düzenle" : "Yeni Haber Ekle"}
               </h2>
             </div>
+
             <div className="p-6">
               <form onSubmit={editingHaber ? handleEditHaber : handleAddHaber} className="space-y-4">
                 <div>
@@ -592,7 +601,6 @@ export default function ArmoniHaberlerPage() {
                     placeholder="Haber başlığı"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">İçerik *</label>
                   <textarea
@@ -604,7 +612,6 @@ export default function ArmoniHaberlerPage() {
                     placeholder="Haber içeriği"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Medya (Opsiyonel)</label>
                   <input
@@ -615,7 +622,7 @@ export default function ArmoniHaberlerPage() {
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                   />
                   <p className="text-xs text-slate-500 mt-1">
-                    You can select multiple files at once. Click "Choose Files" again to add more files.
+                    You can select multiple files at once. Click &ldquo;Choose Files&rdquo; again to add more files.
                   </p>
                   {newHaber.mediaFiles.length > 0 && (
                     <div className="mt-2 space-y-2">
@@ -790,9 +797,6 @@ export default function ArmoniHaberlerPage() {
           )}
         </div>
 
-        
-       
-
         {/* Pagination */}
         {!searchTerm && (pagination.currentPage > 1 || haberler.length === 5) && (
           <div className="flex items-center justify-center gap-4 mt-8">
@@ -804,9 +808,7 @@ export default function ArmoniHaberlerPage() {
               <ChevronLeft className="h-4 w-4" />
               <span className="hidden md:inline">Önceki</span>
             </button>
-
             <span className="text-slate-600 font-medium text-sm md:text-base">Sayfa {pagination.currentPage}</span>
-
             <button
               onClick={() => fetchHaberler("next")}
               disabled={haberler.length < 5}
