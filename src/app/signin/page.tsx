@@ -132,7 +132,7 @@ export default function SignIn() {
         <form onSubmit={handleUsernameSignIn} className="mt-6 space-y-5">
           <div className="space-y-1">
             <label htmlFor="username" className="block text-sm font-medium text-slate-700">
-              Username
+              Kullanıcı Adı
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -146,7 +146,7 @@ export default function SignIn() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="pl-10 block w-full rounded-lg border border-slate-200 bg-slate-50 py-3 px-4 text-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
-                placeholder="username"
+                placeholder="Kullanıcı Adı"
               />
             </div>
           </div>
@@ -154,7 +154,7 @@ export default function SignIn() {
           <div className="space-y-1">
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
+                Şifre
               </label>
               <div className="text-sm">
                 <button
@@ -162,7 +162,7 @@ export default function SignIn() {
                   onClick={() => setFormType("forgot")}
                   className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
                 >
-                  Forgot password?
+                  Şifremi unuttum
                 </button>
               </div>
             </div>
@@ -180,7 +180,7 @@ export default function SignIn() {
                 className="pl-10 block w-full rounded-lg border border-slate-200 bg-slate-50 py-3 px-4 text-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 focus:outline-none"
                 placeholder="••••••••••"
               />
-            </div>
+            </div>  
           </div>
 
           <div className="flex items-center">
@@ -282,25 +282,7 @@ export default function SignIn() {
             </div>
           </div>
 
-          <div className="pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 transition-colors"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  Create account
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </button>
-          </div>
+          
         </form>
       )
     } else if (formType === "forgot") {
@@ -308,7 +290,7 @@ export default function SignIn() {
         <form onSubmit={handleForgotPassword} className="mt-6 space-y-5">
           <div className="space-y-1">
             <label htmlFor="email" className="block text-sm font-medium text-slate-700">
-              Email address
+              E-posta adresi
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -340,7 +322,7 @@ export default function SignIn() {
                 </>
               ) : (
                 <>
-                  Reset password
+                  Şifreyi sıfırla
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </>
               )}
@@ -375,10 +357,10 @@ export default function SignIn() {
                     />
                   </svg>
                 </div>
-                <h1 className="text-2xl font-bold">Stammering Therapy</h1>
+                <h1 className="text-2xl font-bold">E-Kekemelik</h1>
               </div>
-              <p className="mt-6 text-3xl font-bold leading-tight">Find your voice with confidence</p>
-              <p className="mt-2 text-teal-100 text-lg">Personalized therapy that works for you</p>
+              <p className="mt-6 text-3xl font-bold leading-tight">Online Kekemelik Platformu</p>
+              <p className="mt-2 text-teal-100 text-lg">Her zaman ve her yerde</p>
             </div>
 
             <div className="space-y-8 mt-12">
@@ -393,8 +375,8 @@ export default function SignIn() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Personalized sessions</h3>
-                  <p className="text-teal-100">Designed specifically for your needs and progress level</p>
+                  <h3 className="font-semibold text-lg">Sesli Hikaye Okumalar</h3>
+                  <p className="text-teal-100">Dilediğiniz Seviyedeki Hikayeleri Okuyun</p>
                 </div>
               </div>
 
@@ -410,7 +392,7 @@ export default function SignIn() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-lg">Track your progress</h3>
-                  <p className="text-teal-100">Visualize improvements and celebrate milestones</p>
+                  <p className="text-teal-100">İlerlemenizi takip edin. Gelişmeleri gözlemleyin</p>
                 </div>
               </div>
 
@@ -425,30 +407,13 @@ export default function SignIn() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-lg">Community support</h3>
-                  <p className="text-teal-100">Connect with others on the same journey</p>
+                  <h3 className="font-semibold text-lg">Kekemelere Ozel sohbet platformu</h3>
+                  <p className="text-teal-100">Kekemeler ve terapistler ile konuşun</p>
                 </div>
               </div>
             </div>
 
-            <div className="pt-12">
-              <div className="p-4 bg-white/10 rounded-lg">
-                <p className="italic text-teal-50">
-                  {
-                    "This app has transformed my confidence in speaking. I have made more progress in 3 months than in years of traditional therapy."
-                  }
-                </p>
-                <div className="mt-3 flex items-center">
-                  <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-medium">
-                    JD
-                  </div>
-                  <div className="ml-2">
-                    <p className="text-sm font-medium">Jamie D.</p>
-                    <p className="text-xs text-teal-200">Member since 2023</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
           </div>
         </div>
 
@@ -457,14 +422,14 @@ export default function SignIn() {
           <div className="max-w-md mx-auto">
             <div className="text-center md:text-left">
               <h2 className="text-3xl font-bold text-slate-900">
-                {formType === "signin" && "Welcome"}
-                {formType === "signup" && "Create an account"}
-                {formType === "forgot" && "Reset your password"}
+                {formType === "signin" && "Hoş geldiniz"}
+                
+                {formType === "forgot" && "Şifrenizi sıfırlayın"}
               </h2>
               <p className="mt-3 text-slate-600">
-                {formType === "signin" && "Sign in to continue your practice journey"}
+                {formType === "signin" && "Devam etmek için oturum açın"}
                 {formType === "signup" && "Join us to start your speech therapy journey"}
-                {formType === "forgot" && "We'll send you a link to reset your password"}
+                {formType === "forgot" && "Şifrenizi sıfırlamanız için size bir bağlantı göndereceğiz"}
               </p>
             </div>
 
@@ -499,75 +464,16 @@ export default function SignIn() {
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-slate-200"></div>
                     </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-4 bg-white text-slate-500">Or continue with</span>
-                    </div>
+                    
                   </div>
 
-                  <div className="mt-6">
-                    <button
-                      onClick={handleGoogleSignIn}
-                      disabled={loading}
-                      className="w-full flex items-center justify-center px-4 py-3 border border-slate-200 rounded-lg shadow-sm text-base font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 disabled:opacity-50 transition-colors"
-                    >
-                      <svg className="h-5 w-5 mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                        <path
-                          fill="#EA4335"
-                          d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
-                        />
-                        <path
-                          fill="#34A853"
-                          d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2970244 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
-                        />
-                        <path
-                          fill="#4A90E2"
-                          d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
-                        />
-                        <path
-                          fill="#FBBC05"
-                          d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
-                        />
-                      </svg>
-                      Sign in with Google
-                    </button>
-                  </div>
+                  
                 </div>
               </>
             )}
 
             <div className="mt-8 text-center text-slate-600">
-              {formType === "signin" && (
-                <>
-                  {"Do not have an account? "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormType("signup")
-                      setError("")
-                      setSuccessMessage("")
-                    }}
-                    className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
-                  >
-                    Sign up
-                  </button>
-                </>
-              )}
-              {formType === "signup" && (
-                <>
-                  {"Already have an account? "}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setFormType("signin")
-                      setError("")
-                      setSuccessMessage("")
-                    }}
-                    className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
-                  >
-                    Sign in
-                  </button>
-                </>
-              )}
+              
               {formType === "forgot" && (
                 <button
                   type="button"
@@ -578,7 +484,7 @@ export default function SignIn() {
                   }}
                   className="font-medium text-teal-600 hover:text-teal-500 transition-colors"
                 >
-                  Back to sign in
+                  Oturum açma sayfasına geri dön
                 </button>
               )}
             </div>
