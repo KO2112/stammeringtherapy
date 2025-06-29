@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack} from "lucide-react"
+import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack,ChevronLeft, ChevronRight} from "lucide-react"
 import Link from "next/link"
 
 interface TextSegment {
@@ -17,11 +17,12 @@ export default function KirZincirleriniPage() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [activeIndex, setActiveIndex] = useState(-1)
+  const [audioDuration, setAudioDuration] = useState(0)
  
   const audioRef = useRef<HTMLAudioElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Story text segments with timing data - COMPLETE VERSION
+  
   const textSegments: TextSegment[] = [
     { text: "", duration: 0.154, begin: 0.5, index: 0 },
 
@@ -495,6 +496,13 @@ export default function KirZincirleriniPage() {
     }
   }, [])
 
+  // Handle audio metadata loaded to get duration
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setAudioDuration(audioRef.current.duration)
+    }
+  }
+
   const handlePlayPause = () => {
     if (!audioRef.current) return
 
@@ -520,9 +528,7 @@ export default function KirZincirleriniPage() {
     }
     setIsPlaying(!isPlaying)
   }
-
   
-
   const handleSkipForward = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current?.duration || 0)
@@ -544,7 +550,6 @@ export default function KirZincirleriniPage() {
     const progressWidth = rect.width
     const clickPercentage = clickX / progressWidth
     const newTime = clickPercentage * (audioRef.current.duration || 0)
-
     audioRef.current.currentTime = newTime
     setCurrentTime(newTime)
   }
@@ -588,7 +593,6 @@ export default function KirZincirleriniPage() {
             ))}
           </h1>
         </div>
-
         {/* Story Text */}
         <div className="prose prose-lg max-w-none">
           <div className="text-lg md:text-xl leading-relaxed text-slate-700">
@@ -616,13 +620,24 @@ export default function KirZincirleriniPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
       <div className="bg-white shadow-sm border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div className="max-w-7x1 mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link href="/dashboard/stories" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
               <ArrowLeft className="h-5 w-5 mr-2" />
               <span className="hidden sm:inline">Hikayelere Dön</span>
               <span className="sm:hidden">Geri</span>
             </Link>
+
+            {/* Navigation Buttons */}
+<div className="flex items-center space-x-5">
+  
+  <Link href="/dashboard/stories/bir-balikci-hikayesi" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+    <span className="hidden sm:inline">Sonraki Hikaye</span>
+    <span className="sm:hidden">Sonraki</span>
+    <ChevronRight className="h-4 w-4 ml-1" />
+  </Link>
+</div>
+
             <div className="flex items-center text-sm text-slate-500">
               <Volume2 className="h-4 w-4 mr-2" />
               <span className="hidden sm:inline">Sesli Hikaye</span>
@@ -640,7 +655,7 @@ export default function KirZincirleriniPage() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0">
               <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">Sesli Okuma</h2>
               <div className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded">
-                {formatTime(currentTime)} / {formatTime(audioRef.current?.duration || 0)}
+                {formatTime(currentTime)} / {formatTime(audioDuration)}
               </div>
             </div>
 
@@ -653,7 +668,6 @@ export default function KirZincirleriniPage() {
               >
                 <SkipBack className="h-4 w-4" />
               </button>
-
               <button
                 onClick={handlePlayPause}
                 className={`flex items-center justify-center w-12 h-12 rounded-full text-white transition-all duration-200 hover:scale-105 shadow-lg ${
@@ -665,7 +679,6 @@ export default function KirZincirleriniPage() {
               >
                 {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
               </button>
-
               <button
                 onClick={handleSkipForward}
                 className="flex items-center justify-center w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all duration-200 hover:scale-105"
@@ -685,7 +698,7 @@ export default function KirZincirleriniPage() {
                 <div
                   className="bg-gradient-to-r from-teal-500 to-cyan-500 h-full rounded-full transition-all duration-200 relative"
                   style={{
-                    width: `${audioRef.current?.duration ? (currentTime / audioRef.current.duration) * 100 : 0}%`,
+                    width: `${audioDuration ? (currentTime / audioDuration) * 100 : 0}%`,
                   }}
                 >
                   {/* Progress indicator dot */}
@@ -699,9 +712,7 @@ export default function KirZincirleriniPage() {
             ref={audioRef}
             src="/1-1.mp3"
             onEnded={handleAudioEnded}
-            onLoadedMetadata={() => {
-              // Audio loaded, ready to play
-            }}
+            onLoadedMetadata={handleLoadedMetadata}
           />
         </div>
 
