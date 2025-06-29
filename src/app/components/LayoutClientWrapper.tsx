@@ -16,7 +16,8 @@ export default function LayoutClientWrapper({
     ,"/dashboard/private-sessions","/dashboard/stories","/dashboard/support", "/dashboard/Read-Out-Loud","/dashboard/Admin","/dashboard/stories/kir-zincilerini","/dashboard/stories/bir-balikci-hikayesi",
     "/dashboard/stories/gurultu","/dashboard/stories/iyi-ornek-olmak","/dashboard/stories/ozgur-kuslar","/dashboard/stories/semsiye-tamircisi"
   ,"/dashboard/stories/kim-fark-eder","/dashboard/stories/zehir","/dashboard/stories/hemen-mi-olecegim","/dashboard/stories/sirkin-kapisindan-dondugum-gece",
-"/dashboard/stories/bambu-agaci","/dashboard/stories/affetmenin-hafifligi"].includes(pathname);
+"/dashboard/stories/bambu-agaci","/dashboard/stories/affetmenin-hafifligi","/dashboard/stories/garson-kiz","/dashboard/stories/kisilik","/dashboard/stories/kavak-agaci-ile-kabak",
+"/dashboard/stories/on-yargi","/dashboard/stories/profesyonel-yardim"].includes(pathname);
 
   return (
     <>
