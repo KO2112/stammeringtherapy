@@ -5,8 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import {
   signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
+  
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
 } from "firebase/auth"
