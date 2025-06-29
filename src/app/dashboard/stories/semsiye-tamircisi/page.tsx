@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack,ChevronLeft, ChevronRight} from "lucide-react"
+import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack,ChevronLeft,} from "lucide-react"
 import Link from "next/link"
 
 interface TextSegment {
