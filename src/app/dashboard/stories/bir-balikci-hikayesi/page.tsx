@@ -819,7 +819,7 @@ export default function KirZincirleriniPage() {
     <span className="hidden sm:inline">Önceki Hikaye</span>
     <span className="sm:hidden">Önceki</span>
   </Link>
-  <Link href="/your-next-story-link" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
+  <Link href="/dashboard/stories/gurultu" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
     <span className="hidden sm:inline">Sonraki Hikaye</span>
     <span className="sm:hidden">Sonraki</span>
     <ChevronRight className="h-4 w-4 ml-1" />

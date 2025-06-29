@@ -360,28 +360,8 @@ export default function HikayelerPage() {
         >
           Tüm Hikayeler
         </button>
-        <button
-          onClick={() => setActiveFilter("bookmarked")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
-            activeFilter === "bookmarked"
-              ? "bg-amber-100 text-amber-800"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <Bookmark className="h-4 w-4 mr-1.5" />
-          Favoriler
-        </button>
-        <button
-          onClick={() => setActiveFilter("completed")}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
-            activeFilter === "completed"
-              ? "bg-emerald-100 text-emerald-800"
-              : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-          }`}
-        >
-          <CheckCircle className="h-4 w-4 mr-1.5" />
-          Tamamlanan
-        </button>
+        
+        
       </div>
 
       {/* Stories List */}
