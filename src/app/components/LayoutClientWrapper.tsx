@@ -19,7 +19,7 @@ export default function LayoutClientWrapper({
 "/dashboard/stories/bambu-agaci","/dashboard/stories/affetmenin-hafifligi","/dashboard/stories/garson-kiz","/dashboard/stories/kisilik","/dashboard/stories/kavak-agaci-ile-kabak",
 "/dashboard/stories/on-yargi","/dashboard/stories/profesyonel-yardim","/dashboard/stories/hayallerinizden-vazgecmeyin","/dashboard/stories/zeka-ozurluler-sinifi",
 "/dashboard/stories/akilli-deli","/dashboard/stories/elimden-gelen-cabayi-gosterecegim","/dashboard/stories/einstein-ve-soforu","/dashboard/stories/firtina-ciktiginda-uyuyabilirim",
-"/dashboard/stories/bir-hayir-vardir","/dashboard/stories/stanford-universitesi","/dashboard/stories/bagislamanin-yuceligi","/dashboard/armoni-haberler"].includes(pathname);
+"/dashboard/stories/bir-hayir-vardir","/dashboard/stories/stanford-universitesi","/dashboard/stories/bagislamanin-yuceligi","/dashboard/armoni-haberler","/dashboard/sohbet"].includes(pathname);
 
   return (
     <>
