@@ -68,6 +68,8 @@ export default function OgrenciTakipPage() {
 
   const fetchStoryVisits = async () => {
     try {
+      console.log("📊 Fetching story visits...")
+
       // Get visits from last 30 days
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
@@ -91,10 +93,35 @@ export default function OgrenciTakipPage() {
 
       console.log(`📊 Found ${visits.length} visits in last 30 days`)
 
+      // Get all existing users to filter out deleted users
+      console.log("👥 Checking which users still exist...")
+      const usersRef = collection(db, "users")
+      const usersSnapshot = await getDocs(usersRef)
+      const existingUserIds = new Set<string>()
+
+      usersSnapshot.forEach((doc) => {
+        existingUserIds.add(doc.id)
+      })
+
+      console.log(`👤 Found ${existingUserIds.size} existing users`)
+
+      // Filter visits to only include existing users
+      const validVisits = visits.filter((visit) => {
+        const userExists = existingUserIds.has(visit.userId)
+        if (!userExists) {
+          console.log(`🗑️ Filtering out visit from deleted user: ${visit.username} (${visit.userId})`)
+        }
+        return userExists
+      })
+
+      console.log(
+        `✅ ${validVisits.length} visits from existing users (filtered out ${visits.length - validVisits.length} from deleted users)`,
+      )
+
       // Group visits by user
       const statsMap = new Map<string, UserStat>()
 
-      visits.forEach((visit) => {
+      validVisits.forEach((visit) => {
         const userId = visit.userId
         const existing = statsMap.get(userId)
 
@@ -120,7 +147,7 @@ export default function OgrenciTakipPage() {
       // Convert to array and sort by visit count
       const statsArray = Array.from(statsMap.values()).sort((a, b) => b.visitCount - a.visitCount)
 
-      console.log(`👥 Processed ${statsArray.length} users`)
+      console.log(`👥 Processed ${statsArray.length} active users`)
       setUserStats(statsArray)
       setLoading(false)
     } catch (error) {
@@ -168,7 +195,7 @@ export default function OgrenciTakipPage() {
                 <BookOpen className="h-8 w-8 text-teal-600" />
                 <h1 className="text-3xl font-bold text-slate-900">Öğrenci Takip</h1>
               </div>
-              <p className="text-slate-600">Son 30 gündeki hikaye ziyaret istatistikleri</p>
+              <p className="text-slate-600">Son 30 gündeki hikaye ziyaret istatistikleri (sadece aktif kullanıcılar)</p>
             </div>
             <button
               onClick={refreshData}
@@ -326,7 +353,7 @@ export default function OgrenciTakipPage() {
             ) : (
               <div className="text-center py-12">
                 <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-500 font-medium">Son 30 günde hikaye ziyaret eden öğrenci bulunamadı</p>
+                <p className="text-slate-500 font-medium">Son 30 günde hikaye ziyaret eden aktif öğrenci bulunamadı</p>
               </div>
             )}
           </div>

@@ -4,7 +4,18 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { auth, db } from "../../../../firebase"
 import { onAuthStateChanged } from "firebase/auth"
-import { collection, getDocs, doc, updateDoc, query, orderBy, getDoc, type Timestamp } from "firebase/firestore"
+import {
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  orderBy,
+  getDoc,
+  where,
+  deleteDoc,
+  type Timestamp,
+} from "firebase/firestore"
 import { Search, Plus, Shield, ShieldCheck, Trash2, Users, UserPlus, AlertCircle, CheckCircle, X } from "lucide-react"
 import { deleteUserComplete } from "../../../../lib/actions/delete-user-action"
 
@@ -64,6 +75,7 @@ export default function AdminPage() {
 
       try {
         const currentUserDoc = await getDoc(doc(db, "users", user.uid))
+
         if (!currentUserDoc.exists()) {
           setAdminCheck({
             isAdmin: false,
@@ -74,6 +86,7 @@ export default function AdminPage() {
         }
 
         const currentUserData = currentUserDoc.data()
+
         if (currentUserData.role !== "admin") {
           setAdminCheck({
             isAdmin: false,
@@ -119,12 +132,14 @@ export default function AdminPage() {
       const q = query(usersRef, orderBy("email"))
       const querySnapshot = await getDocs(q)
       const usersList: User[] = []
+
       querySnapshot.forEach((doc) => {
         usersList.push({
           id: doc.id,
           ...doc.data(),
         } as User)
       })
+
       setUsers(usersList)
       setLoading(false)
     } catch (error) {
@@ -152,12 +167,14 @@ export default function AdminPage() {
       const usersRef = collection(db, "users")
       const querySnapshot = await getDocs(usersRef)
       let exists = false
+
       querySnapshot.forEach((doc) => {
         const userData = doc.data()
         if (userData.username?.toLowerCase() === username.toLowerCase()) {
           exists = true
         }
       })
+
       return exists
     } catch (error) {
       console.error("Error checking username:", error)
@@ -194,6 +211,7 @@ export default function AdminPage() {
 
       console.log("Response status:", response.status)
       console.log("Response headers:", response.headers)
+
       const contentType = response.headers.get("content-type")
       if (!contentType || !contentType.includes("application/json")) {
         const text = await response.text()
@@ -223,11 +241,13 @@ export default function AdminPage() {
 
   const toggleAdminRole = async (userId: string, currentRole: string) => {
     setActionLoading(userId)
+
     try {
       const newRole = currentRole === "admin" ? "user" : "admin"
       await updateDoc(doc(db, "users", userId), {
         role: newRole,
       })
+
       showAlert("success", `User role updated to ${newRole}`)
       fetchUsers()
     } catch (error) {
@@ -238,17 +258,57 @@ export default function AdminPage() {
     }
   }
 
-  // Updated delete function using server action
+  // Updated delete function with story visits cleanup
   const deleteUserAccount = async (userId: string, email: string) => {
     if (!confirm(`Are you sure you want to delete user ${email}? This action cannot be undone.`)) {
       return
     }
 
     setActionLoading(userId)
+
     try {
+      console.log(`🗑️ Starting deletion for user: ${email}`)
+
+      // 1. Delete story visits first
+      console.log("🧹 Cleaning up story visits...")
+      const visitsRef = collection(db, "storyVisits")
+      const visitsQuery = query(visitsRef, where("userId", "==", userId))
+      const visitsSnapshot = await getDocs(visitsQuery)
+
+      if (!visitsSnapshot.empty) {
+        console.log(`Found ${visitsSnapshot.size} story visits to delete`)
+        const deleteVisitsPromises: Promise<void>[] = []
+        visitsSnapshot.forEach((visitDoc) => {
+          deleteVisitsPromises.push(deleteDoc(doc(db, "storyVisits", visitDoc.id)))
+        })
+        await Promise.all(deleteVisitsPromises)
+        console.log(`✅ Deleted ${visitsSnapshot.size} story visits`)
+      }
+
+      // 2. Delete story completions
+      console.log("🧹 Cleaning up story completions...")
+      const completionsRef = collection(db, "storyCompletions")
+      const completionsQuery = query(completionsRef, where("userId", "==", userId))
+      const completionsSnapshot = await getDocs(completionsQuery)
+
+      if (!completionsSnapshot.empty) {
+        console.log(`Found ${completionsSnapshot.size} story completions to delete`)
+        const deleteCompletionsPromises: Promise<void>[] = []
+        completionsSnapshot.forEach((completionDoc) => {
+          deleteCompletionsPromises.push(deleteDoc(doc(db, "storyCompletions", completionDoc.id)))
+        })
+        await Promise.all(deleteCompletionsPromises)
+        console.log(`✅ Deleted ${completionsSnapshot.size} story completions`)
+      }
+
+      // 3. Call the server action to delete user from auth and users collection
       const result = await deleteUserComplete(userId)
+
       if (result.success) {
-        showAlert("success", result.message)
+        showAlert(
+          "success",
+          `User deleted successfully! Cleaned up ${visitsSnapshot.size} visits and ${completionsSnapshot.size} completions.`,
+        )
         fetchUsers()
       } else {
         showAlert("error", result.message)
@@ -435,7 +495,7 @@ export default function AdminPage() {
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                    placeholder="Minimum 3 characters"
+                    placeholder="Minimum 6 characters"
                     minLength={6}
                   />
                 </div>
@@ -556,6 +616,7 @@ export default function AdminPage() {
                         </div>
                       </div>
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
                       {user.username ? (
                         <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">@{user.username}</span>
@@ -563,7 +624,9 @@ export default function AdminPage() {
                         <span className="text-slate-400 italic">No username</span>
                       )}
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.email}</td>
+
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -583,6 +646,7 @@ export default function AdminPage() {
                         )}
                       </span>
                     </td>
+
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex items-center justify-end gap-2">
                         <button
