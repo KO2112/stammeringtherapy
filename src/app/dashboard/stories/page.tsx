@@ -424,33 +424,7 @@ export default function HikayelerPage() {
               Her seviye kendi içinde özenle seçilmiş hikayeler içerir.
             </p>
           </div>
-          <div className="mt-6 md:mt-0 bg-white/10 backdrop-blur-sm rounded-xl p-4 flex items-center">
-            <div className="mr-4">
-              <div className="text-xs text-teal-100 uppercase tracking-wide font-medium mb-1">İlerlemeniz</div>
-              <div className="text-2xl font-bold">%{progressPercentage}</div>
-            </div>
-            <div className="w-16 h-16 relative">
-              <svg className="w-full h-full" viewBox="0 0 36 36">
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="rgba(255, 255, 255, 0.2)"
-                  strokeWidth="3"
-                  strokeDasharray="100, 100"
-                />
-                <path
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="white"
-                  strokeWidth="3"
-                  strokeDasharray={`${progressPercentage}, 100`}
-                />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <BarChart2 className="h-6 w-6 text-white" />
-              </div>
-            </div>
-          </div>
+          
         </div>
       </div>
 

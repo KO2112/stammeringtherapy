@@ -9,7 +9,9 @@ import { signOut } from "firebase/auth"
 import { auth, db } from "../../../firebase"
 import { useRouter } from "next/navigation"
 import { doc, getDoc } from "firebase/firestore"
-import { Home, Wind, BookOpen, PenLine, User, LogOut, Menu, X, ChevronRight, HelpCircle, Bell, Speech, ShieldIcon as ShieldUser, Newspaper, MessagesSquare} from 'lucide-react'
+import { Home, Wind, BookOpen, User, LogOut, Menu, X, ChevronRight, HelpCircle, Bell, Speech, ShieldIcon as ShieldUser, Newspaper, MessagesSquare,
+  ChartColumnIncreasing
+} from 'lucide-react'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -143,15 +145,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       icon: <Newspaper className="h-5 w-5" />,
     },
     {
-      name: "Günlük",
-      href: "/dashboard/diary",
-      icon: <PenLine className="h-5 w-5" />,
-    },
-    {
       name: "Sohbet",
       href: "/dashboard/sohbet",
       icon: <MessagesSquare className="h-5 w-5" />,
     },
+    
   ]
 
   const secondaryNavItems = [
@@ -169,6 +167,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       name: "Admin",
       href: "/dashboard/Admin",
       icon: <ShieldUser className="h-5 w-5" />,
+    }] : []),
+    ...(userData?.role === "admin" ? [{
+      name: "Öğrenci Takip",
+      href: "/dashboard/ogrenci-takip",
+      icon: <ChartColumnIncreasing className="h-5 w-5" />,
     }] : []),
   ]
 

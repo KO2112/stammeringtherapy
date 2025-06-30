@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from "react"
 import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack, ChevronRight} from "lucide-react"
 import Link from "next/link"
-
+import { onAuthStateChanged, type User } from "firebase/auth"
+import { auth, db } from "../../../../../firebase"
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
 interface TextSegment {
   text: string
   duration: number
@@ -18,10 +20,11 @@ export default function KirZincirleriniPage() {
   const [currentTime, setCurrentTime] = useState(0)
   const [activeIndex, setActiveIndex] = useState(-1)
   const [audioDuration, setAudioDuration] = useState(0)
- 
+  const [user, setUser] = useState<User | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  
   // Story text segments with timing data - COMPLETE VERSION
   const textSegments: TextSegment[] = [
   { text: "", duration: 0.154, begin: 0.500, index: 0 },
@@ -371,7 +374,40 @@ export default function KirZincirleriniPage() {
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`
   }
+ // Track story visit
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser)
+  })
+  return () => unsubscribe()
+}, [])
 
+useEffect(() => {
+  const trackVisit = async () => {
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid))
+        if (!userDoc.exists()) return
+
+        const userData = userDoc.data()
+        const username = userData.username || userData.firstName || "Unknown"
+
+        await addDoc(collection(db, "storyVisits"), {
+          userId: user.uid,
+          username: username,
+          storyName: "Kim Fark Eder", // Change this for each story
+          storyId: "kim-fark-eder",   // Change this for each story
+          visitedAt: serverTimestamp(),
+        })
+        
+        console.log("✅ Visit tracked!")
+      } catch (error) {
+        console.error("❌ Error:", error)
+      }
+    }
+  }
+  trackVisit()
+}, [user])
   const renderTextSegments = () => {
     const titleSegments = textSegments.filter((segment) => segment.isTitle)
     const bodySegments = textSegments.filter((segment) => !segment.isTitle && segment.text.trim())
@@ -426,7 +462,7 @@ export default function KirZincirleriniPage() {
       <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7x1 mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard/stories/zehir" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
+            <Link href="/dashboard/stories" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
               <ArrowLeft className="h-5 w-5 mr-2" />
               <span className="hidden sm:inline">Hikayelere Dön</span>
               <span className="sm:hidden">Geri</span>
