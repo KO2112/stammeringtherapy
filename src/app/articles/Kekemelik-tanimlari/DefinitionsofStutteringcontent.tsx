@@ -60,7 +60,7 @@ export default function DefinitionsOfStutteringArticle() {
               farklı yönlerine odaklanmalarıdır. Johnson (1958) bu çeşitliliği bir fili tarif eden altı kör adamın 
               hikayesiyle açıkladı. Her adam hayvanı farklı şekilde tarif etti çünkü her biri farklı bir parçasına 
               dokundu. Benzer şekilde, kekemelik tanımları her araştırmacının vurguladığı yöne göre değişir 
-              (Silverman, 2004'te belirtildiği gibi).
+              (Silverman, 2004 te belirtildiği gibi).
             </p>
           </div>
 
@@ -72,10 +72,10 @@ export default function DefinitionsOfStutteringArticle() {
               <h2 className="text-2xl font-bold text-gray-900">Kekemeliğin Erken Tanımları</h2>
             </div>
             <p className="text-gray-700 leading-relaxed">
-              En erken tanımlardan biri 1940'larda ve 1950'lerde Johnson ve meslektaşlarından geldi. Kekemeliği 
+              En erken tanımlardan biri 1940 larda ve 1950 lerde Johnson ve meslektaşlarından geldi. Kekemeliği 
               hoş olmayan, endişeli, hipertonik bir kaçınma tepkisi olarak tanımladılar. Başka bir deyişle, 
               kekemeliğin konuşmacının kekemelik beklediği, korku hissettiği, gerginleştiği ve durumdan kaçınmaya 
-              çalıştığı zamanlarda yaptığı şey olduğuna inanıyorlardı (Manning, 2010'da belirtildiği gibi). 
+              çalıştığı zamanlarda yaptığı şey olduğuna inanıyorlardı (Manning, 2010 da belirtildiği gibi). 
               Ancak bu tanım sınırlıydı çünkü belirgin korku veya gerilim olmadan ortaya çıkan kekemelik 
               vakalarını göz ardı ediyordu (Silverman, 2004).
             </p>
@@ -123,7 +123,7 @@ export default function DefinitionsOfStutteringArticle() {
               <div className="bg-blue-100 p-2 rounded-full mr-4">
                 <FileText className="h-6 w-6 text-blue-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Wingate'in Standart Tanımı</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Wingatein Standart Tanımı</h2>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <p className="text-gray-700 leading-relaxed">

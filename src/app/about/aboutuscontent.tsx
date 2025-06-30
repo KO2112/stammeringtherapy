@@ -169,11 +169,11 @@ const AboutPage = () => {
                 ihtiyacı olan herkese ulaştırmak.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                Doğu Avrupa, Batı Avrupa ve Kuzey Amerika'dan onlarca Odyoloji ve Konuşma Bozuklukları Uzmanı, 
+                Doğu Avrupa, Batı Avrupa ve Kuzey Amerikadan onlarca Odyoloji ve Konuşma Bozuklukları Uzmanı, 
                 kekemelik terapisti ve konuşma terapistini bir araya getiren ortak çabamız.
               </p>
               <p className="text-gray-700 leading-relaxed">
-                23 yıldan fazla birleşik deneyimimizle, dünya çapında 10.000'den fazla kişinin kekemelik 
+                23 yıldan fazla birleşik deneyimimizle, dünya çapında 10.000 den fazla kişinin kekemelik 
                 zorluklarını aşmasına ve konuşma güveni kazanmasına yardımcı olduk.
               </p>
 

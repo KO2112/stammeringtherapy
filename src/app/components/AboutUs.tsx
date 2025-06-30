@@ -64,7 +64,7 @@ const AboutUs = () => {
               Etkili kekemelik terapisini ihtiyaç duyan herkese erişilebilir kılmak amacıyla bir araya gelen kekemelik terapi uzmanlarından oluşan özel bir ekibiz.
             </p>
             <p className="text-gray-700 text-lg leading-relaxed">
-              İşbirlikçi çabamız, Doğu Avrupa, Batı Avrupa ve Kuzey Amerika'dan onlarca Odyoloji ve Konuşma Bozuklukları Uzmanı, kekemelik terapisti ve konuşma terapistini bir araya getiriyor.
+              İşbirlikçi çabamız, Doğu Avrupa, Batı Avrupa ve Kuzey Amerikadan onlarca Odyoloji ve Konuşma Bozuklukları Uzmanı, kekemelik terapisti ve konuşma terapistini bir araya getiriyor.
             </p>
             
             <div className="bg-blue-50 p-6 rounded-xl border border-blue-100 mt-8">

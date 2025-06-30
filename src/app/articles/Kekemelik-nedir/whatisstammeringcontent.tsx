@@ -55,7 +55,7 @@ export default function KekemelikNedirMakalesi() {
             </div>
             <p className="text-gray-700 leading-relaxed">
               Birçok araştırmacı, kekemeliği açıklamadan önce akıcılığı tanımlamanın önemini vurgulamıştır.
-              Starkweather'a (1987) göre akıcılık, konuşma ve dil performansında kolaylık anlamına gelir. Akıcı konuşanlar
+              Starkweathera (1987) göre akıcılık, konuşma ve dil performansında kolaylık anlamına gelir. Akıcı konuşanlar
               konuşmada o kadar beceriklidirler ki bunu zahmetsizce yaparlar. Sesler, kelimeler ve cümleler fark edilir
               duraklamalar olmadan düzgün bir şekilde akar. Akıcılık her zaman yüksek düzeyde bir dil yeterliliğine dayanır
               ve akıcı konuşmanın doğal bir ritmi vardır. Bu ritim bozulduğunda, konuşma akıcısız hale gelir.
@@ -71,7 +71,7 @@ export default function KekemelikNedirMakalesi() {
             </div>
             <p className="text-gray-700 leading-relaxed">
               Akıcısızlık, konuşma üretiminin sürekliliğindeki kesintiler olarak tanımlanır (Starkweather, 1987).
-              Silverman'a (2004) göre akıcısız konuşma, heceler arasına ses eklemeyi (um veya uh gibi), ilk hece veya
+              Silvermana (2004) göre akıcısız konuşma, heceler arasına ses eklemeyi (um veya uh gibi), ilk hece veya
               kelimeyi tekrarlamayı, telaffuz hatalarını veya hataları düzeltmeyi içerebilir. Dinleyici bunları bir
               akıcılık bozukluğunun belirtileri olarak fark etmezse, onları hiç fark etmeyebilir bile.
             </p>
@@ -86,7 +86,7 @@ export default function KekemelikNedirMakalesi() {
             </div>
             <p className="text-gray-700 leading-relaxed">
               Geleneksel olarak kekemelik, konuşmanın ritmi veya akıcılığının kesintiler ve bloklar tarafından bozulduğu
-              bir bozukluk olarak tanımlanır (Bloodstein ve Ratner, 2008). Amerikan Psikiyatri Derneği'ne göre
+              bir bozukluk olarak tanımlanır (Bloodstein ve Ratner, 2008). Amerikan Psikiyatri Derneğine göre
               (DSM-IV-TR, 2000), kekemeliğin ana özelliği konuşmanın akıcılığı ve zamanlamasında kişinin yaşına uygun
               olmayan bir bozulmadır.
             </p>
