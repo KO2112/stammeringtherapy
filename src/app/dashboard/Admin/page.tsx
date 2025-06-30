@@ -365,7 +365,7 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 p-3 md:p-6">
       {alert.show && (
         <div
           className={`fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg ${
@@ -375,7 +375,7 @@ export default function AdminPage() {
           }`}
         >
           {alert.type === "success" ? <CheckCircle className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
-          <span className="font-medium">{alert.message}</span>
+          <span className="font-medium text-sm md:text-base">{alert.message}</span>
           <button
             onClick={() => setAlert({ show: false, type: "success", message: "" })}
             className="ml-2 text-slate-400 hover:text-slate-600"
@@ -386,49 +386,49 @@ export default function AdminPage() {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-6 md:mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Shield className="h-8 w-8 text-teal-600" />
-            <h1 className="text-3xl font-bold text-slate-900">Yönetici paneli</h1>
+            <Shield className="h-6 w-6 md:h-8 md:w-8 text-teal-600" />
+            <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Yönetici paneli</h1>
           </div>
-          <p className="text-slate-600">Kullanıcıları, rolleri ve sistem ayarlarını yönetin</p>
+          <p className="text-sm md:text-base text-slate-600">Kullanıcıları, rolleri ve sistem ayarlarını yönetin</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-blue-50 rounded-lg">
+                <Users className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Kullanıcı sayısı</p>
-                <p className="text-2xl font-bold text-slate-900">{users.length}</p>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Kullanıcı sayısı</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">{users.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-teal-50 rounded-lg">
-                <ShieldCheck className="h-6 w-6 text-teal-600" />
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-teal-50 rounded-lg">
+                <ShieldCheck className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Admin sayısı</p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-xs md:text-sm font-medium text-slate-600">Admin sayısı</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">
                   {users.filter((user) => user.role === "admin").length}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <UserPlus className="h-6 w-6 text-green-600" />
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-green-50 rounded-lg">
+                <UserPlus className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Kullanıcı Sayısı</p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-xs md:text-sm font-medium text-slate-600">Kullanıcı Sayısı</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">
                   {users.filter((user) => user.role !== "admin").length}
                 </p>
               </div>
@@ -436,25 +436,26 @@ export default function AdminPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-8">
-          <div className="p-6 border-b border-slate-200">
-            <div className="flex items-center justify-between">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 md:mb-8">
+          <div className="p-4 md:p-6 border-b border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <UserPlus className="h-6 w-6 text-teal-600" />
-                <h2 className="text-xl font-semibold text-slate-900">Kullanıcı Ekle</h2>
+                <UserPlus className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
+                <h2 className="text-lg md:text-xl font-semibold text-slate-900">Kullanıcı Ekle</h2>
               </div>
               <button
                 onClick={() => setShowAddUserForm(!showAddUserForm)}
-                className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 md:px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-sm md:text-base"
               >
                 <Plus className="h-4 w-4" />
-                Kullanıcı Ekle
+                <span className="hidden sm:inline">Kullanıcı Ekle</span>
+                <span className="sm:hidden">Ekle</span>
               </button>
             </div>
           </div>
 
           {showAddUserForm && (
-            <div className="p-6">
+            <div className="p-4 md:p-6">
               <form onSubmit={handleAddUser} className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Username *</label>
@@ -466,7 +467,7 @@ export default function AdminPage() {
                       const username = e.target.value.replace(/\s/g, "").toLowerCase()
                       setNewUser({ ...newUser, username })
                     }}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
                     placeholder="kemalorhan (Boşluk Olmadan)"
                     minLength={3}
                   />
@@ -482,7 +483,7 @@ export default function AdminPage() {
                     required
                     value={newUser.email}
                     onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
                     placeholder="user@example.com"
                   />
                 </div>
@@ -494,7 +495,7 @@ export default function AdminPage() {
                     required
                     value={newUser.password}
                     onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
                     placeholder="Minimum 6 characters"
                     minLength={6}
                   />
@@ -506,7 +507,7 @@ export default function AdminPage() {
                     type="text"
                     value={newUser.firstName}
                     onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
                     placeholder="John"
                   />
                 </div>
@@ -517,16 +518,16 @@ export default function AdminPage() {
                     type="text"
                     value={newUser.lastName}
                     onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
                     placeholder="Doe"
                   />
                 </div>
 
-                <div className="md:col-span-2 flex gap-3">
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
                   <button
                     type="submit"
                     disabled={actionLoading === "add-user"}
-                    className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 md:px-6 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm md:text-base"
                   >
                     {actionLoading === "add-user" ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
@@ -542,7 +543,7 @@ export default function AdminPage() {
                       setShowAddUserForm(false)
                       setNewUser({ email: "", username: "", firstName: "", lastName: "", password: "" })
                     }}
-                    className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                    className="px-4 py-2 md:px-6 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm md:text-base"
                   >
                     Cancel
                   </button>
@@ -553,11 +554,11 @@ export default function AdminPage() {
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-          <div className="p-6 border-b border-slate-200">
+          <div className="p-4 md:p-6 border-b border-slate-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Users className="h-6 w-6 text-teal-600" />
-                <h2 className="text-xl font-semibold text-slate-900">Kullanıcı Yönetimi</h2>
+                <Users className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
+                <h2 className="text-lg md:text-xl font-semibold text-slate-900">Kullanıcı Yönetimi</h2>
               </div>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
@@ -566,13 +567,107 @@ export default function AdminPage() {
                   placeholder="Kullanıcı ara..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent w-full sm:w-64"
+                  className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent w-full sm:w-64 text-sm md:text-base"
                 />
               </div>
             </div>
           </div>
 
-          <div className="overflow-x-auto">
+          {/* Mobile Card View */}
+          <div className="block md:hidden">
+            {filteredUsers.length > 0 ? (
+              <div className="p-4 space-y-4">
+                {filteredUsers.map((user) => (
+                  <div key={user.id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                          <span className="text-white font-medium text-sm">
+                            {user.firstName
+                              ? user.firstName.charAt(0).toUpperCase()
+                              : user.username
+                                ? user.username.charAt(0).toUpperCase()
+                                : user.email.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium text-slate-900">
+                            {user.firstName && user.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user.firstName || user.username || "No name"}
+                          </div>
+                          <div className="text-xs text-slate-600">{user.email}</div>
+                        </div>
+                      </div>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                          user.role === "admin" ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-800"
+                        }`}
+                      >
+                        {user.role === "admin" ? (
+                          <>
+                            <ShieldCheck className="h-3 w-3 mr-1" />
+                            Admin
+                          </>
+                        ) : (
+                          <>
+                            <Users className="h-3 w-3 mr-1" />
+                            User
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    {user.username && (
+                      <div className="mb-3">
+                        <span className="font-mono bg-white px-2 py-1 rounded text-xs border">@{user.username}</span>
+                      </div>
+                    )}
+
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => toggleAdminRole(user.id, user.role || "user")}
+                        disabled={actionLoading === user.id}
+                        className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                          user.role === "admin"
+                            ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                            : "bg-teal-100 text-teal-700 hover:bg-teal-200"
+                        } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      >
+                        {actionLoading === user.id ? (
+                          <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
+                        ) : user.role === "admin" ? (
+                          <Shield className="h-3 w-3" />
+                        ) : (
+                          <ShieldCheck className="h-3 w-3" />
+                        )}
+                        {user.role === "admin" ? "Remove Admin" : "Make Admin"}
+                      </button>
+
+                      <button
+                        onClick={() => deleteUserAccount(user.id, user.email)}
+                        disabled={actionLoading === user.id}
+                        className="flex items-center justify-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+                <p className="text-slate-500 font-medium">
+                  {searchTerm ? "No users found matching your search" : "No users found"}
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-slate-50">
                 <tr>

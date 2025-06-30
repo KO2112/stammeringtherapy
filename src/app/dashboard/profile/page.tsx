@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
 import { auth, db, storage } from "../../../../firebase"
 import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore"
@@ -25,9 +24,6 @@ import {
   Instagram,
   Linkedin,
   Github,
-  Settings,
-  Shield,
-  Bell,
   LogOut,
 } from "lucide-react"
 
@@ -131,7 +127,6 @@ export default function ProfilePage() {
         } else {
           // If no document exists yet, use data from auth
           setProfileData(initialProfile)
-
           // Create a new user document
           await setDoc(userDocRef, {
             ...initialProfile,
@@ -140,7 +135,7 @@ export default function ProfilePage() {
         }
       } catch (error) {
         console.error("Error fetching user profile:", error)
-        showNotification("Failed to load profile data", "error")
+        showNotification("Profil verileri yüklenemedi", "error")
       } finally {
         setLoading(false)
       }
@@ -155,7 +150,6 @@ export default function ProfilePage() {
       type,
       visible: true,
     })
-
     setTimeout(() => {
       setNotification((prev) => ({ ...prev, visible: false }))
     }, 3000)
@@ -170,7 +164,6 @@ export default function ProfilePage() {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0]
       setImage(file)
-
       // Create preview URL
       const reader = new FileReader()
       reader.onloadend = () => {
@@ -215,10 +208,10 @@ export default function ProfilePage() {
       setImage(null)
 
       // Success notification
-      showNotification("Profile updated successfully!", "success")
+      showNotification("Profil başarıyla güncellendi!", "success")
     } catch (error) {
       console.error("Error updating profile:", error)
-      showNotification("Failed to update profile. Please try again.", "error")
+      showNotification("Profil güncellenemedi. Lütfen tekrar deneyin.", "error")
     } finally {
       setSaving(false)
     }
@@ -244,7 +237,7 @@ export default function ProfilePage() {
     } else if (profileData.lastName) {
       return profileData.lastName
     } else {
-      return "Anonymous User"
+      return "Anonim Kullanıcı"
     }
   }
 
@@ -253,7 +246,7 @@ export default function ProfilePage() {
       <div className="flex justify-center items-center h-full min-h-screen bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="h-12 w-12 rounded-full border-4 border-slate-200 border-t-slate-800 animate-spin"></div>
-          <p className="text-slate-600 font-medium">Loading profile...</p>
+          <p className="text-slate-600 font-medium">Profil yükleniyor...</p>
         </div>
       </div>
     )
@@ -299,7 +292,7 @@ export default function ProfilePage() {
                         {previewUrl || profileData.photoURL ? (
                           <img
                             src={previewUrl || profileData.photoURL}
-                            alt="Profile"
+                            alt="Profil"
                             className="h-full w-full object-cover rounded-full"
                           />
                         ) : (
@@ -311,7 +304,7 @@ export default function ProfilePage() {
                           type="button"
                           onClick={triggerFileInput}
                           className="absolute bottom-0 right-0 bg-violet-500 text-white p-1.5 rounded-full shadow-md hover:bg-violet-600 transition-all"
-                          aria-label="Change profile picture"
+                          aria-label="Profil fotoğrafını değiştir"
                         >
                           <Camera className="h-4 w-4" />
                         </button>
@@ -329,21 +322,18 @@ export default function ProfilePage() {
 
                 <div className="pt-14 pb-6 px-6 text-center">
                   <h2 className="text-xl font-bold text-slate-900">{getFullName()}</h2>
-
                   {profileData.occupation && (
                     <p className="text-slate-600 mt-1 flex items-center justify-center gap-1.5">
                       <Briefcase className="h-3.5 w-3.5" />
                       <span>{profileData.occupation}</span>
                     </p>
                   )}
-
                   {profileData.location && (
                     <p className="text-slate-600 mt-1 flex items-center justify-center gap-1.5">
                       <MapPin className="h-3.5 w-3.5" />
                       <span>{profileData.location}</span>
                     </p>
                   )}
-
                   {profileData.bio && <p className="mt-4 text-slate-700 text-sm">{profileData.bio}</p>}
 
                   {/* Social links */}
@@ -416,46 +406,13 @@ export default function ProfilePage() {
                     }`}
                   >
                     <User className="h-5 w-5" />
-                    <span className="font-medium">Profile Information</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("account")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left ${
-                      activeTab === "account" ? "bg-violet-50 text-violet-700" : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <Settings className="h-5 w-5" />
-                    <span className="font-medium">Account Settings</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("security")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left ${
-                      activeTab === "security" ? "bg-violet-50 text-violet-700" : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <Shield className="h-5 w-5" />
-                    <span className="font-medium">Security</span>
-                  </button>
-
-                  <button
-                    onClick={() => setActiveTab("notifications")}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left ${
-                      activeTab === "notifications"
-                        ? "bg-violet-50 text-violet-700"
-                        : "text-slate-700 hover:bg-slate-50"
-                    }`}
-                  >
-                    <Bell className="h-5 w-5" />
-                    <span className="font-medium">Notifications</span>
+                    <span className="font-medium">Profil Bilgileri</span>
                   </button>
                 </nav>
-
                 <div className="px-4 py-4 border-t border-slate-200">
                   <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-rose-600 hover:bg-rose-50">
                     <LogOut className="h-5 w-5" />
-                    <span className="font-medium">Sign Out</span>
+                    <span className="font-medium">Çıkış Yap</span>
                   </button>
                 </div>
               </div>
@@ -470,16 +427,15 @@ export default function ProfilePage() {
                   {/* Personal Information */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                      <h2 className="text-lg font-semibold text-slate-900">Personal Information</h2>
+                      <h2 className="text-lg font-semibold text-slate-900">Kişisel Bilgiler</h2>
                       <Edit2 className="h-5 w-5 text-slate-500" />
                     </div>
-
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* First Name */}
                         <div>
                           <label htmlFor="firstName" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            First Name
+                            Ad
                           </label>
                           <input
                             type="text"
@@ -488,14 +444,14 @@ export default function ProfilePage() {
                             value={profileData.firstName}
                             onChange={handleChange}
                             className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                            placeholder="Enter your first name"
+                            placeholder="Adınızı girin"
                           />
                         </div>
 
                         {/* Last Name */}
                         <div>
                           <label htmlFor="lastName" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Last Name
+                            Soyad
                           </label>
                           <input
                             type="text"
@@ -504,14 +460,14 @@ export default function ProfilePage() {
                             value={profileData.lastName}
                             onChange={handleChange}
                             className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                            placeholder="Enter your last name"
+                            placeholder="Soyadınızı girin"
                           />
                         </div>
 
                         {/* Occupation */}
                         <div>
                           <label htmlFor="occupation" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Occupation
+                            Meslek
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -524,7 +480,7 @@ export default function ProfilePage() {
                               value={profileData.occupation || ""}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="What do you do?"
+                              placeholder="Ne iş yapıyorsunuz?"
                             />
                           </div>
                         </div>
@@ -532,7 +488,7 @@ export default function ProfilePage() {
                         {/* Birthday */}
                         <div>
                           <label htmlFor="birthday" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Birthday
+                            Doğum Tarihi
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -552,7 +508,7 @@ export default function ProfilePage() {
                         {/* Location */}
                         <div>
                           <label htmlFor="location" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Location
+                            Konum
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -565,7 +521,7 @@ export default function ProfilePage() {
                               value={profileData.location}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="City, Country"
+                              placeholder="Şehir, Ülke"
                             />
                           </div>
                         </div>
@@ -573,7 +529,7 @@ export default function ProfilePage() {
                         {/* Phone Number */}
                         <div>
                           <label htmlFor="phoneNumber" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Phone Number
+                            Telefon Numarası
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -586,7 +542,7 @@ export default function ProfilePage() {
                               value={profileData.phoneNumber}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="Enter your phone number"
+                              placeholder="Telefon numaranızı girin"
                             />
                           </div>
                         </div>
@@ -595,7 +551,7 @@ export default function ProfilePage() {
                       {/* Bio */}
                       <div className="mt-6">
                         <label htmlFor="bio" className="block text-sm font-medium text-slate-700 mb-1.5">
-                          About Me
+                          Hakkımda
                         </label>
                         <textarea
                           name="bio"
@@ -604,10 +560,10 @@ export default function ProfilePage() {
                           value={profileData.bio}
                           onChange={handleChange}
                           className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                          placeholder="Tell us a bit about yourself..."
+                          placeholder="Kendiniz hakkında biraz bilgi verin..."
                         />
                         <p className="mt-1.5 text-xs text-slate-500">
-                          Your bio will be displayed on your public profile
+                          Biyografiniz herkese açık profilinizde görüntülenecektir
                         </p>
                       </div>
                     </div>
@@ -616,16 +572,15 @@ export default function ProfilePage() {
                   {/* Social Profiles */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                      <h2 className="text-lg font-semibold text-slate-900">Social Profiles</h2>
+                      <h2 className="text-lg font-semibold text-slate-900">Sosyal Medya Profilleri</h2>
                       <Edit2 className="h-5 w-5 text-slate-500" />
                     </div>
-
                     <div className="p-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Website */}
                         <div>
                           <label htmlFor="website" className="block text-sm font-medium text-slate-700 mb-1.5">
-                            Website
+                            Web Sitesi
                           </label>
                           <div className="relative">
                             <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -638,7 +593,7 @@ export default function ProfilePage() {
                               value={profileData.website || ""}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="https://yourwebsite.com"
+                              placeholder="https://websitesi.com"
                             />
                           </div>
                         </div>
@@ -659,7 +614,7 @@ export default function ProfilePage() {
                               value={profileData.twitter || ""}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="username (without @)"
+                              placeholder="kullanıcıadı (@ olmadan)"
                             />
                           </div>
                         </div>
@@ -680,7 +635,7 @@ export default function ProfilePage() {
                               value={profileData.instagram || ""}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="username (without @)"
+                              placeholder="kullanıcıadı (@ olmadan)"
                             />
                           </div>
                         </div>
@@ -701,12 +656,10 @@ export default function ProfilePage() {
                               value={profileData.linkedin || ""}
                               onChange={handleChange}
                               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-all"
-                              placeholder="username or profile path"
+                              placeholder="kullanıcıadı veya profil yolu"
                             />
                           </div>
                         </div>
-
-                        
                       </div>
                     </div>
                   </div>
@@ -718,15 +671,14 @@ export default function ProfilePage() {
                   {/* Account Information */}
                   <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                     <div className="px-6 py-5 border-b border-slate-200 flex justify-between items-center">
-                      <h2 className="text-lg font-semibold text-slate-900">Account Information</h2>
+                      <h2 className="text-lg font-semibold text-slate-900">Hesap Bilgileri</h2>
                       <Edit2 className="h-5 w-5 text-slate-500" />
                     </div>
-
                     <div className="p-6">
                       {/* Email - Read only */}
                       <div>
                         <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1.5">
-                          Email Address
+                          E-posta Adresi
                         </label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -742,153 +694,22 @@ export default function ProfilePage() {
                           />
                         </div>
                         <p className="mt-1.5 text-xs text-slate-500">
-                          Email cannot be changed. Contact support for help.
+                          E-posta değiştirilemez. Yardım için destek ekibiyle iletişime geçin.
                         </p>
                       </div>
 
                       <div className="mt-8 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                        <h3 className="text-sm font-medium text-amber-800">Account Verification</h3>
+                        <h3 className="text-sm font-medium text-amber-800">Hesap Doğrulama</h3>
                         <p className="mt-1 text-xs text-amber-700">
-                          Your account is not verified. Please check your email for verification instructions or request
-                          a new verification email.
+                          Hesabınız doğrulanmamış. Lütfen doğrulama talimatları için e-postanızı kontrol edin veya yeni
+                          bir doğrulama e-postası isteyin.
                         </p>
                         <button
                           type="button"
                           className="mt-3 px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-medium rounded-lg transition-colors"
                         >
-                          Resend Verification Email
+                          Doğrulama E-postasını Tekrar Gönder
                         </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Danger Zone */}
-                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div className="px-6 py-5 border-b border-slate-200">
-                      <h2 className="text-lg font-semibold text-slate-900">Danger Zone</h2>
-                    </div>
-
-                    <div className="p-6">
-                      <div className="p-4 border border-rose-200 rounded-lg bg-rose-50">
-                        <h3 className="text-sm font-medium text-rose-800">Delete Account</h3>
-                        <p className="mt-1 text-xs text-rose-700">
-                          Once you delete your account, there is no going back. Please be certain.
-                        </p>
-                        <button
-                          type="button"
-                          className="mt-3 px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 text-sm font-medium rounded-lg transition-colors"
-                        >
-                          Delete Account
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "security" && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div className="px-6 py-5 border-b border-slate-200">
-                    <h2 className="text-lg font-semibold text-slate-900">Security Settings</h2>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-sm font-medium text-slate-700 mb-3">Password</h3>
-                        <button
-                          type="button"
-                          className="px-4 py-2 bg-violet-100 hover:bg-violet-200 text-violet-800 text-sm font-medium rounded-lg transition-colors"
-                        >
-                          Change Password
-                        </button>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-200">
-                        <h3 className="text-sm font-medium text-slate-700 mb-3">Two-Factor Authentication</h3>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-slate-600 text-sm">Protect your account with 2FA</p>
-                            <p className="text-xs text-slate-500 mt-1">
-                              Add an extra layer of security to your account
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            className="px-4 py-2 bg-violet-100 hover:bg-violet-200 text-violet-800 text-sm font-medium rounded-lg transition-colors"
-                          >
-                            Enable 2FA
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-200">
-                        <h3 className="text-sm font-medium text-slate-700 mb-3">Login Sessions</h3>
-                        <p className="text-slate-600 text-sm">You are currently logged in on these devices:</p>
-
-                        <div className="mt-3 space-y-3">
-                          <div className="p-3 bg-slate-50 rounded-lg flex justify-between items-center">
-                            <div>
-                              <p className="text-sm font-medium text-slate-700">Current Browser</p>
-                              <p className="text-xs text-slate-500">Last active: Just now</p>
-                            </div>
-                            <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full">
-                              Active
-                            </span>
-                          </div>
-                        </div>
-
-                        <button
-                          type="button"
-                          className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-sm font-medium rounded-lg transition-colors"
-                        >
-                          Log Out All Other Sessions
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "notifications" && (
-                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                  <div className="px-6 py-5 border-b border-slate-200">
-                    <h2 className="text-lg font-semibold text-slate-900">Notification Preferences</h2>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-medium text-slate-700">Email Notifications</h3>
-                          <p className="text-xs text-slate-500 mt-1">Receive updates about account activity</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" defaultChecked />
-                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
-                        </label>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-medium text-slate-700">Push Notifications</h3>
-                          <p className="text-xs text-slate-500 mt-1">Receive notifications on your device</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
-                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
-                        </label>
-                      </div>
-
-                      <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
-                        <div>
-                          <h3 className="text-sm font-medium text-slate-700">Marketing Emails</h3>
-                          <p className="text-xs text-slate-500 mt-1">Receive emails about new features and updates</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input type="checkbox" className="sr-only peer" />
-                          <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-500"></div>
-                        </label>
                       </div>
                     </div>
                   </div>
@@ -901,7 +722,7 @@ export default function ProfilePage() {
                   type="button"
                   className="px-6 py-2.5 bg-white border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition-colors"
                 >
-                  Cancel
+                  İptal
                 </button>
                 <button
                   type="submit"
@@ -930,12 +751,12 @@ export default function ProfilePage() {
                           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                         ></path>
                       </svg>
-                      Saving Changes...
+                      Değişiklikler Kaydediliyor...
                     </>
                   ) : (
                     <>
                       <Save className="h-4 w-4 mr-2" />
-                      Save Changes
+                      Değişiklikleri Kaydet
                     </>
                   )}
                 </button>

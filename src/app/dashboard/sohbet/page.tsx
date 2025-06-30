@@ -20,7 +20,7 @@ import {
   setDoc,
   type Timestamp,
 } from "firebase/firestore"
-import { MessageCircle, Users, Shield, Search, X, Plus, Send, Trash2 } from "lucide-react"
+import { MessageCircle, Users, Shield, Search, X, Plus, Send, Trash2, Menu } from "lucide-react"
 
 interface ChatUser {
   uid: string
@@ -92,6 +92,7 @@ export default function SohbetPage() {
   const [searching, setSearching] = useState(false)
   const [unreadCounts, setUnreadCounts] = useState<Record<string, number>>({})
   const [generalUnreadCount, setGeneralUnreadCount] = useState(0)
+  const [showMobileSidebar, setShowMobileSidebar] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Scroll to bottom when messages change
@@ -173,6 +174,7 @@ export default function SohbetPage() {
         const lastReadTime = userReadDoc.exists() ? userReadDoc.data().lastReadTime : null
 
         let unreadCount = 0
+
         snapshot.forEach((doc) => {
           const messageData = doc.data()
           if (messageData.senderId !== userId) {
@@ -205,6 +207,7 @@ export default function SohbetPage() {
               const lastReadTime = userReadDoc.exists() ? userReadDoc.data().lastReadTime : null
 
               let unreadCount = 0
+
               snapshot.forEach((doc) => {
                 const messageData = doc.data()
                 if (messageData.senderId !== userId) {
@@ -216,7 +219,6 @@ export default function SohbetPage() {
 
               // Update active chats with new unread count
               setActiveChats((prev) => prev.map((chat) => (chat.id === chatId ? { ...chat, unreadCount } : chat)))
-
               // Also update unread counts for admin chats (for regular users)
               setUnreadCounts((prev) => ({ ...prev, [chatId]: unreadCount }))
             }
@@ -245,6 +247,7 @@ export default function SohbetPage() {
               const lastReadTime = userReadDoc.exists() ? userReadDoc.data().lastReadTime : null
 
               let unreadCount = 0
+
               snapshot.forEach((doc) => {
                 const messageData = doc.data()
                 // Only count messages FROM the admin TO the current user as unread
@@ -270,6 +273,7 @@ export default function SohbetPage() {
           if (otherUserId === userId) return // Skip self
 
           const chatId = [userId, otherUserId].sort().join("_")
+
           const messagesRef = collection(db, "private_messages", chatId, "messages")
           const messagesQuery = query(messagesRef, orderBy("createdAt", "desc"))
 
@@ -280,6 +284,7 @@ export default function SohbetPage() {
               const lastReadTime = userReadDoc.exists() ? userReadDoc.data().lastReadTime : null
 
               let unreadCount = 0
+
               snapshot.forEach((doc) => {
                 const messageData = doc.data()
                 // Only count messages FROM the other user TO the current admin as unread
@@ -292,7 +297,6 @@ export default function SohbetPage() {
 
               // Update active chats with new unread count
               setActiveChats((prev) => prev.map((chat) => (chat.id === chatId ? { ...chat, unreadCount } : chat)))
-
               // Also update unread counts for this specific chat
               setUnreadCounts((prev) => ({ ...prev, [chatId]: unreadCount }))
             }
@@ -310,11 +314,13 @@ export default function SohbetPage() {
       const usersRef = collection(db, "users")
       const adminQuery = query(usersRef, where("role", "==", "admin"))
       const adminSnapshot = await getDocs(adminQuery)
+
       const adminList: ChatUser[] = []
 
       for (const doc of adminSnapshot.docs) {
         const adminData = doc.data()
         const adminProfilePicUrl = await getProfilePictureUrl(doc.id)
+
         adminList.push({
           uid: doc.id,
           ...adminData,
@@ -348,6 +354,7 @@ export default function SohbetPage() {
           if (otherParticipantId) {
             // Get other participant's data
             const otherUserDoc = await getDoc(doc(db, "users", otherParticipantId))
+
             if (otherUserDoc.exists()) {
               const otherUserData = otherUserDoc.data()
               const otherUserPhoto = await getProfilePictureUrl(otherParticipantId)
@@ -391,6 +398,7 @@ export default function SohbetPage() {
       const messagesSnapshot = await getDocs(messagesQuery)
 
       let unreadCount = 0
+
       messagesSnapshot.forEach((doc) => {
         const messageData = doc.data()
         if (messageData.senderId !== userId) {
@@ -450,6 +458,7 @@ export default function SohbetPage() {
       const userChatsDoc = await getDoc(userChatsRef)
 
       let existingChats = []
+
       if (userChatsDoc.exists()) {
         existingChats = userChatsDoc.data().chats || []
       }
@@ -471,9 +480,11 @@ export default function SohbetPage() {
     }
 
     setSearching(true)
+
     try {
       const usersRef = collection(db, "users")
       const snapshot = await getDocs(usersRef)
+
       const results: ChatUser[] = []
 
       for (const docSnapshot of snapshot.docs) {
@@ -485,6 +496,7 @@ export default function SohbetPage() {
 
         if (searchableText.includes(term.toLowerCase())) {
           const userPhoto = await getProfilePictureUrl(docSnapshot.id)
+
           results.push({
             uid: docSnapshot.id,
             ...userData,
@@ -565,6 +577,7 @@ export default function SohbetPage() {
               ...doc.data(),
             } as Message)
           })
+
           setMessages(messageList)
 
           // Mark chat as read when viewing messages
@@ -589,6 +602,7 @@ export default function SohbetPage() {
     if (!newMessage.trim() || !currentUser || sending) return
 
     setSending(true)
+
     try {
       let messagesRef
       let chatId
@@ -662,6 +676,7 @@ export default function SohbetPage() {
     setSelectedChat(chat)
     setMessages([])
     setShowUserSearch(false)
+    setShowMobileSidebar(false) // Close mobile sidebar
 
     // Mark chat as read when selecting it
     const chatId = chat.type === "general" ? "general" : [currentUser!.uid, chat.participantId].sort().join("_")
@@ -743,309 +758,339 @@ export default function SohbetPage() {
   }
 
   return (
-    <div className="h-screen bg-slate-50 flex overflow-hidden">
-      {/* Sidebar */}
-      <div className="w-80 bg-white border-r border-slate-200 flex flex-col">
-        <div className="p-4 border-b border-slate-200">
-          <h1 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-teal-600" />
-            Sohbet
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Hoş geldin, {currentUser.firstName || currentUser.username || "User"}!
-          </p>
-          {currentUser.role === "admin" && (
-            <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
-              <Shield className="h-3 w-3" />
-              Admin
-            </p>
-          )}
-        </div>
+    <div className="h-screen bg-slate-50 flex flex-col md:flex-row overflow-hidden">
+      {/* Mobile Header - only visible on mobile */}
+      <div className="md:hidden bg-white border-b border-slate-200 p-4 flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+          <MessageCircle className="h-5 w-5 text-teal-600" />
+          {selectedChat.name || "Sohbet"}
+        </h1>
+        <button onClick={() => setShowMobileSidebar(!showMobileSidebar)} className="p-2 rounded-lg hover:bg-slate-100">
+          <Menu className="h-5 w-5 text-slate-600" />
+        </button>
+      </div>
 
-        <div className="flex-1 overflow-y-auto">
-          {/* General Chat */}
-          <div className="p-2">
-            <button
-              onClick={() =>
-                selectChat({
-                  id: "general",
-                  name: "Genel Sohbet",
-                  type: "general",
-                })
-              }
-              className={`w-full p-3 rounded-lg text-left transition-colors ${
-                selectedChat.id === "general" ? "bg-teal-100 text-teal-900" : "hover:bg-slate-100 text-slate-700"
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center relative">
-                  <Users className="h-5 w-5 text-white" />
-                  {generalUnreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">
-                        {generalUnreadCount > 9 ? "9+" : generalUnreadCount}
-                      </span>
-                    </div>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">Genel Sohbet</p>
-                  <p className="text-sm text-slate-500">Tüm kullanıcılar</p>
-                </div>
-              </div>
+      {/* Sidebar */}
+      <div
+        className={`${
+          showMobileSidebar
+            ? "fixed inset-0 z-50 bg-black bg-opacity-50 md:bg-transparent md:relative md:inset-auto"
+            : "hidden"
+        } md:block md:w-80 md:bg-white md:border-r md:border-slate-200 md:flex md:flex-col`}
+      >
+        <div
+          className={`${
+            showMobileSidebar ? "w-80 h-full bg-white" : "w-full h-full"
+          } md:w-full md:h-full flex flex-col`}
+        >
+          <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-semibold text-slate-900 flex items-center gap-2">
+                <MessageCircle className="h-6 w-6 text-teal-600" />
+                <span className="hidden md:inline">Sohbet</span>
+              </h1>
+              <p className="text-sm text-slate-500 mt-1 hidden md:block">
+                Hoş geldin, {currentUser.firstName || currentUser.username || "User"}!
+              </p>
+              {currentUser.role === "admin" && (
+                <p className="text-xs text-blue-600 mt-1 flex items-center gap-1 hidden md:flex">
+                  <Shield className="h-3 w-3" />
+                  Admin
+                </p>
+              )}
+            </div>
+            <button onClick={() => setShowMobileSidebar(false)} className="md:hidden p-2 rounded-lg hover:bg-slate-100">
+              <X className="h-5 w-5 text-slate-600" />
             </button>
           </div>
 
-          {/* Admin Search (for admins only) */}
-          {currentUser.role === "admin" && (
+          <div className="flex-1 overflow-y-auto">
+            {/* General Chat */}
             <div className="p-2">
-              <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center justify-between">
-                Kullanıcı Ara
-                <button
-                  onClick={() => setShowUserSearch(!showUserSearch)}
-                  className="text-teal-600 hover:text-teal-700"
-                >
-                  {showUserSearch ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                </button>
-              </div>
-              {showUserSearch && (
-                <div className="px-2 pb-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <input
-                      type="text"
-                      placeholder="Kullanıcı ara..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
-                    />
+              <button
+                onClick={() =>
+                  selectChat({
+                    id: "general",
+                    name: "Genel Sohbet",
+                    type: "general",
+                  })
+                }
+                className={`w-full p-3 rounded-lg text-left transition-colors ${
+                  selectedChat.id === "general" ? "bg-teal-100 text-teal-900" : "hover:bg-slate-100 text-slate-700"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-teal-600 rounded-full flex items-center justify-center relative">
+                    <Users className="h-4 w-4 md:h-5 md:w-5 text-white" />
+                    {generalUnreadCount > 0 && (
+                      <div className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-red-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">
+                          {generalUnreadCount > 9 ? "9+" : generalUnreadCount}
+                        </span>
+                      </div>
+                    )}
                   </div>
-                  {searching && (
-                    <div className="text-center py-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-teal-600 mx-auto"></div>
-                    </div>
-                  )}
-                  {searchResults.length > 0 && (
-                    <div className="mt-2 max-h-40 overflow-y-auto">
-                      {searchResults.map((user) => (
-                        <button
-                          key={user.uid}
-                          onClick={() => startChatWithUser(user)}
-                          className="w-full p-2 rounded-lg text-left hover:bg-slate-100 transition-colors"
-                        >
-                          <div className="flex items-center gap-2">
-                            <img
-                              src={user.profilePhoto || "/placeholder.svg"}
-                              alt={user.firstName || user.username || "User"}
-                              className="w-6 h-6 rounded-full object-cover"
-                              onError={(e) => {
-                                const target = e.currentTarget
-                                target.style.display = "none"
-                                const fallback = target.nextElementSibling as HTMLElement
-                                if (fallback) {
-                                  fallback.style.display = "flex"
-                                }
-                              }}
-                            />
-                            <div
-                              className="w-6 h-6 bg-slate-400 rounded-full flex items-center justify-center text-xs text-white"
-                              style={{ display: user.profilePhoto ? "none" : "flex" }}
-                            >
-                              {(user.firstName?.[0] || user.username?.[0] || "U").toUpperCase()}
-                            </div>
-                            <span className="text-sm">{user.firstName || user.username || user.email}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                  <div className="flex-1">
+                    <p className="font-medium text-sm md:text-base">Genel Sohbet</p>
+                    <p className="text-xs md:text-sm text-slate-500">Tüm kullanıcılar</p>
+                  </div>
                 </div>
-              )}
+              </button>
             </div>
-          )}
 
-          {/* Admins (for regular users) */}
-          {currentUser.role !== "admin" && admins.length > 0 && (
-            <div className="p-2">
-              <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Adminler ({admins.length})
-              </div>
-              {admins.map((admin) => {
-                const adminUnreadCount = unreadCounts[`admin_${admin.uid}`] || 0
-
-                return (
+            {/* Admin Search (for admins only) */}
+            {currentUser.role === "admin" && (
+              <div className="p-2">
+                <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider flex items-center justify-between">
+                  Kullanıcı Ara
                   <button
-                    key={admin.uid}
-                    onClick={() =>
-                      selectChat({
-                        id: `private_${admin.uid}`,
-                        name: admin.firstName || admin.username || admin.email || "Admin",
-                        type: "private",
-                        participantId: admin.uid,
-                        participantName: admin.firstName || admin.username || admin.email || "Admin",
-                        participantPhoto: admin.profilePhoto,
-                      })
-                    }
-                    className={`w-full p-3 rounded-lg text-left transition-colors mb-1 ${
-                      selectedChat.id === `private_${admin.uid}`
-                        ? "bg-teal-100 text-teal-900"
-                        : "hover:bg-slate-100 text-slate-700"
-                    }`}
+                    onClick={() => setShowUserSearch(!showUserSearch)}
+                    className="text-teal-600 hover:text-teal-700"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img
-                          src={admin.profilePhoto || "/placeholder.svg"}
-                          alt={admin.firstName || admin.username || "Admin"}
-                          className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => {
-                            const target = e.currentTarget
-                            target.style.display = "none"
-                            const fallback = target.parentElement?.querySelector(".fallback-avatar") as HTMLElement
-                            if (fallback) {
-                              fallback.style.display = "flex"
-                            }
-                          }}
-                        />
-                        <div
-                          className="fallback-avatar w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center"
-                          style={{ display: admin.profilePhoto ? "none" : "flex" }}
-                        >
-                          <span className="text-white font-medium text-sm">
-                            {(admin.firstName?.[0] || admin.username?.[0] || "A").toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center">
-                          <Shield className="h-2.5 w-2.5 text-white" />
-                        </div>
-                        {adminUnreadCount > 0 && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">
-                              {adminUnreadCount > 9 ? "9+" : adminUnreadCount}
+                    {showUserSearch ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                  </button>
+                </div>
+                {showUserSearch && (
+                  <div className="px-2 pb-2">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      <input
+                        type="text"
+                        placeholder="Kullanıcı ara..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
+                      />
+                    </div>
+                    {searching && (
+                      <div className="text-center py-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-teal-600 mx-auto"></div>
+                      </div>
+                    )}
+                    {searchResults.length > 0 && (
+                      <div className="mt-2 max-h-40 overflow-y-auto">
+                        {searchResults.map((user) => (
+                          <button
+                            key={user.uid}
+                            onClick={() => startChatWithUser(user)}
+                            className="w-full p-2 rounded-lg text-left hover:bg-slate-100 transition-colors"
+                          >
+                            <div className="flex items-center gap-2">
+                              <img
+                                src={user.profilePhoto || "/placeholder.svg"}
+                                alt={user.firstName || user.username || "User"}
+                                className="w-6 h-6 rounded-full object-cover"
+                                onError={(e) => {
+                                  const target = e.currentTarget
+                                  target.style.display = "none"
+                                  const fallback = target.nextElementSibling as HTMLElement
+                                  if (fallback) {
+                                    fallback.style.display = "flex"
+                                  }
+                                }}
+                              />
+                              <div
+                                className="w-6 h-6 bg-slate-400 rounded-full flex items-center justify-center text-xs text-white"
+                                style={{ display: user.profilePhoto ? "none" : "flex" }}
+                              >
+                                {(user.firstName?.[0] || user.username?.[0] || "U").toUpperCase()}
+                              </div>
+                              <span className="text-sm">{user.firstName || user.username || user.email}</span>
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Admins (for regular users) */}
+            {currentUser.role !== "admin" && admins.length > 0 && (
+              <div className="p-2">
+                <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Adminler ({admins.length})
+                </div>
+                {admins.map((admin) => {
+                  const adminUnreadCount = unreadCounts[`admin_${admin.uid}`] || 0
+                  return (
+                    <button
+                      key={admin.uid}
+                      onClick={() =>
+                        selectChat({
+                          id: `private_${admin.uid}`,
+                          name: admin.firstName || admin.username || admin.email || "Admin",
+                          type: "private",
+                          participantId: admin.uid,
+                          participantName: admin.firstName || admin.username || admin.email || "Admin",
+                          participantPhoto: admin.profilePhoto,
+                        })
+                      }
+                      className={`w-full p-3 rounded-lg text-left transition-colors mb-1 ${
+                        selectedChat.id === `private_${admin.uid}`
+                          ? "bg-teal-100 text-teal-900"
+                          : "hover:bg-slate-100 text-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <img
+                            src={admin.profilePhoto || "/placeholder.svg"}
+                            alt={admin.firstName || admin.username || "Admin"}
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.currentTarget
+                              target.style.display = "none"
+                              const fallback = target.parentElement?.querySelector(".fallback-avatar") as HTMLElement
+                              if (fallback) {
+                                fallback.style.display = "flex"
+                              }
+                            }}
+                          />
+                          <div
+                            className="fallback-avatar w-8 h-8 md:w-10 md:h-10 bg-blue-600 rounded-full flex items-center justify-center"
+                            style={{ display: admin.profilePhoto ? "none" : "flex" }}
+                          >
+                            <span className="text-white font-medium text-xs md:text-sm">
+                              {(admin.firstName?.[0] || admin.username?.[0] || "A").toUpperCase()}
                             </span>
                           </div>
-                        )}
+                          <div className="absolute -top-1 -right-1 w-3 h-3 md:w-4 md:h-4 bg-blue-600 rounded-full flex items-center justify-center">
+                            <Shield className="h-2 w-2 md:h-2.5 md:w-2.5 text-white" />
+                          </div>
+                          {adminUnreadCount > 0 && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-red-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                {adminUnreadCount > 9 ? "9+" : adminUnreadCount}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm md:text-base">
+                            {admin.firstName || admin.username || admin.email || "Admin"}
+                          </p>
+                          <p className="text-xs md:text-sm text-slate-500">Admin</p>
+                        </div>
                       </div>
-                      <div className="flex-1">
-                        <p className="font-medium">{admin.firstName || admin.username || admin.email || "Admin"}</p>
-                        <p className="text-sm text-slate-500">Admin</p>
-                      </div>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-          )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
-          {/* Active Chats */}
-          {activeChats.filter((chat) => {
-            // For regular users, filter out chats with admins since they're already shown in the admins section
-            if (currentUser.role !== "admin") {
-              return !admins.some((admin) => admin.uid === chat.otherParticipant.uid)
-            }
-            return true
-          }).length > 0 && (
-            <div className="p-2">
-              <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
-                Sohbetler (
-                {
-                  activeChats.filter((chat) => {
+            {/* Active Chats */}
+            {activeChats.filter((chat) => {
+              // For regular users, filter out chats with admins since they're already shown in the admins section
+              if (currentUser.role !== "admin") {
+                return !admins.some((admin) => admin.uid === chat.otherParticipant.uid)
+              }
+              return true
+            }).length > 0 && (
+              <div className="p-2">
+                <div className="px-3 py-2 text-xs font-medium text-slate-500 uppercase tracking-wider">
+                  Sohbetler (
+                  {
+                    activeChats.filter((chat) => {
+                      if (currentUser.role !== "admin") {
+                        return !admins.some((admin) => admin.uid === chat.otherParticipant.uid)
+                      }
+                      return true
+                    }).length
+                  }
+                  )
+                </div>
+                {activeChats
+                  .filter((chat) => {
                     if (currentUser.role !== "admin") {
                       return !admins.some((admin) => admin.uid === chat.otherParticipant.uid)
                     }
                     return true
-                  }).length
-                }
-                )
-              </div>
-              {activeChats
-                .filter((chat) => {
-                  if (currentUser.role !== "admin") {
-                    return !admins.some((admin) => admin.uid === chat.otherParticipant.uid)
-                  }
-                  return true
-                })
-                .map((chat) => (
-                  <button
-                    key={chat.id}
-                    onClick={() =>
-                      selectChat({
-                        id: `private_${chat.otherParticipant.uid}`,
-                        name:
-                          chat.otherParticipant.firstName ||
-                          chat.otherParticipant.username ||
-                          chat.otherParticipant.email ||
-                          "User",
-                        type: "private",
-                        participantId: chat.otherParticipant.uid,
-                        participantName:
-                          chat.otherParticipant.firstName ||
-                          chat.otherParticipant.username ||
-                          chat.otherParticipant.email ||
-                          "User",
-                        participantPhoto: chat.otherParticipant.profilePhoto,
-                      })
-                    }
-                    className={`w-full p-3 rounded-lg text-left transition-colors mb-1 ${
-                      selectedChat.id === `private_${chat.otherParticipant.uid}`
-                        ? "bg-teal-100 text-teal-900"
-                        : "hover:bg-slate-100 text-slate-700"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <img
-                          src={chat.otherParticipant.profilePhoto || "/placeholder.svg"}
-                          alt={chat.otherParticipant.firstName || chat.otherParticipant.username || "User"}
-                          className="w-10 h-10 rounded-full object-cover"
-                          onError={(e) => {
-                            const target = e.currentTarget
-                            target.style.display = "none"
-                            const fallback = target.parentElement?.querySelector(".fallback-avatar") as HTMLElement
-                            if (fallback) {
-                              fallback.style.display = "flex"
-                            }
-                          }}
-                        />
-                        <div
-                          className="fallback-avatar w-10 h-10 bg-slate-600 rounded-full flex items-center justify-center"
-                          style={{ display: chat.otherParticipant.profilePhoto ? "none" : "flex" }}
-                        >
-                          <span className="text-white font-medium text-sm">
-                            {(
-                              chat.otherParticipant.firstName?.[0] ||
-                              chat.otherParticipant.username?.[0] ||
-                              "U"
-                            ).toUpperCase()}
-                          </span>
-                        </div>
-                        {(chat.unreadCount || 0) > 0 && (
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">
-                              {(chat.unreadCount || 0) > 9 ? "9+" : chat.unreadCount}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <p className="font-medium">
-                          {chat.otherParticipant.firstName ||
+                  })
+                  .map((chat) => (
+                    <button
+                      key={chat.id}
+                      onClick={() =>
+                        selectChat({
+                          id: `private_${chat.otherParticipant.uid}`,
+                          name:
+                            chat.otherParticipant.firstName ||
                             chat.otherParticipant.username ||
                             chat.otherParticipant.email ||
-                            "User"}
-                        </p>
+                            "User",
+                          type: "private",
+                          participantId: chat.otherParticipant.uid,
+                          participantName:
+                            chat.otherParticipant.firstName ||
+                            chat.otherParticipant.username ||
+                            chat.otherParticipant.email ||
+                            "User",
+                          participantPhoto: chat.otherParticipant.profilePhoto,
+                        })
+                      }
+                      className={`w-full p-3 rounded-lg text-left transition-colors mb-1 ${
+                        selectedChat.id === `private_${chat.otherParticipant.uid}`
+                          ? "bg-teal-100 text-teal-900"
+                          : "hover:bg-slate-100 text-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <img
+                            src={chat.otherParticipant.profilePhoto || "/placeholder.svg"}
+                            alt={chat.otherParticipant.firstName || chat.otherParticipant.username || "User"}
+                            className="w-8 h-8 md:w-10 md:h-10 rounded-full object-cover"
+                            onError={(e) => {
+                              const target = e.currentTarget
+                              target.style.display = "none"
+                              const fallback = target.parentElement?.querySelector(".fallback-avatar") as HTMLElement
+                              if (fallback) {
+                                fallback.style.display = "flex"
+                              }
+                            }}
+                          />
+                          <div
+                            className="fallback-avatar w-8 h-8 md:w-10 md:h-10 bg-slate-600 rounded-full flex items-center justify-center"
+                            style={{ display: chat.otherParticipant.profilePhoto ? "none" : "flex" }}
+                          >
+                            <span className="text-white font-medium text-xs md:text-sm">
+                              {(
+                                chat.otherParticipant.firstName?.[0] ||
+                                chat.otherParticipant.username?.[0] ||
+                                "U"
+                              ).toUpperCase()}
+                            </span>
+                          </div>
+                          {(chat.unreadCount || 0) > 0 && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 md:w-5 md:h-5 bg-red-500 rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">
+                                {(chat.unreadCount || 0) > 9 ? "9+" : chat.unreadCount}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium text-sm md:text-base">
+                            {chat.otherParticipant.firstName ||
+                              chat.otherParticipant.username ||
+                              chat.otherParticipant.email ||
+                              "User"}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </button>
-                ))}
-            </div>
-          )}
+                    </button>
+                  ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
       {/* Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Chat Header */}
-        <div className="bg-white border-b border-slate-200 p-4">
+      <div className="flex-1 flex flex-col min-h-0">
+        {/* Chat Header - hidden on mobile since we have mobile header */}
+        <div className="hidden md:block bg-white border-b border-slate-200 p-4">
           <div className="flex items-center gap-3">
             {selectedChat.type === "general" ? (
               <div className="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
@@ -1074,23 +1119,23 @@ export default function SohbetPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollBehavior: "smooth" }}>
+        <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-4" style={{ scrollBehavior: "smooth" }}>
           {messages.length === 0 ? (
             <div className="text-center py-8">
-              <MessageCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500">Henüz mesaj yok. İlk mesajı sen gönder!</p>
+              <MessageCircle className="h-10 w-10 md:h-12 md:w-12 text-slate-300 mx-auto mb-4" />
+              <p className="text-slate-500 text-sm md:text-base">Henüz mesaj yok. İlk mesajı sen gönder!</p>
             </div>
           ) : (
             messages.map((message) => (
               <div
                 key={message.id}
-                className={`flex gap-3 group ${message.senderId === currentUser.uid ? "flex-row-reverse" : ""}`}
+                className={`flex gap-2 md:gap-3 group ${message.senderId === currentUser.uid ? "flex-row-reverse" : ""}`}
               >
                 <div className="flex-shrink-0 relative">
                   <img
                     src={messageProfilePics[message.senderId] || message.senderPhoto || "/placeholder.svg"}
                     alt={message.senderName}
-                    className="w-8 h-8 rounded-full object-cover"
+                    className="w-6 h-6 md:w-8 md:h-8 rounded-full object-cover"
                     onError={(e) => {
                       const target = e.currentTarget
                       target.style.display = "none"
@@ -1101,7 +1146,7 @@ export default function SohbetPage() {
                     }}
                   />
                   <div
-                    className="fallback-avatar w-8 h-8 bg-slate-400 rounded-full flex items-center justify-center"
+                    className="fallback-avatar w-6 h-6 md:w-8 md:h-8 bg-slate-400 rounded-full flex items-center justify-center"
                     style={{ display: messageProfilePics[message.senderId] || message.senderPhoto ? "none" : "flex" }}
                   >
                     <span className="text-white text-xs font-medium">
@@ -1109,9 +1154,12 @@ export default function SohbetPage() {
                     </span>
                   </div>
                 </div>
-                <div className={`max-w-xs lg:max-w-md ${message.senderId === currentUser.uid ? "text-right" : ""}`}>
+
+                <div
+                  className={`max-w-xs md:max-w-md lg:max-w-lg ${message.senderId === currentUser.uid ? "text-right" : ""}`}
+                >
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-sm font-medium text-slate-900">
+                    <span className="text-xs md:text-sm font-medium text-slate-900">
                       {message.senderId === currentUser.uid ? "Sen" : message.senderName}
                     </span>
                     <span className="text-xs text-slate-500">
@@ -1135,7 +1183,7 @@ export default function SohbetPage() {
                       message.senderId === currentUser.uid ? "bg-teal-600 text-white" : "bg-slate-100 text-slate-900"
                     }`}
                   >
-                    <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                    <p className="text-sm md:text-base whitespace-pre-wrap">{message.text}</p>
                   </div>
                 </div>
               </div>
@@ -1145,24 +1193,24 @@ export default function SohbetPage() {
         </div>
 
         {/* Message Input */}
-        <div className="bg-white border-t border-slate-200 p-4">
-          <div className="flex gap-3">
+        <div className="bg-white border-t border-slate-200 p-3 md:p-4">
+          <div className="flex gap-2 md:gap-3">
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               onKeyPress={handleKeyPress}
               placeholder="Mesajınızı yazın..."
-              className="flex-1 resize-none border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="flex-1 resize-none border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
               rows={1}
-              style={{ minHeight: "40px", maxHeight: "120px" }}
+              style={{ minHeight: "36px", maxHeight: "120px" }}
             />
             <button
               onClick={sendMessage}
               disabled={!newMessage.trim() || sending}
-              className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-3 py-2 md:px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1 md:gap-2"
             >
               <Send className="h-4 w-4" />
-              {sending ? "Gönderiliyor..." : "Gönder"}
+              <span className="hidden md:inline">{sending ? "Gönderiliyor..." : "Gönder"}</span>
             </button>
           </div>
         </div>

@@ -186,68 +186,71 @@ export default function OgrenciTakipPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6">
+    <div className="min-h-screen bg-slate-50 p-3 md:p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <BookOpen className="h-8 w-8 text-teal-600" />
-                <h1 className="text-3xl font-bold text-slate-900">Öğrenci Takip</h1>
+                <BookOpen className="h-6 w-6 md:h-8 md:w-8 text-teal-600" />
+                <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Öğrenci Takip</h1>
               </div>
-              <p className="text-slate-600">Son 30 gündeki hikaye ziyaret istatistikleri (sadece aktif kullanıcılar)</p>
+              <p className="text-sm md:text-base text-slate-600">
+                Son 30 gündeki hikaye ziyaret istatistikleri (sadece aktif kullanıcılar)
+              </p>
             </div>
             <button
               onClick={refreshData}
               disabled={refreshing}
-              className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50"
+              className="flex items-center justify-center gap-2 px-3 py-2 md:px-4 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 text-sm md:text-base"
             >
               {refreshing ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
               ) : (
                 <RefreshCw className="h-4 w-4" />
               )}
-              {refreshing ? "Yenileniyor..." : "Yenile"}
+              <span className="hidden sm:inline">{refreshing ? "Yenileniyor..." : "Yenile"}</span>
+              <span className="sm:hidden">{refreshing ? "..." : "↻"}</span>
             </button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <Users className="h-6 w-6 text-blue-600" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-blue-50 rounded-lg">
+                <Users className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Aktif Öğrenci</p>
-                <p className="text-2xl font-bold text-slate-900">{userStats.length}</p>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Aktif Öğrenci</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">{userStats.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-teal-50 rounded-lg">
-                <BookOpen className="h-6 w-6 text-teal-600" />
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-teal-50 rounded-lg">
+                <BookOpen className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Toplam Ziyaret</p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-xs md:text-sm font-medium text-slate-600">Toplam Ziyaret</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">
                   {userStats.reduce((total, stat) => total + stat.visitCount, 0)}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-green-50 rounded-lg">
-                <Calendar className="h-6 w-6 text-green-600" />
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-green-50 rounded-lg">
+                <Calendar className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm font-medium text-slate-600">Farklı Hikaye</p>
-                <p className="text-2xl font-bold text-slate-900">
+                <p className="text-xs md:text-sm font-medium text-slate-600">Farklı Hikaye</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">
                   {new Set(userStats.flatMap((stat) => stat.stories)).size}
                 </p>
               </div>
@@ -257,12 +260,12 @@ export default function OgrenciTakipPage() {
 
         {/* Search and Results */}
         <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-          <div className="p-6 border-b border-slate-200">
+          <div className="p-4 md:p-6 border-b border-slate-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div className="flex items-center gap-3">
-                <Trophy className="h-6 w-6 text-teal-600" />
-                <h2 className="text-xl font-semibold text-slate-900">Ziyaret Sıralaması</h2>
-                <span className="bg-teal-100 text-teal-800 text-sm font-medium px-2.5 py-0.5 rounded-full">
+                <Trophy className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
+                <h2 className="text-lg md:text-xl font-semibold text-slate-900">Ziyaret Sıralaması</h2>
+                <span className="bg-teal-100 text-teal-800 text-xs md:text-sm font-medium px-2 py-1 md:px-2.5 md:py-0.5 rounded-full">
                   {filteredStats.length} öğrenci
                 </span>
               </div>
@@ -273,24 +276,24 @@ export default function OgrenciTakipPage() {
                   placeholder="Öğrenci ara..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent w-full sm:w-64"
+                  className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent w-full sm:w-64 text-sm md:text-base"
                 />
               </div>
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             {filteredStats.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-3 md:space-y-4">
                 {filteredStats.map((stat, index) => (
                   <div
                     key={stat.userId}
-                    className="bg-slate-50 rounded-lg p-6 border border-slate-200 hover:bg-slate-100 transition-colors"
+                    className="bg-slate-50 rounded-lg p-4 md:p-6 border border-slate-200 hover:bg-slate-100 transition-colors"
                   >
                     <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-3 md:gap-4">
                         <div
-                          className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
+                          className={`flex items-center justify-center w-6 h-6 md:w-8 md:h-8 rounded-full text-xs md:text-sm font-bold ${
                             index === 0
                               ? "bg-yellow-100 text-yellow-800"
                               : index === 1
@@ -303,24 +306,24 @@ export default function OgrenciTakipPage() {
                           {index + 1}
                         </div>
 
-                        <div className="h-12 w-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
-                          <span className="text-white font-medium text-lg">
+                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                          <span className="text-white font-medium text-sm md:text-lg">
                             {stat.username.charAt(0).toUpperCase()}
                           </span>
                         </div>
 
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-slate-900">@{stat.username}</h3>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <h3 className="font-semibold text-slate-900 text-sm md:text-base">@{stat.username}</h3>
                             {index < 3 && (
                               <Trophy
-                                className={`h-4 w-4 ${
+                                className={`h-3 w-3 md:h-4 md:w-4 ${
                                   index === 0 ? "text-yellow-500" : index === 1 ? "text-gray-500" : "text-orange-500"
                                 }`}
                               />
                             )}
                           </div>
-                          <p className="text-sm text-slate-600">
+                          <p className="text-xs md:text-sm text-slate-600">
                             {stat.visitCount} hikaye ziyareti • {stat.stories.length} farklı hikaye
                           </p>
                           {stat.lastVisited && (
@@ -329,14 +332,14 @@ export default function OgrenciTakipPage() {
                         </div>
                       </div>
 
-                      <div className="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm font-medium">
+                      <div className="bg-teal-100 text-teal-800 px-2 py-1 md:px-3 rounded-full text-xs md:text-sm font-medium flex-shrink-0">
                         +{stat.visitCount}
                       </div>
                     </div>
 
-                    <div className="mt-4 ml-16">
-                      <p className="text-sm font-medium text-slate-700 mb-2">Ziyaret Edilen Hikayeler:</p>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="mt-3 md:mt-4 ml-12 md:ml-16">
+                      <p className="text-xs md:text-sm font-medium text-slate-700 mb-2">Ziyaret Edilen Hikayeler:</p>
+                      <div className="flex flex-wrap gap-1 md:gap-2">
                         {stat.stories.map((story, storyIndex) => (
                           <span
                             key={storyIndex}
@@ -351,9 +354,11 @@ export default function OgrenciTakipPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <BookOpen className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <p className="text-slate-500 font-medium">Son 30 günde hikaye ziyaret eden aktif öğrenci bulunamadı</p>
+              <div className="text-center py-8 md:py-12">
+                <BookOpen className="h-10 w-10 md:h-12 md:w-12 text-slate-400 mx-auto mb-4" />
+                <p className="text-slate-500 font-medium text-sm md:text-base">
+                  Son 30 günde hikaye ziyaret eden aktif öğrenci bulunamadı
+                </p>
               </div>
             )}
           </div>
