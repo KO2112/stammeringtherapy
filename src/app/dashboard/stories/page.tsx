@@ -1,24 +1,53 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Clock, BookOpen, BarChart2, CheckCircle, Bookmark, BookmarkCheck, ChevronRight } from "lucide-react"
+import { Clock, BookOpen, BarChart2, CheckCircle, Bookmark, BookmarkCheck, ChevronRight, Plus } from "lucide-react"
+import { auth, db, storage } from "../../../../firebase"
+import { onAuthStateChanged } from "firebase/auth"
+import { collection, getDocs, query, orderBy, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 interface Story {
   id: string
   title: string
   description: string
-  level: 1 | 2 | 3 | 4
+  level: 1 | 2 | 3 | 4 | "yeni"
   readingTimeMinutes: number
   completed?: boolean
   bookmarked?: boolean
 }
 
+interface NewStory {
+  id: string
+  title: string
+  description: string
+  content: string
+  audioUrl?: string
+  readingTimeMinutes: number
+  createdAt: any
+  authorId: string
+  authorName: string
+  level: "yeni" // Add this line
+}
+
 export default function HikayelerPage() {
-  const [activeLevel, setActiveLevel] = useState<1 | 2 | 3 | 4>(1)
+  const [activeLevel, setActiveLevel] = useState<1 | 2 | 3 | 4 | "yeni">(1)
   const [bookmarkedStories, setBookmarkedStories] = useState<string[]>([])
   const [completedStories, setCompletedStories] = useState<string[]>([])
   const [activeFilter, setActiveFilter] = useState<"all" | "bookmarked" | "completed">("all")
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [newStories, setNewStories] = useState<NewStory[]>([])
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [newStoryForm, setNewStoryForm] = useState({
+    title: "",
+    description: "",
+    content: "",
+    readingTimeMinutes: 5,
+    audioFile: null as File | null,
+  })
 
   // Turkish stories data
   const stories: Story[] = [
@@ -65,7 +94,6 @@ export default function HikayelerPage() {
       level: 1,
       readingTimeMinutes: 6,
     },
-
     // 2. Seviye
     {
       id: "kim-fark-eder",
@@ -109,7 +137,6 @@ export default function HikayelerPage() {
       level: 2,
       readingTimeMinutes: 6,
     },
-
     // 3. Seviye
     {
       id: "garson-kiz",
@@ -160,7 +187,6 @@ export default function HikayelerPage() {
       level: 3,
       readingTimeMinutes: 8,
     },
-
     // 4. Seviye
     {
       id: "akilli-deli",
@@ -234,6 +260,80 @@ export default function HikayelerPage() {
     localStorage.setItem("completedStories", JSON.stringify(completedStories))
   }, [completedStories])
 
+  // Auth and fetch new stories
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, "users", user.uid))
+        if (userDoc.exists()) {
+          setCurrentUser({ uid: user.uid, ...userDoc.data() })
+        }
+      }
+      await fetchNewStories()
+    })
+    return () => unsubscribe()
+  }, [])
+
+  const fetchNewStories = async () => {
+    try {
+      const storiesRef = collection(db, "new_stories")
+      const q = query(storiesRef, orderBy("createdAt", "desc"))
+      const querySnapshot = await getDocs(q)
+      const storiesList: NewStory[] = []
+      querySnapshot.forEach((doc) => {
+        storiesList.push({
+          id: doc.id,
+          ...doc.data(),
+          level: "yeni" as const, // Add this line
+        } as NewStory)
+      })
+      setNewStories(storiesList)
+    } catch (error) {
+      console.error("Error fetching new stories:", error)
+    }
+  }
+
+  const handleAddNewStory = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!currentUser || currentUser.role !== "admin") return
+
+    try {
+      let audioUrl = ""
+      if (newStoryForm.audioFile) {
+        const timestamp = Date.now()
+        const fileName = `${timestamp}_${newStoryForm.audioFile.name}`
+        const storageRef = ref(storage, `new_stories_audio/${fileName}`)
+        await uploadBytes(storageRef, newStoryForm.audioFile)
+        audioUrl = await getDownloadURL(storageRef)
+      }
+
+      await addDoc(collection(db, "new_stories"), {
+        title: newStoryForm.title,
+        description: newStoryForm.description,
+        content: newStoryForm.content,
+        readingTimeMinutes: newStoryForm.readingTimeMinutes,
+        audioUrl,
+        createdAt: serverTimestamp(),
+        authorId: currentUser.uid,
+        authorName: currentUser.firstName || currentUser.username || "Admin",
+      })
+
+      setNewStoryForm({
+        title: "",
+        description: "",
+        content: "",
+        readingTimeMinutes: 5,
+        audioFile: null,
+      })
+      setShowAddForm(false)
+      await fetchNewStories()
+      alert("Hikaye başarıyla eklendi!")
+    } catch (error) {
+      console.error("Error adding story:", error)
+      alert("Hikaye eklenemedi")
+    }
+  }
+
   const toggleBookmark = (storyId: string) => {
     if (bookmarkedStories.includes(storyId)) {
       setBookmarkedStories((prev) => prev.filter((id) => id !== storyId))
@@ -243,23 +343,35 @@ export default function HikayelerPage() {
   }
 
   // Filter stories based on level and active filter
-  const filteredStories = stories
-    .filter((story) => story.level === activeLevel)
-    .filter((story) => {
-      if (activeFilter === "all") return true
-      if (activeFilter === "bookmarked") return bookmarkedStories.includes(story.id)
-      if (activeFilter === "completed") return completedStories.includes(story.id)
-      return true
-    })
+  const filteredStories =
+    activeLevel === "yeni"
+      ? newStories.filter((story) => {
+          if (activeFilter === "all") return true
+          if (activeFilter === "bookmarked") return bookmarkedStories.includes(story.id)
+          if (activeFilter === "completed") return completedStories.includes(story.id)
+          return true
+        })
+      : stories
+          .filter((story) => story.level === activeLevel)
+          .filter((story) => {
+            if (activeFilter === "all") return true
+            if (activeFilter === "bookmarked") return bookmarkedStories.includes(story.id)
+            if (activeFilter === "completed") return completedStories.includes(story.id)
+            return true
+          })
 
   // Calculate progress stats
-  const totalStoriesCount = stories.filter((story) => story.level === activeLevel).length
-  const completedStoriesCount = stories.filter(
-    (story) => story.level === activeLevel && completedStories.includes(story.id),
-  ).length
+  const totalStoriesCount =
+    activeLevel === "yeni" ? newStories.length : stories.filter((story) => story.level === activeLevel).length
+
+  const completedStoriesCount =
+    activeLevel === "yeni"
+      ? newStories.filter((story) => completedStories.includes(story.id)).length
+      : stories.filter((story) => story.level === activeLevel && completedStories.includes(story.id)).length
+
   const progressPercentage = totalStoriesCount > 0 ? Math.round((completedStoriesCount / totalStoriesCount) * 100) : 0
 
-  const getLevelColor = (level: number) => {
+  const getLevelColor = (level: 1 | 2 | 3 | 4 | "yeni") => {
     switch (level) {
       case 1:
         return "from-emerald-500 to-teal-500"
@@ -269,12 +381,14 @@ export default function HikayelerPage() {
         return "from-purple-500 to-pink-500"
       case 4:
         return "from-amber-500 to-orange-500"
+      case "yeni":
+        return "from-rose-500 to-pink-500"
       default:
         return "from-gray-500 to-slate-500"
     }
   }
 
-  const getLevelBadgeColor = (level: number) => {
+  const getLevelBadgeColor = (level: 1 | 2 | 3 | 4 | "yeni") => {
     switch (level) {
       case 1:
         return "bg-emerald-100 text-emerald-800"
@@ -284,6 +398,8 @@ export default function HikayelerPage() {
         return "bg-purple-100 text-purple-800"
       case 4:
         return "bg-amber-100 text-amber-800"
+      case "yeni":
+        return "bg-rose-100 text-rose-800"
       default:
         return "bg-gray-100 text-gray-800"
     }
@@ -333,10 +449,10 @@ export default function HikayelerPage() {
 
       {/* Level Tabs */}
       <div className="flex flex-wrap mb-8 border-b border-slate-200">
-        {[1, 2, 3, 4].map((level) => (
+        {[1, 2, 3, 4, "yeni"].map((level) => (
           <button
             key={level}
-            onClick={() => setActiveLevel(level as 1 | 2 | 3 | 4)}
+            onClick={() => setActiveLevel(level as 1 | 2 | 3 | 4 | "yeni")}
             className={`px-6 py-3 text-lg font-medium border-b-2 transition-colors ${
               activeLevel === level
                 ? "border-teal-600 text-teal-600"
@@ -344,11 +460,83 @@ export default function HikayelerPage() {
             }`}
           >
             <div className="flex items-center">
-              <span>{level}. Seviye</span>
+              <span>{level === "yeni" ? "Yeni Hikayeler" : `${level}. Seviye`}</span>
             </div>
           </button>
         ))}
       </div>
+
+      {/* Admin Add Story Button */}
+      {activeLevel === "yeni" && currentUser?.role === "admin" && (
+        <div className="mb-6">
+          <button
+            onClick={() => setShowAddForm(!showAddForm)}
+            className="flex items-center gap-2 px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors"
+          >
+            <Plus className="h-4 w-4" />
+            Yeni Hikaye Ekle
+          </button>
+        </div>
+      )}
+
+      {/* Add Story Form */}
+      {showAddForm && activeLevel === "yeni" && currentUser?.role === "admin" && (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 mb-8 p-6">
+          <h3 className="text-lg font-semibold mb-4">Yeni Hikaye Ekle</h3>
+          <form onSubmit={handleAddNewStory} className="space-y-4">
+            <input
+              type="text"
+              placeholder="Hikaye başlığı"
+              value={newStoryForm.title}
+              onChange={(e) => setNewStoryForm({ ...newStoryForm, title: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              required
+            />
+            <textarea
+              placeholder="Hikaye açıklaması"
+              value={newStoryForm.description}
+              onChange={(e) => setNewStoryForm({ ...newStoryForm, description: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              rows={3}
+              required
+            />
+            <textarea
+              placeholder="Hikaye metni"
+              value={newStoryForm.content}
+              onChange={(e) => setNewStoryForm({ ...newStoryForm, content: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
+              rows={8}
+              required
+            />
+            <input
+              type="number"
+              placeholder="Okuma süresi (dakika)"
+              value={newStoryForm.readingTimeMinutes}
+              onChange={(e) =>
+                setNewStoryForm({ ...newStoryForm, readingTimeMinutes: Number.parseInt(e.target.value) })
+              }
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              min="1"
+              required
+            />
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={(e) => setNewStoryForm({ ...newStoryForm, audioFile: e.target.files?.[0] || null })}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
+              required
+            />
+            <div className="flex gap-2">
+              <button type="submit" className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">
+                Kaydet
+              </button>
+              <button type="button" onClick={() => setShowAddForm(false)} className="px-4 py-2 border rounded-lg">
+                İptal
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -360,15 +548,17 @@ export default function HikayelerPage() {
         >
           Tüm Hikayeler
         </button>
-        
-        
       </div>
 
       {/* Stories List */}
       {filteredStories.length > 0 ? (
         <div className="space-y-4">
           {filteredStories.map((story, index) => (
-            <Link key={story.id} href={`stories/${story.id}`} className="block group">
+            <Link
+              key={story.id}
+              href={activeLevel === "yeni" ? `/dashboard/stories/yeni/${story.id}` : `stories/${story.id}`}
+              className="block group"
+            >
               <div className="bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-md hover:border-slate-300 transition-all duration-200 overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start justify-between">
@@ -377,7 +567,7 @@ export default function HikayelerPage() {
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${getLevelBadgeColor(story.level)}`}
                         >
-                          {story.level}. Seviye
+                          {story.level === "yeni" ? "Yeni Hikaye" : `${story.level}. Seviye`}
                         </span>
                         <div className="flex items-center text-slate-500 text-sm">
                           <Clock className="h-4 w-4 mr-1" />
@@ -390,13 +580,12 @@ export default function HikayelerPage() {
                           </span>
                         )}
                       </div>
-
                       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-teal-600 transition-colors">
                         {story.title}
                       </h3>
-
-                      <p className="text-slate-600 text-sm leading-relaxed mb-4">{story.description}</p>
-
+                      {activeLevel !== "yeni" && (
+                        <p className="text-slate-600 text-sm leading-relaxed mb-4">{story.description}</p>
+                      )}
                       <div className="flex items-center justify-between">
                         <div className="flex items-center text-slate-500 text-sm">
                           <BookOpen className="h-4 w-4 mr-1" />
@@ -408,7 +597,6 @@ export default function HikayelerPage() {
                         </div>
                       </div>
                     </div>
-
                     <div className="ml-4 flex flex-col items-end gap-2">
                       <button
                         onClick={(e) => {
@@ -424,7 +612,6 @@ export default function HikayelerPage() {
                           <Bookmark className="h-5 w-5 text-slate-400 hover:text-slate-600" />
                         )}
                       </button>
-
                       <div className={`w-1 h-16 rounded-full bg-gradient-to-b ${getLevelColor(story.level)}`}></div>
                     </div>
                   </div>
@@ -440,11 +627,13 @@ export default function HikayelerPage() {
           </div>
           <h3 className="text-xl font-semibold text-slate-800 mb-2">Hikaye bulunamadı</h3>
           <p className="text-slate-600 mb-6">
-            {activeFilter === "bookmarked"
-              ? "Bu seviyede henüz favori hikayeniz yok."
-              : activeFilter === "completed"
-                ? "Bu seviyede henüz tamamladığınız hikaye yok."
-                : "Bu seviyede mevcut hikaye bulunmuyor."}
+            {activeLevel === "yeni"
+              ? "Henüz yeni hikaye eklenmemiş."
+              : activeFilter === "bookmarked"
+                ? "Bu seviyede henüz favori hikayeniz yok."
+                : activeFilter === "completed"
+                  ? "Bu seviyede henüz tamamladığınız hikaye yok."
+                  : "Bu seviyede mevcut hikaye bulunmuyor."}
           </p>
           <button
             onClick={() => setActiveFilter("all")}
