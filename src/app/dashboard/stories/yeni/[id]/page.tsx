@@ -18,9 +18,16 @@ interface NewStory {
   content: string
   audioUrl?: string
   readingTimeMinutes: number
-  createdAt: any
+  createdAt: Date
 }
-
+interface User {
+  uid: string
+  firstName?: string
+  lastName?: string
+  username?: string
+  email?: string
+  role?: string
+}
 export default function YeniHikayePage() {
   const params = useParams()
   const [story, setStory] = useState<NewStory | null>(null)
@@ -32,7 +39,7 @@ export default function YeniHikayePage() {
   const [editedContent, setEditedContent] = useState("")
   const [editedTitle, setEditedTitle] = useState("")
   const [saving, setSaving] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
 
   const audioRef = useRef<HTMLAudioElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)

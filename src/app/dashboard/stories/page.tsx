@@ -27,18 +27,25 @@ interface NewStory {
   content: string
   audioUrl?: string
   readingTimeMinutes: number
-  createdAt: any
+  createdAt: Date
   authorId: string
   authorName: string
   level: "yeni" // Add this line
 }
-
+interface User {
+  uid: string
+  firstName?: string
+  lastName?: string
+  username?: string
+  email?: string
+  role?: string
+}
 export default function HikayelerPage() {
   const [activeLevel, setActiveLevel] = useState<1 | 2 | 3 | 4 | "yeni">(1)
   const [bookmarkedStories, setBookmarkedStories] = useState<string[]>([])
   const [completedStories, setCompletedStories] = useState<string[]>([])
   const [activeFilter, setActiveFilter] = useState<"all" | "bookmarked" | "completed">("all")
-  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [newStories, setNewStories] = useState<NewStory[]>([])
   const [showAddForm, setShowAddForm] = useState(false)
   const [newStoryForm, setNewStoryForm] = useState({
