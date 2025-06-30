@@ -7,8 +7,8 @@ const StammeringTherapyTechniques = () => {
   const techniques = [
     {
       id: 'speechRate',
-      title: 'Speech Rate Control',
-      description: 'Manage the speed of speech to enhance fluency and maintain consistent, controlled speech patterns. This technique helps create a more rhythmic speaking style that reduces stammering incidents.',
+      title: 'Konuşma Hızı Kontrolü',
+      description: 'Akıcılığı artırmak ve tutarlı, kontrollü konuşma kalıplarını sürdürmek için konuşma hızını yönetin. Bu teknik, kekemelik olaylarını azaltan daha ritmik bir konuşma tarzı oluşturmaya yardımcı olur.',
       icon: (
         <svg className="w-12 h-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -17,8 +17,8 @@ const StammeringTherapyTechniques = () => {
     },
     {
       id: 'breathing',
-      title: 'Diaphragmatic Breathing',
-      description: 'Improve breath control for smooth speech, ensuring better airflow and voice stability. This foundational technique creates the support needed for fluent speech production and reduces tension in speech muscles.',
+      title: 'Diyafram Nefes Alma',
+      description: 'Pürüzsüz konuşma için nefes kontrolünü geliştirin, daha iyi hava akışı ve ses stabilitesi sağlayın. Bu temel teknik, akıcı konuşma üretimi için gereken desteği yaratır ve konuşma kaslarındaki gerginliği azaltır.',
       icon: (
         <svg className="w-12 h-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -27,8 +27,8 @@ const StammeringTherapyTechniques = () => {
     },
     {
       id: 'motorControl',
-      title: 'Oral Motor Control',
-      description: 'Strengthen and coordinate speech muscles for clear and effective communication. Targeted exercises improve the precision and timing of speech movements, resulting in more controlled articulation and reduced stammering.',
+      title: 'Ağız Motor Kontrolü',
+      description: 'Net ve etkili iletişım için konuşma kaslarını güçlendirin ve koordine edin. Hedefli egzersizler, konuşma hareketlerinin hassasiyetini ve zamanlamasını geliştirerek daha kontrollü artikülasyon ve azaltılmış kekemelik ile sonuçlanır.',
       icon: (
         <svg className="w-12 h-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15.536a5 5 0 001.414 1.414m-2.828-4.242a9 9 0 001.414 1.414" />
@@ -37,8 +37,8 @@ const StammeringTherapyTechniques = () => {
     },
     {
       id: 'fluencyShaping',
-      title: 'Fluency Shaping',
-      description: 'Develop fluent speech patterns, reducing stammering through structured techniques. This comprehensive approach modifies speech behaviors to create smoother transitions between sounds and words, building confidence in communication.',
+      title: 'Akıcılık Şekillendirme',
+      description: 'Yapılandırılmış tekniklerle kekemeliği azaltarak akıcı konuşma kalıpları geliştirin. Bu kapsamlı yaklaşım, sesler ve kelimeler arasında daha pürüzsüz geçişler yaratmak için konuşma davranışlarını değiştirerek iletişimde güven oluşturur.',
       icon: (
         <svg className="w-12 h-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -52,19 +52,19 @@ const StammeringTherapyTechniques = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* SEO-optimized heading area */}
         <div className="text-center mb-16">
-          <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Evidence-Based Approach</h2>
-          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 leading-tight">What is Stammering Therapy?</h2>
+          <h2 className="text-sm font-semibold text-blue-600 uppercase tracking-wide">Kanıta Dayalı Yaklaşım</h2>
+          <h2 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 leading-tight">Kekemelik Terapisi Nedir?</h2>
           <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
-            Stammering therapy focuses on proven techniques that help individuals achieve greater speech fluency, communication confidence, and reduced speech anxiety.
+            Kekemelik terapisi, bireylerin daha fazla konuşma akıcılığı, iletişim güveni ve azaltılmış konuşma kaygısı elde etmelerine yardımcı olan kanıtlanmış tekniklere odaklanır.
           </p>
         </div>
 
         {/* How does it work section */}
         <div className="mb-16">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-6">How Does It Work?</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-6">Nasıl Çalışır?</h2>
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-10">
             <p className="text-gray-700 text-lg leading-relaxed">
-              Our comprehensive stammering therapy program combines multiple evidence-based techniques tailored to your specific needs. Through consistent practice and expert guidance, you will develop strategies that address both the physical aspects of speech production and psychological factors that impact fluency.
+              Kapsamlı kekemelik terapi programımız, özel ihtiyaçlarınıza göre uyarlanmış birden fazla kanıta dayalı tekniği birleştirir. Tutarlı pratik ve uzman rehberliği ile, hem konuşma üretiminin fiziksel yönlerini hem de akıcılığı etkileyen psikolojik faktörleri ele alan stratejiler geliştireceksiniz.
             </p>
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
@@ -74,9 +74,9 @@ const StammeringTherapyTechniques = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900">Personalized Assessment</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Kişisel Değerlendirme</h3>
                 </div>
-                <p className="mt-3 text-gray-700">We analyze your specific speech patterns to develop a customized therapy program.</p>
+                <p className="mt-3 text-gray-700">Özelleştirilmiş bir terapi programı geliştirmek için özel konuşma kalıplarınızı analiz ediyoruz.</p>
               </div>
               <div className="bg-blue-50 p-6 rounded-xl border border-blue-100">
                 <div className="flex items-center">
@@ -85,9 +85,9 @@ const StammeringTherapyTechniques = () => {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900">Structured Learning</h3>
+                  <h3 className="text-lg font-medium text-gray-900">Yapılandırılmış Öğrenme</h3>
                 </div>
-                <p className="mt-3 text-gray-700">Progressive techniques build skills gradually for lasting improvement.</p>
+                <p className="mt-3 text-gray-700">Aşamalı teknikler, kalıcı gelişim için becerileri kademeli olarak oluşturur.</p>
               </div>
             </div>
           </div>
@@ -95,7 +95,7 @@ const StammeringTherapyTechniques = () => {
 
         {/* Techniques section with tabs */}
         <div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-10">Core Therapy Techniques</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center mb-10">Temel Terapi Teknikleri</h2>
           
           {/* Technique selector tabs */}
           <div className="flex flex-wrap justify-center gap-4 mb-10">
@@ -138,25 +138,25 @@ const StammeringTherapyTechniques = () => {
                       {tech.description}
                     </p>
                     <div className="bg-blue-50 p-5 rounded-xl">
-                      <h4 className="font-medium text-blue-800 mb-2">Benefits:</h4>
+                      <h4 className="font-medium text-blue-800 mb-2">Faydalar:</h4>
                       <ul className="space-y-2">
                         <li className="flex items-start">
                           <svg className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span className="text-gray-700">Increased speech fluency in everyday situations</span>
+                          <span className="text-gray-700">Günlük durumlarda artan konuşma akıcılığı</span>
                         </li>
                         <li className="flex items-start">
                           <svg className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span className="text-gray-700">Reduced speech anxiety and improved confidence</span>
+                          <span className="text-gray-700">Azaltılmış konuşma kaygısı ve gelişmiş güven</span>
                         </li>
                         <li className="flex items-start">
                           <svg className="w-5 h-5 text-blue-500 mr-2 mt-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          <span className="text-gray-700">Long-term sustainable speech improvement</span>
+                          <span className="text-gray-700">Uzun vadeli sürdürülebilir konuşma gelişimi</span>
                         </li>
                       </ul>
                     </div>
@@ -173,7 +173,7 @@ const StammeringTherapyTechniques = () => {
             href="/services" 
             className="inline-flex items-center px-6 py-3 text-lg font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
           >
-            Learn More About Our Services
+            Hizmetlerimiz Hakkında Daha Fazla Bilgi Alın
             <svg 
               className="ml-2 h-5 w-5" 
               xmlns="http://www.w3.org/2000/svg" 

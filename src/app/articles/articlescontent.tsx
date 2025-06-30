@@ -9,38 +9,38 @@ export default function ArticlesPage() {
   const articles = [
     {
       id: 1,
-      title: "Stammering Therapy app",
+      title: "E-Kekemelik Uygulaması",
       excerpt:
-        "Learn how our stammering therapy app works and how it can help.",
-      date: "May 5, 2025",
-      readTime: "5 min read",
-      slug: "Stammering-Therapy-App",
+        "Kekemelik terapi uygulamamızın nasıl çalıştığını ve nasıl yardımcı olabileceğini öğrenin.",
+      date: "5 Mayıs 2025",
+      readTime: "5 dk okuma",
+      slug: "E-Kekemelik",
     },
     {
       id: 2,
-      title: "What is stammering",
+      title: "Kekemelik nedir",
       excerpt:
-        "What is stammering and how it affects people?",
-      date: "April 28, 2025",
-      readTime: "4 min read",
-      slug: "what-is-stammering",
+        "Kekemelik nedir ve insanları nasıl etkiler?",
+      date: "28 Nisan 2025",
+      readTime: "4 dk okuma",
+      slug: "Kekemelik-nedir",
     },
     {
       id: 3,
-      title: "Mouth and breathing exercises for stammering",
+      title: "Kekemelik için ağız ve nefes egzersizleri",
       excerpt:
-        "How do mouth and breathing exercises help people who stammer?",
-      date: "April 15, 2025",
-      readTime: "6 min read",
-      slug: "Mouth-and-breathing-exercises",
+        "Ağız ve nefes egzersizleri kekeme kişilere nasıl yardımcı olur?",
+      date: "15 Nisan 2025",
+      readTime: "6 dk okuma",
+      slug: "Nefes-ve-agiz-teknikleri",
     },
     {
       id: 4,
-      title: "Definitions of stuttering",
-      excerpt: "Exploring how experts define stuttering from various perspectives.",
-      date: "April 3, 2025",
-      readTime: "7 min read",
-      slug: "Definitions-of-Stuttering",
+      title: "Kekemelik tanımları",
+      excerpt: "Uzmanların kekemeliği çeşitli perspektiflerden nasıl tanımladığını keşfedin.",
+      date: "3 Nisan 2025",
+      readTime: "7 dk okuma",
+      slug: "Kekemelik-tanimlari",
     },
   ]
 
@@ -50,7 +50,7 @@ export default function ArticlesPage() {
         {/* Header area */}
         <div className="text-center mb-16">
           
-          <h1 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 leading-tight">Articles</h1>
+          <h1 className="mt-2 text-3xl md:text-4xl font-bold text-gray-900 leading-tight">Makaleler</h1>
           
         </div>
 
@@ -76,7 +76,7 @@ export default function ArticlesPage() {
                   href={`/articles/${article.slug}`}
                   className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group"
                 >
-                  Read more
+                  Devamını oku
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>

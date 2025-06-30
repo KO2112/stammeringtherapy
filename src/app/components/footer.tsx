@@ -7,26 +7,26 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-blue-300">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-2 text-blue-300">Hızlı Bağlantılar</h3>
             <ul className="space-y-1 text-sm">
               <li>
                 <Link href="/" className="hover:text-blue-300 transition-colors duration-200">
-                  Home
+                  Ana Sayfa
                 </Link>
               </li>
               <li>
                 <Link href="/services" className="hover:text-blue-300 transition-colors duration-200">
-                  Speech Therapy Services
+                  Konuşma Terapisi Hizmetleri
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-blue-300 transition-colors duration-200">
-                  About Stammering Therapy
+                  Kekemelik Terapisi Hakkında
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="hover:text-blue-300 transition-colors duration-200">
-                  Contact Us
+                  İletişim
                 </Link>
               </li>
             </ul>
@@ -34,7 +34,7 @@ const Footer = () => {
 
           {/* Get in Touch */}
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-blue-300">Get in Touch</h3>
+            <h3 className="text-lg font-semibold mb-2 text-blue-300">İletişime Geçin</h3>
             <div className="space-y-1 text-sm">
               <p className="flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -53,9 +53,9 @@ const Footer = () => {
 
           {/* Description */}
           <div>
-            <h3 className="text-lg font-semibold mb-2 text-blue-300">Stammering & Speech Therapy</h3>
+            <h3 className="text-lg font-semibold mb-2 text-blue-300">Kekemelik ve Konuşma Terapisi</h3>
             <p className="text-gray-300 text-sm">
-              Providing expert speech therapy for stammering, fluency control, and communication skills improvement.
+              Kekemelik, akıcılık kontrolü ve iletişim becerilerinin geliştirilmesi için uzman konuşma terapisi sağlıyoruz.
             </p>
             <div className="mt-2 flex space-x-3">
               <a href="#" className="text-blue-300 hover:text-white">
@@ -81,7 +81,7 @@ const Footer = () => {
         </div>
         
         <div className="border-t border-gray-700 mt-4 pt-4 text-center text-gray-400 text-sm">
-          <p>© 2025 Stammering Therapy. All Rights Reserved.</p>
+          <p>© 2025 Kekemelik Terapisi. Tüm Hakları Saklıdır.</p>
         </div>
       </div>
     </footer>

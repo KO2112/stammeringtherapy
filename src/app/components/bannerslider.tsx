@@ -14,18 +14,18 @@ const BannerSlider = () => {
   const slides: Slide[] = [
     {
       image: "/therapy-session.jpg",
-      title: "Speech Freedom Therapy",
-      subtitle: "Professional support for overcoming stammering challenges"
+      title: "Konuşma Özgürlüğü Terapisi",
+      subtitle: "Kekemelik zorluklarını aşmak için profesyonel destek"
     },
     {
       image: "/digital-tools.jpg",
-      title: "Digital Speech Tools",
-      subtitle: "Practice techniques and track your progress at home"
+      title: "Dijital Konuşma Araçları",
+      subtitle: "Teknikleri pratik yapın ve evinizde ilerlemenizi takip edin"
     },
     {
       image: "/group-session.jpg",
-      title: "Community Support",
-      subtitle: "Connect with others on the same journey"
+      title: "Topluluk Desteği",
+      subtitle: "Aynı yolculukta olan diğerleriyle bağlantı kurun"
     }
   ];
 
@@ -75,7 +75,7 @@ const BannerSlider = () => {
                 ? "w-6 h-2 bg-white rounded-full" 
                 : "w-2 h-2 bg-white bg-opacity-50 rounded-full"
             }`}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={`Slayt ${index + 1}'e git`}
           />
         ))}
       </div>

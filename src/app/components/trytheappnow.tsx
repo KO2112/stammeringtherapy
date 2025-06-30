@@ -13,11 +13,11 @@ const TryTheAppNow = () => {
           {/* Left side - App information */}
           <div className="space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold text-blue-800">
-              Try the E-Stammering App Today
+              Try the E-Kekemelik App Today
             </h2>
             
             <p className="text-lg text-gray-700 leading-relaxed">
-              The E-Stammering Therapy App is a specialized tool designed for people who stammer, 
+              The E-Kekemelik Therapy App is a specialized tool designed for people who stammer, 
               providing effective techniques and exercises to improve speech fluency and build confidence.
             </p>
             
