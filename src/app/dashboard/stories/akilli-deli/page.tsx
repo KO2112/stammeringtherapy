@@ -3,7 +3,9 @@
 import { useState, useRef, useEffect } from "react"
 import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack, ChevronRight} from "lucide-react"
 import Link from "next/link"
-
+import { auth, db } from "../../../../../firebase"
+import { onAuthStateChanged, type User } from "firebase/auth"
+import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
 interface TextSegment {
   text: string
   duration: number
@@ -19,6 +21,7 @@ export default function KirZincirleriniPage() {
   const [activeIndex, setActiveIndex] = useState(-1)
   const [audioDuration, setAudioDuration] = useState(0)
  
+const [user, setUser] = useState<User | null>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -337,7 +340,48 @@ export default function KirZincirleriniPage() {
       audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current?.duration || 0)
     }
   }
+// First useEffect: Listen for auth changes
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    setUser(currentUser)
+  })
+  return () => unsubscribe()
+}, [])
 
+// Second useEffect: Track visit when user is available
+useEffect(() => {
+  const trackVisit = async () => {
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid))
+        if (!userDoc.exists()) return
+
+        const userData = userDoc.data()
+        const username = userData.username || userData.firstName || "Unknown"
+
+        // Get story ID from current URL (last part)
+        const currentPath = window.location.pathname
+        const storyId = currentPath.split('/').pop() || 'unknown'
+        
+        // Convert kebab-case to Title Case for display
+        const storyName = storyId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+
+        await addDoc(collection(db, "storyVisits"), {
+          userId: user.uid,
+          username: username,
+          storyName: storyName,
+          storyId: storyId,
+          visitedAt: serverTimestamp(),
+        })
+        
+        console.log(`✅ Visit tracked: ${storyName}`)
+      } catch (error) {
+        console.error("❌ Error:", error)
+      }
+    }
+  }
+  trackVisit()
+}, [user])
   const handleSkipBackward = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 10, 0)

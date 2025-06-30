@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Clock, BookOpen, BarChart2, CheckCircle, Bookmark, BookmarkCheck, ChevronRight, Plus } from "lucide-react"
+import { Clock, BookOpen,  CheckCircle, Bookmark, BookmarkCheck, ChevronRight, Plus } from "lucide-react"
 import { auth, db, storage } from "../../../../firebase"
 import { onAuthStateChanged } from "firebase/auth"
 import { collection, getDocs, query, orderBy, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
@@ -376,7 +376,7 @@ export default function HikayelerPage() {
       ? newStories.filter((story) => completedStories.includes(story.id)).length
       : stories.filter((story) => story.level === activeLevel && completedStories.includes(story.id)).length
 
-  const progressPercentage = totalStoriesCount > 0 ? Math.round((completedStoriesCount / totalStoriesCount) * 100) : 0
+  
 
   const getLevelColor = (level: 1 | 2 | 3 | 4 | "yeni") => {
     switch (level) {
