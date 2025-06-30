@@ -367,14 +367,7 @@ export default function HikayelerPage() {
             return true
           })
 
-  // Calculate progress stats
-  const totalStoriesCount =
-    activeLevel === "yeni" ? newStories.length : stories.filter((story) => story.level === activeLevel).length
-
-  const completedStoriesCount =
-    activeLevel === "yeni"
-      ? newStories.filter((story) => completedStories.includes(story.id)).length
-      : stories.filter((story) => story.level === activeLevel && completedStories.includes(story.id)).length
+  
 
   
 
