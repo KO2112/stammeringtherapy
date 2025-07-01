@@ -13,19 +13,18 @@ const TryTheAppNow = () => {
           {/* Left side - App information */}
           <div className="space-y-6">
             <h2 className="text-3xl md:text-4xl font-bold text-blue-800">
-              Try the E-Kekemelik App Today
+              E-Kekemelik Uygulamasını Deneyin
             </h2>
             
             <p className="text-lg text-gray-700 leading-relaxed">
-              The E-Kekemelik Therapy App is a specialized tool designed for people who stammer, 
-              providing effective techniques and exercises to improve speech fluency and build confidence.
+              E-Kekemelik Terapi Uygulaması, kekemeliği olan bireyler için tasarlanmış özel bir araçtır ve 
+              konuşma akıcılığını geliştirmek ve güven oluşturmak için etkili teknikler ve egzersizler sunar.
             </p>
             
             <div className="bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500">
               <p className="text-gray-700">
-                This app has been developed in collaboration with certified stammering therapists 
-                and Audiology and Speech Disorders Specialists, incorporating evidence-based 
-                approaches to help you overcome stammering challenges.
+                Bu uygulama, sertifikalı kekemelik terapistleri ve Odyoloji ve Konuşma Bozuklukları Uzmanları ile iş birliği içinde geliştirilmiş olup, 
+                kekemelikle ilgili zorlukların üstesinden gelmenize yardımcı olacak kanıta dayalı yaklaşımlar içermektedir.
               </p>
             </div>
             
@@ -36,7 +35,7 @@ const TryTheAppNow = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="ml-3 text-gray-700">Personalized speech exercises tailored to your specific needs</p>
+                <p className="ml-3 text-gray-700">Size özel olarak uyarlanmış kişiselleştirilmiş konuşma egzersizleri</p>
               </div>
               
               <div className="flex items-start">
@@ -45,7 +44,7 @@ const TryTheAppNow = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="ml-3 text-gray-700">Real-time feedback and progress tracking</p>
+                <p className="ml-3 text-gray-700">Gerçek zamanlı geri bildirim ve gelişim takibi</p>
               </div>
               
               <div className="flex items-start">
@@ -54,7 +53,7 @@ const TryTheAppNow = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 </div>
-                <p className="ml-3 text-gray-700">Access to a supportive community of users and specialists</p>
+                <p className="ml-3 text-gray-700">Kullanıcılar ve uzmanlardan oluşan destekleyici bir topluluğa erişim</p>
               </div>
             </div>
             
@@ -69,7 +68,7 @@ const TryTheAppNow = () => {
                   isHovered ? 'shadow-lg transform -translate-y-1' : 'shadow'
                 }`}
               >
-                Try the App Now
+                Uygulamayı Şimdi Dene
                 <svg 
                   className={`ml-2 h-5 w-5 transition-transform duration-300 ${isHovered ? 'transform translate-x-1' : ''}`} 
                   xmlns="http://www.w3.org/2000/svg" 
@@ -87,11 +86,10 @@ const TryTheAppNow = () => {
           <div className="relative h-64 md:h-96 rounded-xl overflow-hidden shadow-xl">
             <Image
               src="/Stammering-Therapy-logo.png"
-              alt="E-Stammering App Demo"
+              alt="E-Kekemelik Uygulama Demosu"
               fill
               className="object-cover rounded-xl"
             />
-            
           </div>
         </div>
       </div>

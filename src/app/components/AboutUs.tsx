@@ -24,13 +24,13 @@ const AboutUs = () => {
           <div className="space-y-8">
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/StammeringTherapy.png"
+                src="/ekip.jpg"
                 alt="Kekemelik Terapi Ekibi"
                 fill
                 className="object-cover"
               />
               {/* Overlay for better text visibility */}
-              <div className="absolute inset-0 bg-blue-900 bg-opacity-30"></div>
+              
               <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-blue-900 to-transparent">
                 <h3 className="text-white text-2xl font-bold">Küresel Ekibimiz</h3>
                 <p className="text-blue-100">Dünyanın dört bir yanından uzmanlar</p>

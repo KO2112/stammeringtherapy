@@ -370,7 +370,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl sm:text-5xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent mb-4">
-              Armoni Dashboard
+              Armoni Panel
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
               Okuma becerilerinizi geliştirmek için tüm araçlara buradan erişebilirsiniz

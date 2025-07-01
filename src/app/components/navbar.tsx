@@ -8,7 +8,7 @@ import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
+  const [isScrolled] = useState(false)
   const pathname = usePathname()
   const isHomePage = pathname === "/"
 
@@ -21,16 +21,7 @@ const Navbar = () => {
     { name: "İletişim", path: "/contact", icon: <MessageSquare className="w-5 h-5" /> },
   ]
 
-  // Handle scroll effect
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY
-      setIsScrolled(scrollY > 50)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+  
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -78,17 +69,34 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
-            {/* Logo */}
+            {/* Logo with Text */}
             <div className="flex-shrink-0 z-10">
               <Link href="/" className="block">
-                <div className="relative h-12 w-48 sm:h-16 sm:w-56">
-                  <Image
-                    src="/StammeringTherapy.png"
-                    alt="Kekemelik Terapisi Logo"
-                    fill
-                    className="object-contain"
-                    priority
-                  />
+                <div className="flex items-center space-x-3">
+                  {/* Logo Image */}
+                  <div className="relative h-12 w-12 sm:h-16 sm:w-16">
+                    <Image
+                      src="/Stammering-Therapy-logo.png"
+                      alt="Kekemelik Terapisi Logo"
+                      fill
+                      className="object-contain"
+                      priority
+                    />
+                  </div>
+                  
+                  {/* Logo Text */}
+                  <div className={`text-left leading-tight ${
+                    isScrolled 
+                      ? "text-blue-900" 
+                      : "text-white"
+                  }`}>
+                    <div className="text-base sm:text-lg font-bold">Armoni Eğitim Merkezi</div>
+                    <div className={`text-sm sm:text-base font-semibold ${
+                      isScrolled 
+                        ? "text-blue-600" 
+                        : "text-blue-200"
+                    }`}>E-Kekemelik</div>
+                  </div>
                 </div>
               </Link>
             </div>
