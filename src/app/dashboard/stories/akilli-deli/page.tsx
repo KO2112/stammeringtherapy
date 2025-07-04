@@ -415,15 +415,25 @@ useEffect(() => {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`
   }
 
-  const renderTextSegments = () => {
+   const renderTextSegments = () => {
     const titleSegments = textSegments.filter((segment) => segment.isTitle)
     const bodySegments = textSegments.filter((segment) => !segment.isTitle && segment.text.trim())
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 w-full max-w-full">
         {/* Title */}
-        <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">
+        <div className="text-center w-full">
+          <h1
+            className="text-3xl md:text-4xl font-bold text-slate-900 mb-8 leading-tight w-full max-w-full break-words"
+            style={{
+              wordSpacing: "0",
+              letterSpacing: "0",
+              overflow: "hidden",
+              wordWrap: "break-word",
+              overflowWrap: "anywhere",
+              hyphens: "auto",
+            }}
+          >
             {titleSegments.map((segment) => (
               <span
                 key={segment.index}
@@ -434,15 +444,33 @@ useEffect(() => {
                       ? "text-black opacity-100"
                       : "text-slate-900 opacity-40"
                 }`}
+                style={{
+                  display: "inline",
+                  fontSize: "inherit",
+                  lineHeight: "inherit",
+                  wordSpacing: "0",
+                  letterSpacing: "0",
+                }}
               >
                 {segment.text}
               </span>
             ))}
           </h1>
         </div>
+
         {/* Story Text */}
-        <div className="prose prose-lg max-w-none">
-          <div className="text-lg md:text-xl leading-relaxed text-slate-700">
+        <div className="prose prose-lg max-w-none w-full">
+          <div
+            className="text-lg md:text-xl leading-relaxed text-slate-700 w-full max-w-full"
+            style={{
+              wordSpacing: "0",
+              letterSpacing: "0",
+              lineHeight: "1.7",
+              overflow: "hidden",
+              wordWrap: "break-word",
+              overflowWrap: "anywhere",
+            }}
+          >
             {bodySegments.map((segment) => (
               <span
                 key={segment.index}
@@ -453,6 +481,15 @@ useEffect(() => {
                       ? "text-black opacity-100"
                       : "text-slate-700 opacity-40"
                 }`}
+                style={{
+                  display: "inline",
+                  whiteSpace: "pre-wrap",
+                  fontSize: "inherit",
+                  lineHeight: "inherit",
+                  fontFamily: "inherit",
+                  wordSpacing: "0",
+                  letterSpacing: "0",
+                }}
               >
                 {segment.text}
               </span>

@@ -648,7 +648,8 @@ export default function KirZincirleriniPage() {
 ];
   
 
- useEffect(() => {
+  // All your existing useEffect hooks and functions remain the same
+  useEffect(() => {
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
@@ -656,7 +657,6 @@ export default function KirZincirleriniPage() {
     }
   }, [])
 
-  // Handle audio metadata loaded to get duration
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
       setAudioDuration(audioRef.current.duration)
@@ -665,7 +665,6 @@ export default function KirZincirleriniPage() {
 
   const handlePlayPause = () => {
     if (!audioRef.current) return
-
     if (isPlaying) {
       audioRef.current.pause()
       if (intervalRef.current) {
@@ -688,7 +687,7 @@ export default function KirZincirleriniPage() {
     }
     setIsPlaying(!isPlaying)
   }
-  
+
   const handleSkipForward = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current?.duration || 0)
@@ -703,7 +702,6 @@ export default function KirZincirleriniPage() {
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!audioRef.current) return
-
     const progressBar = e.currentTarget
     const rect = progressBar.getBoundingClientRect()
     const clickX = e.clientX - rect.left
@@ -727,57 +725,60 @@ export default function KirZincirleriniPage() {
     const secs = Math.floor(seconds % 60)
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`
   }
-// First useEffect: Listen for auth changes
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser)
-  })
-  return () => unsubscribe()
-}, [])
 
-// Second useEffect: Track visit when user is available
-useEffect(() => {
-  const trackVisit = async () => {
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid))
-        if (!userDoc.exists()) return
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser)
+    })
+    return () => unsubscribe()
+  }, [])
 
-        const userData = userDoc.data()
-        const username = userData.username || userData.firstName || "Unknown"
-
-        // Get story ID from current URL (last part)
-        const currentPath = window.location.pathname
-        const storyId = currentPath.split('/').pop() || 'unknown'
-        
-        // Convert kebab-case to Title Case for display
-        const storyName = storyId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
-
-        await addDoc(collection(db, "storyVisits"), {
-          userId: user.uid,
-          username: username,
-          storyName: storyName,
-          storyId: storyId,
-          visitedAt: serverTimestamp(),
-        })
-        
-        console.log(`✅ Visit tracked: ${storyName}`)
-      } catch (error) {
-        console.error("❌ Error:", error)
+  useEffect(() => {
+    const trackVisit = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid))
+          if (!userDoc.exists()) return
+          const userData = userDoc.data()
+          const username = userData.username || userData.firstName || "Unknown"
+          const currentPath = window.location.pathname
+          const storyId = currentPath.split("/").pop() || "unknown"
+          const storyName = storyId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+          await addDoc(collection(db, "storyVisits"), {
+            userId: user.uid,
+            username: username,
+            storyName: storyName,
+            storyId: storyId,
+            visitedAt: serverTimestamp(),
+          })
+          console.log(`✅ Visit tracked: ${storyName}`)
+        } catch (error) {
+          console.error("❌ Error:", error)
+        }
       }
     }
-  }
-  trackVisit()
-}, [user])
+    trackVisit()
+  }, [user])
+
   const renderTextSegments = () => {
     const titleSegments = textSegments.filter((segment) => segment.isTitle)
     const bodySegments = textSegments.filter((segment) => !segment.isTitle && segment.text.trim())
 
     return (
-      <div className="space-y-8">
+      <div className="space-y-8 w-full max-w-full">
         {/* Title */}
-        <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-8">
+        <div className="text-center w-full">
+          <h1
+            className="text-3xl md:text-4xl font-bold text-slate-900 mb-8 leading-tight w-full max-w-full break-words"
+            style={{
+              wordSpacing: "0",
+              letterSpacing: "0",
+              overflow: "hidden",
+              wordWrap: "break-word",
+              overflowWrap: "anywhere",
+              hyphens: "auto",
+            }}
+          >
             {titleSegments.map((segment) => (
               <span
                 key={segment.index}
@@ -788,15 +789,33 @@ useEffect(() => {
                       ? "text-black opacity-100"
                       : "text-slate-900 opacity-40"
                 }`}
+                style={{
+                  display: "inline",
+                  fontSize: "inherit",
+                  lineHeight: "inherit",
+                  wordSpacing: "0",
+                  letterSpacing: "0",
+                }}
               >
                 {segment.text}
               </span>
             ))}
           </h1>
         </div>
+
         {/* Story Text */}
-        <div className="prose prose-lg max-w-none">
-          <div className="text-lg md:text-xl leading-relaxed text-slate-700">
+        <div className="prose prose-lg max-w-none w-full">
+          <div
+            className="text-lg md:text-xl leading-relaxed text-slate-700 w-full max-w-full"
+            style={{
+              wordSpacing: "0",
+              letterSpacing: "0",
+              lineHeight: "1.7",
+              overflow: "hidden",
+              wordWrap: "break-word",
+              overflowWrap: "anywhere",
+            }}
+          >
             {bodySegments.map((segment) => (
               <span
                 key={segment.index}
@@ -807,6 +826,15 @@ useEffect(() => {
                       ? "text-black opacity-100"
                       : "text-slate-700 opacity-40"
                 }`}
+                style={{
+                  display: "inline",
+                  whiteSpace: "pre-wrap",
+                  fontSize: "inherit",
+                  lineHeight: "inherit",
+                  fontFamily: "inherit",
+                  wordSpacing: "0",
+                  letterSpacing: "0",
+                }}
               >
                 {segment.text}
               </span>
@@ -823,21 +851,25 @@ useEffect(() => {
       <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7x1 mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard/stories" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/dashboard/stories"
+              className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+            >
               <ArrowLeft className="h-5 w-5 mr-2" />
               <span className="hidden sm:inline">Hikayelere Dön</span>
               <span className="sm:hidden">Geri</span>
             </Link>
 
-            {/* Navigation Buttons */}
-<div className="flex items-center space-x-5">
-  <Link href="/dashboard/stories/bambu-agaci" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
-    <ChevronLeft className="h-4 w-4 mr-1" />
-    <span className="hidden sm:inline">Önceki Hikaye</span>
-    <span className="sm:hidden">Önceki</span>
-  </Link>
-  
-</div>
+            <div className="flex items-center space-x-5">
+              <Link
+                href="/dashboard/stories/bambu-agaci"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Önceki Hikaye</span>
+                <span className="sm:hidden">Önceki</span>
+              </Link>
+            </div>
 
             <div className="flex items-center text-sm text-slate-500">
               <Volume2 className="h-4 w-4 mr-2" />
@@ -849,10 +881,9 @@ useEffect(() => {
 
       {/* Main Content */}
       <div className="max-w-7x2 mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Audio Controls - Compact Horizontal at Top */}
+        {/* Audio Controls */}
         <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-4 mb-6 backdrop-blur-sm bg-white/95">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-            {/* Left Section - Title and Time */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0">
               <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">Sesli Okuma</h2>
               <div className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded">
@@ -860,7 +891,6 @@ useEffect(() => {
               </div>
             </div>
 
-            {/* Center Section - Controls */}
             <div className="flex items-center justify-center space-x-3">
               <button
                 onClick={handleSkipBackward}
@@ -889,7 +919,6 @@ useEffect(() => {
               </button>
             </div>
 
-            {/* Right Section - Interactive Progress Bar */}
             <div className="flex-1 lg:max-w-xs">
               <div
                 className="w-full bg-slate-200 rounded-full h-3 cursor-pointer hover:h-4 transition-all duration-200 relative group"
@@ -902,23 +931,21 @@ useEffect(() => {
                     width: `${audioDuration ? (currentTime / audioDuration) * 100 : 0}%`,
                   }}
                 >
-                  {/* Progress indicator dot */}
                   <div className="absolute right-0 top-1/2 transform translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-200"></div>
                 </div>
               </div>
             </div>
           </div>
-
-          <audio
-            ref={audioRef}
-            src="/2-6.mp3"
-            onEnded={handleAudioEnded}
-            onLoadedMetadata={handleLoadedMetadata}
-          />
+          <audio ref={audioRef} src="/2-6.mp3" onEnded={handleAudioEnded} onLoadedMetadata={handleLoadedMetadata} />
         </div>
 
         {/* Story Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">{renderTextSegments()}</div>
+        <div
+          className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 w-full max-w-full"
+          style={{ overflow: "hidden" }}
+        >
+          {renderTextSegments()}
+        </div>
       </div>
     </div>
   )
