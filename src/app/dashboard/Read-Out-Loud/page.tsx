@@ -337,36 +337,76 @@ export default function ReadOutLoudPage() {
 
   // Function to render story content with highlighted first vowels
   const renderStoryContent = (content: string) => {
-    return content.split("\n\n").map((paragraph, index) => (
-      <p key={index} className="mb-6 leading-relaxed">
-        {highlightVowels
-          ? paragraph.split(" ").map((word, wordIndex) => {
-              if (!word) return " "
-
-              const vowelMatch = word.match(/[aeıioöuüAEIİOÖUÜ]/)
-              if (!vowelMatch) {
-                return <span key={wordIndex}>{word} </span>
-              }
-
-              const vowelIndex = vowelMatch.index as number
-              const beforeVowel = word.substring(0, vowelIndex)
-              const vowel = word[vowelIndex]
-              const afterVowel = word.substring(vowelIndex + 1)
-
+  return content.split("\n\n").map((paragraph, index) => (
+    <p key={index} className="mb-6 leading-relaxed">
+      {highlightVowels
+        ? paragraph.split(" ").map((word, wordIndex) => {
+            if (!word) return " "
+            const vowelMatch = word.match(/[aeıioöuüAEIİOÖUÜ]/)
+            if (!vowelMatch) {
               return (
-                <span key={wordIndex}>
-                  {beforeVowel}
-                  <span className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded">
-                    {vowel}
-                  </span>
-                  {afterVowel}{" "}
+                <span 
+                  key={wordIndex}
+                  style={{
+                    display: "inline",
+                    wordSpacing: "0",
+                    letterSpacing: "0",
+                  }}
+                >
+                  {word}{" "}
                 </span>
               )
-            })
-          : paragraph.split(" ").map((word, wordIndex) => <span key={wordIndex}>{word} </span>)}
-      </p>
-    ))
-  }
+            }
+            const vowelIndex = vowelMatch.index as number
+            const beforeVowel = word.substring(0, vowelIndex)
+            const vowel = word[vowelIndex]
+            const afterVowel = word.substring(vowelIndex + 1)
+            return (
+              <span 
+                key={wordIndex}
+                style={{
+                  display: "inline",
+                  wordSpacing: "0",
+                  letterSpacing: "0",
+                }}
+              >
+                <span style={{ display: "inline", wordSpacing: "0", letterSpacing: "0" }}>
+                  {beforeVowel}
+                </span>
+                <span 
+                  className="bg-yellow-200 dark:bg-yellow-700 text-black dark:text-white font-medium px-0.5 rounded"
+                  style={{
+                    display: "inline",
+                    wordSpacing: "0",
+                    letterSpacing: "0",
+                  }}
+                >
+                  {vowel}
+                </span>
+                <span style={{ display: "inline", wordSpacing: "0", letterSpacing: "0" }}>
+                  {afterVowel}
+                </span>
+                <span style={{ display: "inline", wordSpacing: "0", letterSpacing: "0" }}>
+                  {" "}
+                </span>
+              </span>
+            )
+          })
+        : paragraph.split(" ").map((word, wordIndex) => (
+            <span 
+              key={wordIndex}
+              style={{
+                display: "inline",
+                wordSpacing: "0",
+                letterSpacing: "0",
+              }}
+            >
+              {word}{" "}
+            </span>
+          ))}
+    </p>
+  ))
+}
 
   if (authLoading || adminCheck.loading || storiesLoading) {
     return (
