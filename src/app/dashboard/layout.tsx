@@ -22,7 +22,7 @@ import {
   ShieldIcon as ShieldUser,
   Newspaper,
   MessagesSquare,
-  CodeIcon as ChartColumnIncreasing,
+  ChartColumnIncreasing,
 } from "lucide-react"
 
 interface LayoutProps {
