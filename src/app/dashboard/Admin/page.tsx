@@ -1,5 +1,4 @@
 "use client"
-
 import type React from "react"
 import { useState, useEffect } from "react"
 import { auth, db } from "../../../../firebase"
@@ -16,7 +15,20 @@ import {
   deleteDoc,
   type Timestamp,
 } from "firebase/firestore"
-import { Search, Plus, Shield, ShieldCheck, Trash2, Users, UserPlus, AlertCircle, CheckCircle, X } from "lucide-react"
+import {
+  Search,
+  Plus,
+  Shield,
+  ShieldCheck,
+  Trash2,
+  Users,
+  UserPlus,
+  AlertCircle,
+  CheckCircle,
+  X,
+  UserCheck,
+  UserX,
+} from "lucide-react"
 import { deleteUserComplete } from "../../../../lib/actions/delete-user-action"
 
 interface User {
@@ -75,7 +87,6 @@ export default function AdminPage() {
 
       try {
         const currentUserDoc = await getDoc(doc(db, "users", user.uid))
-
         if (!currentUserDoc.exists()) {
           setAdminCheck({
             isAdmin: false,
@@ -86,7 +97,6 @@ export default function AdminPage() {
         }
 
         const currentUserData = currentUserDoc.data()
-
         if (currentUserData.role !== "admin") {
           setAdminCheck({
             isAdmin: false,
@@ -167,14 +177,12 @@ export default function AdminPage() {
       const usersRef = collection(db, "users")
       const querySnapshot = await getDocs(usersRef)
       let exists = false
-
       querySnapshot.forEach((doc) => {
         const userData = doc.data()
         if (userData.username?.toLowerCase() === username.toLowerCase()) {
           exists = true
         }
       })
-
       return exists
     } catch (error) {
       console.error("Error checking username:", error)
@@ -241,18 +249,35 @@ export default function AdminPage() {
 
   const toggleAdminRole = async (userId: string, currentRole: string) => {
     setActionLoading(userId)
-
     try {
       const newRole = currentRole === "admin" ? "user" : "admin"
       await updateDoc(doc(db, "users", userId), {
         role: newRole,
       })
-
       showAlert("success", `User role updated to ${newRole}`)
       fetchUsers()
     } catch (error) {
       console.error("Error updating user role:", error)
       showAlert("error", "Failed to update user role")
+    } finally {
+      setActionLoading(null)
+    }
+  }
+
+  // New function to toggle user activation status
+  const toggleUserStatus = async (userId: string, currentRole: string) => {
+    setActionLoading(`status-${userId}`)
+    try {
+      const newRole = currentRole === "nouser" ? "user" : "nouser"
+      await updateDoc(doc(db, "users", userId), {
+        role: newRole,
+      })
+      const statusText = newRole === "user" ? "aktif" : "devre dışı"
+      showAlert("success", `Kullanıcı durumu ${statusText} olarak güncellendi`)
+      fetchUsers()
+    } catch (error) {
+      console.error("Error updating user status:", error)
+      showAlert("error", "Kullanıcı durumu güncellenirken hata oluştu")
     } finally {
       setActionLoading(null)
     }
@@ -265,10 +290,8 @@ export default function AdminPage() {
     }
 
     setActionLoading(userId)
-
     try {
       console.log(`🗑️ Starting deletion for user: ${email}`)
-
       // 1. Delete story visits first
       console.log("🧹 Cleaning up story visits...")
       const visitsRef = collection(db, "storyVisits")
@@ -303,7 +326,6 @@ export default function AdminPage() {
 
       // 3. Call the server action to delete user from auth and users collection
       const result = await deleteUserComplete(userId)
-
       if (result.success) {
         showAlert(
           "success",
@@ -319,6 +341,36 @@ export default function AdminPage() {
       showAlert("error", `Failed to delete user: ${errorMessage}`)
     } finally {
       setActionLoading(null)
+    }
+  }
+
+  // Helper function to get role display info
+  const getRoleDisplayInfo = (role: string) => {
+    switch (role) {
+      case "admin":
+        return {
+          label: "Admin",
+          icon: ShieldCheck,
+          className: "bg-teal-100 text-teal-800",
+        }
+      case "user":
+        return {
+          label: "Aktif Kullanıcı",
+          icon: UserCheck,
+          className: "bg-green-100 text-green-800",
+        }
+      case "nouser":
+        return {
+          label: "Devre Dışı",
+          icon: UserX,
+          className: "bg-red-100 text-red-800",
+        }
+      default:
+        return {
+          label: "Kullanıcı",
+          icon: Users,
+          className: "bg-slate-100 text-slate-800",
+        }
     }
   }
 
@@ -394,14 +446,14 @@ export default function AdminPage() {
           <p className="text-sm md:text-base text-slate-600">Kullanıcıları, rolleri ve sistem ayarlarını yönetin</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="p-2 md:p-3 bg-blue-50 rounded-lg">
                 <Users className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-slate-600">Kullanıcı sayısı</p>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Toplam Kullanıcı</p>
                 <p className="text-xl md:text-2xl font-bold text-slate-900">{users.length}</p>
               </div>
             </div>
@@ -413,7 +465,7 @@ export default function AdminPage() {
                 <ShieldCheck className="h-5 w-5 md:h-6 md:w-6 text-teal-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-slate-600">Admin sayısı</p>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Admin Sayısı</p>
                 <p className="text-xl md:text-2xl font-bold text-slate-900">
                   {users.filter((user) => user.role === "admin").length}
                 </p>
@@ -424,12 +476,26 @@ export default function AdminPage() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="p-2 md:p-3 bg-green-50 rounded-lg">
-                <UserPlus className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
+                <UserCheck className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-xs md:text-sm font-medium text-slate-600">Kullanıcı Sayısı</p>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Aktif Kullanıcı</p>
                 <p className="text-xl md:text-2xl font-bold text-slate-900">
-                  {users.filter((user) => user.role !== "admin").length}
+                  {users.filter((user) => user.role === "user").length}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="p-2 md:p-3 bg-red-50 rounded-lg">
+                <UserX className="h-5 w-5 md:h-6 md:w-6 text-red-600" />
+              </div>
+              <div>
+                <p className="text-xs md:text-sm font-medium text-slate-600">Devre Dışı</p>
+                <p className="text-xl md:text-2xl font-bold text-slate-900">
+                  {users.filter((user) => user.role === "nouser").length}
                 </p>
               </div>
             </div>
@@ -475,7 +541,6 @@ export default function AdminPage() {
                     Username must be at least 6 characters, no spaces allowed
                   </p>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
                   <input
@@ -487,7 +552,6 @@ export default function AdminPage() {
                     placeholder="user@example.com"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Password *</label>
                   <input
@@ -500,7 +564,6 @@ export default function AdminPage() {
                     minLength={6}
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">First Name</label>
                   <input
@@ -511,7 +574,6 @@ export default function AdminPage() {
                     placeholder="John"
                   />
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Last Name</label>
                   <input
@@ -522,7 +584,6 @@ export default function AdminPage() {
                     placeholder="Doe"
                   />
                 </div>
-
                 <div className="md:col-span-2 flex flex-col sm:flex-row gap-3">
                   <button
                     type="submit"
@@ -536,7 +597,6 @@ export default function AdminPage() {
                     )}
                     {actionLoading === "add-user" ? "Adding..." : "Add User"}
                   </button>
-
                   <button
                     type="button"
                     onClick={() => {
@@ -577,84 +637,95 @@ export default function AdminPage() {
           <div className="block md:hidden">
             {filteredUsers.length > 0 ? (
               <div className="p-4 space-y-4">
-                {filteredUsers.map((user) => (
-                  <div key={user.id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
-                            {user.firstName
-                              ? user.firstName.charAt(0).toUpperCase()
-                              : user.username
-                                ? user.username.charAt(0).toUpperCase()
-                                : user.email.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="text-sm font-medium text-slate-900">
-                            {user.firstName && user.lastName
-                              ? `${user.firstName} ${user.lastName}`
-                              : user.firstName || user.username || "No name"}
+                {filteredUsers.map((user) => {
+                  const roleInfo = getRoleDisplayInfo(user.role || "user")
+                  const IconComponent = roleInfo.icon
+
+                  return (
+                    <div key={user.id} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                            <span className="text-white font-medium text-sm">
+                              {user.firstName
+                                ? user.firstName.charAt(0).toUpperCase()
+                                : user.username
+                                  ? user.username.charAt(0).toUpperCase()
+                                  : user.email.charAt(0).toUpperCase()}
+                            </span>
                           </div>
-                          <div className="text-xs text-slate-600">{user.email}</div>
+                          <div>
+                            <div className="text-sm font-medium text-slate-900">
+                              {user.firstName && user.lastName
+                                ? `${user.firstName} ${user.lastName}`
+                                : user.firstName || user.username || "No name"}
+                            </div>
+                            <div className="text-xs text-slate-600">{user.email}</div>
+                          </div>
                         </div>
+                        <span
+                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${roleInfo.className}`}
+                        >
+                          <IconComponent className="h-3 w-3 mr-1" />
+                          {roleInfo.label}
+                        </span>
                       </div>
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                          user.role === "admin" ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-800"
-                        }`}
-                      >
-                        {user.role === "admin" ? (
-                          <>
-                            <ShieldCheck className="h-3 w-3 mr-1" />
-                            Admin
-                          </>
-                        ) : (
-                          <>
-                            <Users className="h-3 w-3 mr-1" />
-                            User
-                          </>
+                      {user.username && (
+                        <div className="mb-3">
+                          <span className="font-mono bg-white px-2 py-1 rounded text-xs border">@{user.username}</span>
+                        </div>
+                      )}
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        {user.role !== "admin" && (
+                          <button
+                            onClick={() => toggleUserStatus(user.id, user.role || "user")}
+                            disabled={actionLoading === `status-${user.id}`}
+                            className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                              user.role === "nouser"
+                                ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                : "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {actionLoading === `status-${user.id}` ? (
+                              <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
+                            ) : user.role === "nouser" ? (
+                              <UserCheck className="h-3 w-3" />
+                            ) : (
+                              <UserX className="h-3 w-3" />
+                            )}
+                            {user.role === "nouser" ? "Aktif" : "Devre Dışı"}
+                          </button>
                         )}
-                      </span>
-                    </div>
-
-                    {user.username && (
-                      <div className="mb-3">
-                        <span className="font-mono bg-white px-2 py-1 rounded text-xs border">@{user.username}</span>
+                        <button
+                          onClick={() => toggleAdminRole(user.id, user.role || "user")}
+                          disabled={actionLoading === user.id}
+                          className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
+                            user.role === "admin"
+                              ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                              : "bg-teal-100 text-teal-700 hover:bg-teal-200"
+                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                        >
+                          {actionLoading === user.id ? (
+                            <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
+                          ) : user.role === "admin" ? (
+                            <Shield className="h-3 w-3" />
+                          ) : (
+                            <ShieldCheck className="h-3 w-3" />
+                          )}
+                          {user.role === "admin" ? "Remove Admin" : "Make Admin"}
+                        </button>
+                        <button
+                          onClick={() => deleteUserAccount(user.id, user.email)}
+                          disabled={actionLoading === user.id}
+                          className="flex items-center justify-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                          Delete
+                        </button>
                       </div>
-                    )}
-
-                    <div className="flex flex-col sm:flex-row gap-2">
-                      <button
-                        onClick={() => toggleAdminRole(user.id, user.role || "user")}
-                        disabled={actionLoading === user.id}
-                        className={`flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                          user.role === "admin"
-                            ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                            : "bg-teal-100 text-teal-700 hover:bg-teal-200"
-                        } disabled:opacity-50 disabled:cursor-not-allowed`}
-                      >
-                        {actionLoading === user.id ? (
-                          <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
-                        ) : user.role === "admin" ? (
-                          <Shield className="h-3 w-3" />
-                        ) : (
-                          <ShieldCheck className="h-3 w-3" />
-                        )}
-                        {user.role === "admin" ? "Remove Admin" : "Make Admin"}
-                      </button>
-
-                      <button
-                        onClick={() => deleteUserAccount(user.id, user.email)}
-                        disabled={actionLoading === user.id}
-                        className="flex items-center justify-center gap-1 px-3 py-2 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <Trash2 className="h-3 w-3" />
-                        Delete
-                      </button>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             ) : (
               <div className="text-center py-12">
@@ -681,7 +752,7 @@ export default function AdminPage() {
                     Email
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">
-                    Rol
+                    Durum
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">
                     Eylemler
@@ -689,95 +760,103 @@ export default function AdminPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-slate-200">
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
-                          <span className="text-white font-medium text-sm">
-                            {user.firstName
-                              ? user.firstName.charAt(0).toUpperCase()
-                              : user.username
-                                ? user.username.charAt(0).toUpperCase()
-                                : user.email.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium text-slate-900">
-                            {user.firstName && user.lastName
-                              ? `${user.firstName} ${user.lastName}`
-                              : user.firstName || user.username || "No name"}
+                {filteredUsers.map((user) => {
+                  const roleInfo = getRoleDisplayInfo(user.role || "user")
+                  const IconComponent = roleInfo.icon
+
+                  return (
+                    <tr key={user.id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center">
+                            <span className="text-white font-medium text-sm">
+                              {user.firstName
+                                ? user.firstName.charAt(0).toUpperCase()
+                                : user.username
+                                  ? user.username.charAt(0).toUpperCase()
+                                  : user.email.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-slate-900">
+                              {user.firstName && user.lastName
+                                ? `${user.firstName} ${user.lastName}`
+                                : user.firstName || user.username || "No name"}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
-                      {user.username ? (
-                        <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">@{user.username}</span>
-                      ) : (
-                        <span className="text-slate-400 italic">No username</span>
-                      )}
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.email}</td>
-
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.role === "admin" ? "bg-teal-100 text-teal-800" : "bg-slate-100 text-slate-800"
-                        }`}
-                      >
-                        {user.role === "admin" ? (
-                          <>
-                            <ShieldCheck className="h-3 w-3 mr-1" />
-                            Admin
-                          </>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">
+                        {user.username ? (
+                          <span className="font-mono bg-slate-100 px-2 py-1 rounded text-xs">@{user.username}</span>
                         ) : (
-                          <>
-                            <Users className="h-3 w-3 mr-1" />
-                            User
-                          </>
+                          <span className="text-slate-400 italic">No username</span>
                         )}
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          onClick={() => toggleAdminRole(user.id, user.role || "user")}
-                          disabled={actionLoading === user.id}
-                          className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                            user.role === "admin"
-                              ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                              : "bg-teal-100 text-teal-700 hover:bg-teal-200"
-                          } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-900">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${roleInfo.className}`}
                         >
-                          {actionLoading === user.id ? (
-                            <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
-                          ) : user.role === "admin" ? (
-                            <Shield className="h-3 w-3" />
-                          ) : (
-                            <ShieldCheck className="h-3 w-3" />
+                          <IconComponent className="h-3 w-3 mr-1" />
+                          {roleInfo.label}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2">
+                          {user.role !== "admin" && (
+                            <button
+                              onClick={() => toggleUserStatus(user.id, user.role || "user")}
+                              disabled={actionLoading === `status-${user.id}`}
+                              className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                                user.role === "nouser"
+                                  ? "bg-green-100 text-green-700 hover:bg-green-200"
+                                  : "bg-orange-100 text-orange-700 hover:bg-orange-200"
+                              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            >
+                              {actionLoading === `status-${user.id}` ? (
+                                <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
+                              ) : user.role === "nouser" ? (
+                                <UserCheck className="h-3 w-3" />
+                              ) : (
+                                <UserX className="h-3 w-3" />
+                              )}
+                              {user.role === "nouser" ? "Aktif" : "Devre Dışı"}
+                            </button>
                           )}
-                          {user.role === "admin" ? "Remove Admin" : "Make Admin"}
-                        </button>
-
-                        <button
-                          onClick={() => deleteUserAccount(user.id, user.email)}
-                          disabled={actionLoading === user.id}
-                          className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          <button
+                            onClick={() => toggleAdminRole(user.id, user.role || "user")}
+                            disabled={actionLoading === user.id}
+                            className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                              user.role === "admin"
+                                ? "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                                : "bg-teal-100 text-teal-700 hover:bg-teal-200"
+                            } disabled:opacity-50 disabled:cursor-not-allowed`}
+                          >
+                            {actionLoading === user.id ? (
+                              <div className="animate-spin rounded-full h-3 w-3 border-t-2 border-b-2 border-current"></div>
+                            ) : user.role === "admin" ? (
+                              <Shield className="h-3 w-3" />
+                            ) : (
+                              <ShieldCheck className="h-3 w-3" />
+                            )}
+                            {user.role === "admin" ? "Remove Admin" : "Make Admin"}
+                          </button>
+                          <button
+                            onClick={() => deleteUserAccount(user.id, user.email)}
+                            disabled={actionLoading === user.id}
+                            className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 rounded-lg text-xs font-medium hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
-
             {filteredUsers.length === 0 && (
               <div className="text-center py-12">
                 <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
