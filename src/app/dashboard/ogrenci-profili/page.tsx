@@ -232,7 +232,7 @@ export default function OgrenciProfiliPage() {
         month: "long",
         day: "numeric",
       });
-    } catch (error) {
+    } catch {
       return "Geçersiz tarih";
     }
   };
@@ -254,7 +254,7 @@ export default function OgrenciProfiliPage() {
       }
 
       return `${age} yaşında`;
-    } catch (error) {
+    } catch {
       return "Geçersiz yaş";
     }
   };
