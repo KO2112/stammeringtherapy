@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { signOut } from "firebase/auth"
-import { auth, db } from "../../../firebase"
-import { useRouter } from "next/navigation"
-import { doc, getDoc } from "firebase/firestore"
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { signOut } from "firebase/auth";
+import { auth, db } from "../../../firebase";
+import { useRouter } from "next/navigation";
+import { doc, getDoc } from "firebase/firestore";
 import {
   Home,
   Wind,
@@ -23,44 +23,45 @@ import {
   Newspaper,
   MessagesSquare,
   ChartColumnIncreasing,
-} from "lucide-react"
+  MessageCircleHeart,
+} from "lucide-react";
 
 interface LayoutProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 interface UserData {
-  firstName?: string
-  lastName?: string
-  email?: string
-  photoURL?: string
-  location?: string
-  role?: string
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  photoURL?: string;
+  location?: string;
+  role?: string;
 }
 
 export default function DashboardLayout({ children }: LayoutProps) {
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
-  const router = useRouter()
-  const pathname = usePathname()
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const fetchUserData = async (userId: string) => {
       try {
-        const userDocRef = doc(db, "users", userId)
-        const userDoc = await getDoc(userDocRef)
+        const userDocRef = doc(db, "users", userId);
+        const userDoc = await getDoc(userDocRef);
 
         if (userDoc.exists()) {
-          return userDoc.data() as UserData
+          return userDoc.data() as UserData;
         }
-        return null
+        return null;
       } catch (error) {
-        console.error("Error fetching user data:", error)
-        return null
+        console.error("Error fetching user data:", error);
+        return null;
       }
-    }
+    };
 
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -68,75 +69,75 @@ export default function DashboardLayout({ children }: LayoutProps) {
         const basicUserData = {
           email: user.email || "",
           photoURL: user.photoURL || "",
-        }
+        };
 
-        setUserData(basicUserData)
+        setUserData(basicUserData);
 
         // Then fetch additional user data from Firestore
-        const firestoreData = await fetchUserData(user.uid)
+        const firestoreData = await fetchUserData(user.uid);
         if (firestoreData) {
           setUserData({
             ...basicUserData,
             ...firestoreData,
-          })
+          });
 
           // Check if user has valid role, if not sign them out
           if (firestoreData.role !== "user" && firestoreData.role !== "admin") {
-            console.log("User does not have valid role, signing out...")
-            await signOut(auth)
-            router.push("/signin")
-            return
+            console.log("User does not have valid role, signing out...");
+            await signOut(auth);
+            router.push("/signin");
+            return;
           }
         }
       } else {
         // If not logged in, redirect to sign in page
-        router.push("/signin")
+        router.push("/signin");
       }
-      setLoading(false)
-    })
+      setLoading(false);
+    });
 
-    return () => unsubscribe()
-  }, [router])
+    return () => unsubscribe();
+  }, [router]);
 
   // Close mobile sidebar when route changes
   useEffect(() => {
-    setIsMobileSidebarOpen(false)
-  }, [pathname])
+    setIsMobileSidebarOpen(false);
+  }, [pathname]);
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth)
-      router.push("/signin")
+      await signOut(auth);
+      router.push("/signin");
     } catch (error) {
-      console.error("Error signing out:", error)
+      console.error("Error signing out:", error);
     }
-  }
+  };
 
   const isActive = (path: string) => {
-    return pathname === path
-  }
+    return pathname === path;
+  };
 
   const getDisplayName = () => {
     if (userData?.firstName && userData?.lastName) {
-      return `${userData.firstName} ${userData.lastName}`
+      return `${userData.firstName} ${userData.lastName}`;
     } else if (userData?.firstName) {
-      return userData.firstName
+      return userData.firstName;
     } else if (userData?.email) {
-      return userData.email.split("@")[0]
+      return userData.email.split("@")[0];
     }
-    return "User"
-  }
+    return "User";
+  };
 
   const getInitials = () => {
     if (userData?.firstName && userData?.lastName) {
-      return `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase()
+      return `${userData.firstName.charAt(0)}${userData.lastName.charAt(0)}`.toUpperCase();
     } else if (userData?.firstName) {
-      return userData.firstName.charAt(0).toUpperCase()
+      return userData.firstName.charAt(0).toUpperCase();
     } else if (userData?.email) {
-      return userData.email.charAt(0).toUpperCase()
+      return userData.email.charAt(0).toUpperCase();
     }
-    return "?"
-  }
+    return "?";
+  };
 
   const navigationItems = [
     {
@@ -155,6 +156,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       icon: <Wind className="h-5 w-5" />,
     },
     {
+      name: "Kolay Kekemelik",
+      href: "/dashboard/kolay-kekemelik",
+      icon: <MessageCircleHeart className="h-5 w-5" />,
+    },
+    {
       name: "Kendin Oku",
       href: "/dashboard/Read-Out-Loud",
       icon: <Speech className="h-5 w-5" />,
@@ -169,7 +175,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
       href: "/dashboard/sohbet",
       icon: <MessagesSquare className="h-5 w-5" />,
     },
-  ]
+  ];
 
   const secondaryNavItems = [
     {
@@ -196,17 +202,19 @@ export default function DashboardLayout({ children }: LayoutProps) {
           },
         ]
       : []),
-  ]
+  ];
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <div className="flex flex-col items-center gap-4">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-600"></div>
-          <p className="text-slate-600 font-medium">Loading your dashboard...</p>
+          <p className="text-slate-600 font-medium">
+            Loading your dashboard...
+          </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -224,17 +232,25 @@ export default function DashboardLayout({ children }: LayoutProps) {
         className={`${
           isSidebarCollapsed ? "w-20" : "w-72"
         } bg-white shadow-lg fixed h-screen flex flex-col z-30 transition-all duration-300 ease-in-out transform ${
-          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          isMobileSidebarOpen
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
         }`}
       >
         {/* Logo section */}
         <div className="p-5 flex items-center justify-between border-b border-slate-100">
           <div className="flex items-center">
             <div className="flex-shrink-0 w-10">
-              <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-10 w-auto" />
+              <img
+                src="/Stammering-Therapy-logo.png"
+                alt="FluentVoice Logo"
+                className="h-10 w-auto"
+              />
             </div>
             {!isSidebarCollapsed && (
-              <span className="ml-0 text-xl font-bold text-teal-900 whitespace-nowrap">E-Kekemelik</span>
+              <span className="ml-0 text-xl font-bold text-teal-900 whitespace-nowrap">
+                E-Kekemelik
+              </span>
             )}
           </div>
           <div className="flex-shrink-0">
@@ -268,8 +284,14 @@ export default function DashboardLayout({ children }: LayoutProps) {
                     : "text-slate-600 hover:bg-slate-50 hover:text-teal-600"
                 } ${isSidebarCollapsed ? "justify-center" : ""}`}
               >
-                <span className={`${isActive(item.href) ? "text-teal-600" : "text-slate-400"}`}>{item.icon}</span>
-                {!isSidebarCollapsed && <span className="ml-3">{item.name}</span>}
+                <span
+                  className={`${isActive(item.href) ? "text-teal-600" : "text-slate-400"}`}
+                >
+                  {item.icon}
+                </span>
+                {!isSidebarCollapsed && (
+                  <span className="ml-3">{item.name}</span>
+                )}
                 {!isSidebarCollapsed && isActive(item.href) && (
                   <span className="ml-auto h-2 w-2 rounded-full bg-teal-500"></span>
                 )}
@@ -279,7 +301,9 @@ export default function DashboardLayout({ children }: LayoutProps) {
 
           <div className="mt-10 mb-4">
             {!isSidebarCollapsed && (
-              <p className="px-3 text-xs font-medium text-slate-400 uppercase tracking-wider">Account</p>
+              <p className="px-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
+                Account
+              </p>
             )}
             <div className="mt-3 space-y-1.5">
               {secondaryNavItems.map((item) => (
@@ -292,8 +316,14 @@ export default function DashboardLayout({ children }: LayoutProps) {
                       : "text-slate-600 hover:bg-slate-50 hover:text-teal-600"
                   } ${isSidebarCollapsed ? "justify-center" : ""}`}
                 >
-                  <span className={`${isActive(item.href) ? "text-teal-600" : "text-slate-400"}`}>{item.icon}</span>
-                  {!isSidebarCollapsed && <span className="ml-3">{item.name}</span>}
+                  <span
+                    className={`${isActive(item.href) ? "text-teal-600" : "text-slate-400"}`}
+                  >
+                    {item.icon}
+                  </span>
+                  {!isSidebarCollapsed && (
+                    <span className="ml-3">{item.name}</span>
+                  )}
                 </Link>
               ))}
             </div>
@@ -301,7 +331,9 @@ export default function DashboardLayout({ children }: LayoutProps) {
         </nav>
 
         {/* Profile section - Fixed at bottom */}
-        <div className={`p-4 border-t border-slate-200 mt-auto ${isSidebarCollapsed ? "flex justify-center" : ""}`}>
+        <div
+          className={`p-4 border-t border-slate-200 mt-auto ${isSidebarCollapsed ? "flex justify-center" : ""}`}
+        >
           {isSidebarCollapsed ? (
             <div className="relative cursor-pointer">
               {userData?.photoURL ? (
@@ -314,7 +346,9 @@ export default function DashboardLayout({ children }: LayoutProps) {
                 </div>
               ) : (
                 <div className="h-11 w-11 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
-                  <span className="text-white font-medium text-sm">{getInitials()}</span>
+                  <span className="text-white font-medium text-sm">
+                    {getInitials()}
+                  </span>
                 </div>
               )}
               <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
@@ -333,14 +367,20 @@ export default function DashboardLayout({ children }: LayoutProps) {
                     </div>
                   ) : (
                     <div className="h-11 w-11 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
-                      <span className="text-white font-medium text-base">{getInitials()}</span>
+                      <span className="text-white font-medium text-base">
+                        {getInitials()}
+                      </span>
                     </div>
                   )}
                   <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-slate-900 truncate">{getDisplayName()}</p>
-                  <p className="text-xs text-slate-500 truncate">{userData?.location || "Active now"}</p>
+                  <p className="text-sm font-medium text-slate-900 truncate">
+                    {getDisplayName()}
+                  </p>
+                  <p className="text-xs text-slate-500 truncate">
+                    {userData?.location || "Active now"}
+                  </p>
                 </div>
               </div>
 
@@ -365,17 +405,27 @@ export default function DashboardLayout({ children }: LayoutProps) {
           <Menu className="h-6 w-6" />
         </button>
         <div className="flex items-center space-x-3">
-          <img src="/Stammering-Therapy-logo.png" alt="FluentVoice Logo" className="h-8 w-auto" />
+          <img
+            src="/Stammering-Therapy-logo.png"
+            alt="FluentVoice Logo"
+            className="h-8 w-auto"
+          />
           <span className="text-lg font-bold text-teal-900">E-Kekemelik</span>
         </div>
         <div className="relative">
           {userData?.photoURL ? (
             <div className="h-9 w-9 rounded-full overflow-hidden border-2 border-white shadow-sm">
-              <img src={userData.photoURL || "/placeholder.svg"} alt="Profile" className="h-full w-full object-cover" />
+              <img
+                src={userData.photoURL || "/placeholder.svg"}
+                alt="Profile"
+                className="h-full w-full object-cover"
+              />
             </div>
           ) : (
             <div className="h-9 w-9 rounded-full bg-gradient-to-br from-teal-500 to-emerald-600 flex items-center justify-center shadow-sm">
-              <span className="text-white font-medium text-sm">{getInitials()}</span>
+              <span className="text-white font-medium text-sm">
+                {getInitials()}
+              </span>
             </div>
           )}
           <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-green-500 border-2 border-white"></span>
@@ -389,7 +439,9 @@ export default function DashboardLayout({ children }: LayoutProps) {
         } transition-all duration-300 ease-in-out pt-16 lg:pt-0`}
       >
         {/* Page content */}
-        <main className={`flex-1 overflow-y-auto ${pathname === "/dashboard" ? "p-0" : "py-0 px-4 sm:px-6 lg:px-1"}`}>
+        <main
+          className={`flex-1 overflow-y-auto ${pathname === "/dashboard" ? "p-0" : "py-0 px-4 sm:px-6 lg:px-1"}`}
+        >
           {pathname === "/dashboard" && (
             <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 p-4 sm:p-6 lg:p-8">
               <div className="max-w-7xl mx-auto">
@@ -399,7 +451,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                     Armoni Panel
                   </h1>
                   <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                    Okuma becerilerinizi geliştirmek için tüm araçlara buradan erişebilirsiniz
+                    Okuma becerilerinizi geliştirmek için tüm araçlara buradan
+                    erişebilirsiniz
                   </p>
                 </div>
 
@@ -411,7 +464,12 @@ export default function DashboardLayout({ children }: LayoutProps) {
                       <div className="absolute inset-0 bg-gradient-to-br from-blue-500 via-blue-600 to-indigo-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -424,7 +482,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                           Hikayeler
                         </h3>
                         <p className="text-gray-600 group-hover:text-blue-100 transition-colors duration-300 leading-relaxed">
-                          İlgi çekici hikayelerle okuma becerilerinizi geliştirin ve kelime dağarcığınızı genişletin
+                          İlgi çekici hikayelerle okuma becerilerinizi
+                          geliştirin ve kelime dağarcığınızı genişletin
                         </p>
                         <div className="mt-6 flex items-center text-blue-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Keşfet</span>
@@ -447,12 +506,20 @@ export default function DashboardLayout({ children }: LayoutProps) {
                   </a>
 
                   {/* Nefes ve Ağız Çalışmaları */}
-                  <a href="/dashboard/mouth-and-breathing-exercises" className="group block">
+                  <a
+                    href="/dashboard/mouth-and-breathing-exercises"
+                    className="group block"
+                  >
                     <div className="relative overflow-hidden bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 border border-gray-100">
                       <div className="absolute inset-0 bg-gradient-to-br from-emerald-500 via-green-600 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -465,7 +532,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                           Nefes ve Ağız Çalışmaları
                         </h3>
                         <p className="text-gray-600 group-hover:text-emerald-100 transition-colors duration-300 leading-relaxed">
-                          Doğru nefes ve ağız egzersizleriyle konuşmanızı geliştirin.
+                          Doğru nefes ve ağız egzersizleriyle konuşmanızı
+                          geliştirin.
                         </p>
                         <div className="mt-6 flex items-center text-emerald-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Başla</span>
@@ -493,7 +561,12 @@ export default function DashboardLayout({ children }: LayoutProps) {
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-500 via-violet-600 to-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -506,7 +579,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                           Kendin Oku
                         </h3>
                         <p className="text-gray-600 group-hover:text-purple-100 transition-colors duration-300 leading-relaxed">
-                          Sesli okuma pratiği yaparak telaffuz ve akıcılığınızı geliştirin, özgüveninizi artırın
+                          Sesli okuma pratiği yaparak telaffuz ve akıcılığınızı
+                          geliştirin, özgüveninizi artırın
                         </p>
                         <div className="mt-6 flex items-center text-purple-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Oku</span>
@@ -534,7 +608,12 @@ export default function DashboardLayout({ children }: LayoutProps) {
                       <div className="absolute inset-0 bg-gradient-to-br from-orange-500 via-amber-600 to-orange-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-orange-500 to-amber-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -547,7 +626,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                           Armoni Haberler
                         </h3>
                         <p className="text-gray-600 group-hover:text-orange-100 transition-colors duration-300 leading-relaxed">
-                          Güncel haberler, duyurular ve topluluk gelişmeleri hakkında bilgi alın
+                          Güncel haberler, duyurular ve topluluk gelişmeleri
+                          hakkında bilgi alın
                         </p>
                         <div className="mt-6 flex items-center text-orange-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Gör</span>
@@ -570,12 +650,20 @@ export default function DashboardLayout({ children }: LayoutProps) {
                   </a>
 
                   {/* Sohbet */}
-                  <a href="/dashboard/sohbet" className="group block sm:col-span-2 lg:col-span-1">
+                  <a
+                    href="/dashboard/sohbet"
+                    className="group block sm:col-span-2 lg:col-span-1"
+                  >
                     <div className="relative overflow-hidden bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 border border-gray-100">
                       <div className="absolute inset-0 bg-gradient-to-br from-teal-500 via-cyan-600 to-blue-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                       <div className="relative p-8">
                         <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
-                          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
                             <path
                               strokeLinecap="round"
                               strokeLinejoin="round"
@@ -588,7 +676,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
                           Sohbet
                         </h3>
                         <p className="text-gray-600 group-hover:text-teal-100 transition-colors duration-300 leading-relaxed">
-                          Toplulukla iletişim kurun, deneyimlerinizi paylaşın ve birlikte öğrenin
+                          Toplulukla iletişim kurun, deneyimlerinizi paylaşın ve
+                          birlikte öğrenin
                         </p>
                         <div className="mt-6 flex items-center text-teal-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Katıl</span>
@@ -617,5 +706,5 @@ export default function DashboardLayout({ children }: LayoutProps) {
         </main>
       </div>
     </div>
-  )
+  );
 }
