@@ -207,8 +207,7 @@ export default function OgrenciProfiliPage() {
 
       setStudents(studentsList);
       setLoading(false);
-    } catch (error) {
-      console.error("Error fetching students:", error);
+    } catch {
       setAlert({
         show: true,
         type: "error",
@@ -258,13 +257,6 @@ export default function OgrenciProfiliPage() {
     } catch (error) {
       return "Geçersiz yaş";
     }
-  };
-
-  const showAlert = (type: "success" | "error", message: string) => {
-    setAlert({ show: true, type, message });
-    setTimeout(() => {
-      setAlert({ show: false, type: "success", message: "" });
-    }, 5000);
   };
 
   if (adminCheck.loading) {
