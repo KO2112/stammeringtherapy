@@ -24,6 +24,7 @@ import {
   MessagesSquare,
   ChartColumnIncreasing,
   MessageCircleHeart,
+  UserSearch,
 } from "lucide-react";
 
 interface LayoutProps {
@@ -202,6 +203,15 @@ export default function DashboardLayout({ children }: LayoutProps) {
           },
         ]
       : []),
+      ...(userData?.role === "admin"
+      ? [
+          {
+            name: "Öğrenci Profili",
+            href: "/dashboard/ogrenci-profili",
+            icon: <UserSearch className="h-5 w-5" />,
+          },
+        ]
+      : []),
   ];
 
   if (loading) {
@@ -302,7 +312,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           <div className="mt-10 mb-4">
             {!isSidebarCollapsed && (
               <p className="px-3 text-xs font-medium text-slate-400 uppercase tracking-wider">
-                Account
+                Hesap
               </p>
             )}
             <div className="mt-3 space-y-1.5">
@@ -537,6 +547,52 @@ export default function DashboardLayout({ children }: LayoutProps) {
                         </p>
                         <div className="mt-6 flex items-center text-emerald-600 group-hover:text-white transition-colors duration-300">
                           <span className="font-semibold">Başla</span>
+                          <svg
+                            className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform duration-300"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M17 8l4 4m0 0l-4 4m4-4H3"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+
+                  {/* Kolay Kekemelik */}
+                  <a href="/dashboard/kolay-kekemelik" className="group block">
+                    <div className="relative overflow-hidden bg-white rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-500 border border-gray-100">
+                      <div className="absolute inset-0 bg-gradient-to-br from-rose-500 via-pink-600 to-rose-700 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      <div className="relative p-8">
+                        <div className="flex items-center justify-center w-16 h-16 bg-gradient-to-br from-rose-500 to-pink-600 rounded-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+                          <svg
+                            className="w-8 h-8 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-800 group-hover:text-white mb-3 transition-colors duration-300">
+                          Kolay Kekemelik
+                        </h3>
+                        <p className="text-gray-600 group-hover:text-rose-100 transition-colors duration-300 leading-relaxed">
+                          Tekrarlayarak kolay kekemelik tekniklerini öğrenin
+                        </p>
+                        <div className="mt-6 flex items-center text-rose-600 group-hover:text-white transition-colors duration-300">
+                          <span className="font-semibold">Öğren</span>
                           <svg
                             className="w-5 h-5 ml-2 transform group-hover:translate-x-2 transition-transform duration-300"
                             fill="none"
