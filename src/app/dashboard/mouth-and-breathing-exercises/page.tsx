@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Wind,
   MessageSquare,
@@ -16,35 +16,35 @@ import {
   ArrowRight,
   Repeat,
   PlayCircle,
-} from "lucide-react"
+} from "lucide-react";
 
 // Define types for our exercises
 interface BaseExercise {
-  id: number
-  title: string
-  description: string
-  duration: number
-  steps: string[]
-  benefits: string[]
+  id: number;
+  title: string;
+  description: string;
+  duration: number;
+  steps: string[];
+  benefits: string[];
 }
 
 // Instead of an empty interface, use a type alias with a discriminator
 type BreathingExercise = BaseExercise & {
-  type: "breathing"
-}
+  type: "breathing";
+};
 
 interface MouthExercise extends BaseExercise {
-  practice: string
-  type: "mouth"
+  practice: string;
+  type: "mouth";
 }
 
 export default function TurkishVocalExercises() {
-  const [activeTab, setActiveTab] = useState("breathing")
-  const [activeExercise, setActiveExercise] = useState<number | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [timer, setTimer] = useState(0)
-  const [maxTime, setMaxTime] = useState(60)
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [activeTab, setActiveTab] = useState("breathing");
+  const [activeExercise, setActiveExercise] = useState<number | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [maxTime, setMaxTime] = useState(60);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const breathingExercises: BreathingExercise[] = [
     {
@@ -59,7 +59,11 @@ export default function TurkishVocalExercises() {
         "Ağzınızdan nefes verin (6s)",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Stresi azaltır", "Odaklanmayı artırır", "Oksijen akışını artırır"],
+      benefits: [
+        "Stresi azaltır",
+        "Odaklanmayı artırır",
+        "Oksijen akışını artırır",
+      ],
       type: "breathing",
     },
     {
@@ -75,7 +79,11 @@ export default function TurkishVocalExercises() {
         "Her verme arasında kısa durun",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Diyaframı güçlendirir", "Nefes kontrolünü geliştirir", "Vokal stabilitesini artırır"],
+      benefits: [
+        "Diyaframı güçlendirir",
+        "Nefes kontrolünü geliştirir",
+        "Vokal stabilitesini artırır",
+      ],
       type: "breathing",
     },
     {
@@ -91,7 +99,11 @@ export default function TurkishVocalExercises() {
         "Ağzınızdan nefes verin (6s)",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Akciğer kapasitesini artırır", "Nefes kontrolünü geliştirir", "Kaygıyı azaltır"],
+      benefits: [
+        "Akciğer kapasitesini artırır",
+        "Nefes kontrolünü geliştirir",
+        "Kaygıyı azaltır",
+      ],
       type: "breathing",
     },
     {
@@ -107,7 +119,11 @@ export default function TurkishVocalExercises() {
         "Kontrollü patlamalar halinde nefes verin",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Yüz kaslarını güçlendirir", "Nefes kontrolünü geliştirir", "Artikülasyonu artırır"],
+      benefits: [
+        "Yüz kaslarını güçlendirir",
+        "Nefes kontrolünü geliştirir",
+        "Artikülasyonu artırır",
+      ],
       type: "breathing",
     },
     {
@@ -123,7 +139,11 @@ export default function TurkishVocalExercises() {
         "Ağzınızdan nefes verin (6s)",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["CO2 toleransını artırır", "Sinir sistemini sakinleştirir", "Odaklanma ve konsantrasyonu geliştirir"],
+      benefits: [
+        "CO2 toleransını artırır",
+        "Sinir sistemini sakinleştirir",
+        "Odaklanma ve konsantrasyonu geliştirir",
+      ],
       type: "breathing",
     },
     {
@@ -139,7 +159,11 @@ export default function TurkishVocalExercises() {
         "Tutarlı ses çıkarın",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Diyaframı güçlendirir", "Nefes kontrolünü geliştirir", "Vokal rezonansı artırır"],
+      benefits: [
+        "Diyaframı güçlendirir",
+        "Nefes kontrolünü geliştirir",
+        "Vokal rezonansı artırır",
+      ],
       type: "breathing",
     },
     {
@@ -155,7 +179,11 @@ export default function TurkishVocalExercises() {
         "Tutarlı ritim koruyun",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Nefes kontrolünü geliştirir", "Ritim algısını artırır", "Vokal kasları güçlendirir"],
+      benefits: [
+        "Nefes kontrolünü geliştirir",
+        "Ritim algısını artırır",
+        "Vokal kasları güçlendirir",
+      ],
       type: "breathing",
     },
     {
@@ -171,7 +199,11 @@ export default function TurkishVocalExercises() {
         "Tutarlı ton koruyun",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Ses tellerini güçlendirir", "Nefes kontrolünü geliştirir", "Vokal projeksiyonu artırır"],
+      benefits: [
+        "Ses tellerini güçlendirir",
+        "Nefes kontrolünü geliştirir",
+        "Vokal projeksiyonu artırır",
+      ],
       type: "breathing",
     },
     {
@@ -187,7 +219,11 @@ export default function TurkishVocalExercises() {
         "Her sesli harfi net telaffuz edin",
         "Ciğerlerinizi tamamen boşaltın",
       ],
-      benefits: ["Artikülasyonu geliştirir", "Vokal aralığını artırır", "Nefes kontrolünü güçlendirir"],
+      benefits: [
+        "Artikülasyonu geliştirir",
+        "Vokal aralığını artırır",
+        "Nefes kontrolünü güçlendirir",
+      ],
       type: "breathing",
     },
     {
@@ -203,16 +239,21 @@ export default function TurkishVocalExercises() {
         "Tutarlı ritim koruyun",
         "30 saniye devam edin",
       ],
-      benefits: ["Diyaframı güçlendirir", "Oksijen alımını artırır", "Vücudu enerjiler"],
+      benefits: [
+        "Diyaframı güçlendirir",
+        "Oksijen alımını artırır",
+        "Vücudu enerjiler",
+      ],
       type: "breathing",
     },
-  ]
+  ];
 
   const mouthExercises: MouthExercise[] = [
     {
       id: 1,
       title: "Sesli Harf Artikülasyonu",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki harfleri söyleyiniz:",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki harfleri söyleyiniz:",
       practice: "U İ",
       duration: 30,
       steps: [
@@ -222,13 +263,18 @@ export default function TurkishVocalExercises() {
         "'İ' harfini abartılı ağız açışı ile telaffuz edin",
         "Diziyi tekrarlayın",
       ],
-      benefits: ["Sesli harf netliğini geliştirir", "Yüz kaslarını güçlendirir", "Artikülasyonu artırır"],
+      benefits: [
+        "Sesli harf netliğini geliştirir",
+        "Yüz kaslarını güçlendirir",
+        "Artikülasyonu artırır",
+      ],
       type: "mouth",
     },
     {
       id: 2,
       title: "Hece Tekrarı",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "Manamana Menemene Minimini Monomono Munumunu",
       duration: 45,
       steps: [
@@ -238,13 +284,18 @@ export default function TurkishVocalExercises() {
         "Tutarlı ritim koruyun",
         "Tam diziyi tamamlayın",
       ],
-      benefits: ["Diksiyonu geliştirir", "Artikülasyon kaslarını güçlendirir", "Konuşma netliğini artırır"],
+      benefits: [
+        "Diksiyonu geliştirir",
+        "Artikülasyon kaslarını güçlendirir",
+        "Konuşma netliğini artırır",
+      ],
       type: "mouth",
     },
     {
       id: 3,
       title: "Sibilant Sesler",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "Sa Şa Za Se Şe Ze Si Şi Zi So Şo Zo Su Şu Zu",
       duration: 60,
       steps: [
@@ -254,13 +305,18 @@ export default function TurkishVocalExercises() {
         "'s', 'ş', ve 'z' seslerine odaklanın",
         "Tam diziyi tamamlayın",
       ],
-      benefits: ["Sibilant sesleri geliştirir", "Konuşma netliğini artırır", "Dil kontrolünü güçlendirir"],
+      benefits: [
+        "Sibilant sesleri geliştirir",
+        "Konuşma netliğini artırır",
+        "Dil kontrolünü güçlendirir",
+      ],
       type: "mouth",
     },
     {
       id: 4,
       title: "Ünsüz Kombinasyonları",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "O Pi Kap Bu Pi Kap Şu Pi Kap",
       duration: 45,
       steps: [
@@ -270,7 +326,11 @@ export default function TurkishVocalExercises() {
         "Sesler arası geçişlere odaklanın",
         "Tam diziyi tamamlayın",
       ],
-      benefits: ["Ünsüz netliğini geliştirir", "Konuşma ritmini artırır", "Artikülasyonu güçlendirir"],
+      benefits: [
+        "Ünsüz netliğini geliştirir",
+        "Konuşma ritmini artırır",
+        "Artikülasyonu güçlendirir",
+      ],
       type: "mouth",
     },
     {
@@ -288,14 +348,20 @@ export default function TurkishVocalExercises() {
         "Tutarlı ritim koruyun",
         "Üç satırı da tamamlayın",
       ],
-      benefits: ["Nefes kontrolünü geliştirir", "Konuşma ritmini artırır", "Artikülasyon kaslarını güçlendirir"],
+      benefits: [
+        "Nefes kontrolünü geliştirir",
+        "Konuşma ritmini artırır",
+        "Artikülasyon kaslarını güçlendirir",
+      ],
       type: "mouth",
     },
     {
       id: 6,
       title: "Ünsüz-Sesli Harf Çiftleri",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
-      practice: "pa-pe pi-po-ba-be-bi-bo-ma-me-mi-mo\nPap-pep-pip-pop-bab-beb-bib-bob-mam-mem-mim-mom",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      practice:
+        "pa-pe pi-po-ba-be-bi-bo-ma-me-mi-mo\nPap-pep-pip-pop-bab-beb-bib-bob-mam-mem-mim-mom",
       duration: 60,
       steps: [
         "Derin nefes alın",
@@ -304,14 +370,20 @@ export default function TurkishVocalExercises() {
         "Ünsüz-sesli harf geçişlerine odaklanın",
         "Her iki satırı da tamamlayın",
       ],
-      benefits: ["Artikülasyonu geliştirir", "Konuşma netliğini artırır", "Yüz kaslarını güçlendirir"],
+      benefits: [
+        "Artikülasyonu geliştirir",
+        "Konuşma netliğini artırır",
+        "Yüz kaslarını güçlendirir",
+      ],
       type: "mouth",
     },
     {
       id: 7,
       title: "Diş Ünsüzleri",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
-      practice: "Da-de-di-do-na-ne-ni-no-ta-te-ti-to\nDad-ded-did-dod-nan-nen-nin-non-tat-tet-tit-tot",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      practice:
+        "Da-de-di-do-na-ne-ni-no-ta-te-ti-to\nDad-ded-did-dod-nan-nen-nin-non-tat-tet-tit-tot",
       duration: 60,
       steps: [
         "Derin nefes alın",
@@ -320,13 +392,18 @@ export default function TurkishVocalExercises() {
         "'d', 'n', ve 't' seslerine odaklanın",
         "Her iki satırı da tamamlayın",
       ],
-      benefits: ["Diş ünsüzü netliğini geliştirir", "Dil yerleşimini artırır", "Artikülasyonu güçlendirir"],
+      benefits: [
+        "Diş ünsüzü netliğini geliştirir",
+        "Dil yerleşimini artırır",
+        "Artikülasyonu güçlendirir",
+      ],
       type: "mouth",
     },
     {
       id: 8,
       title: "Velar Ünsüzler",
-      description: "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
+      description:
+        "Diyafram nefesi kullanarak ve ağzınızı abartılı bir şekilde açarak aşağıdaki egzersizi okuyunuz:",
       practice: "Kah-keh-kıh-kih-koh-köh-kuh-küh",
       duration: 45,
       steps: [
@@ -358,7 +435,11 @@ export default function TurkishVocalExercises() {
         "Son ünsüz kümelerine odaklanın",
         "Dört satırı da tamamlayın",
       ],
-      benefits: ["Ünsüz küme netliğini geliştirir", "Nefes kontrolünü artırır", "Artikülasyon kaslarını güçlendirir"],
+      benefits: [
+        "Ünsüz küme netliğini geliştirir",
+        "Nefes kontrolünü artırır",
+        "Artikülasyon kaslarını güçlendirir",
+      ],
       type: "mouth",
     },
     {
@@ -375,75 +456,83 @@ export default function TurkishVocalExercises() {
         "Her harfi net telaffuz edin",
         "Tüm alfabeyi tamamlayın",
       ],
-      benefits: ["Çene kaslarını güçlendirir", "Artikülasyonu geliştirir", "Ağız kontrolünü artırır"],
+      benefits: [
+        "Çene kaslarını güçlendirir",
+        "Artikülasyonu geliştirir",
+        "Ağız kontrolünü artırır",
+      ],
       type: "mouth",
     },
-  ]
+  ];
 
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current)
+        clearInterval(timerRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const startTimer = () => {
     if (timerRef.current) {
-      clearInterval(timerRef.current)
+      clearInterval(timerRef.current);
     }
-    setIsPlaying(true)
-    setTimer(0)
+    setIsPlaying(true);
+    setTimer(0);
     timerRef.current = setInterval(() => {
       setTimer((prev) => {
         if (prev >= maxTime) {
           if (timerRef.current) {
-            clearInterval(timerRef.current)
+            clearInterval(timerRef.current);
           }
-          setIsPlaying(false)
-          return maxTime
+          setIsPlaying(false);
+          return maxTime;
         }
-        return prev + 1
-      })
-    }, 1000)
-  }
+        return prev + 1;
+      });
+    }, 1000);
+  };
 
   const pauseTimer = () => {
     if (timerRef.current) {
-      clearInterval(timerRef.current)
+      clearInterval(timerRef.current);
     }
-    setIsPlaying(false)
-  }
+    setIsPlaying(false);
+  };
 
   const resetTimer = () => {
     if (timerRef.current) {
-      clearInterval(timerRef.current)
+      clearInterval(timerRef.current);
     }
-    setIsPlaying(false)
-    setTimer(0)
-  }
+    setIsPlaying(false);
+    setTimer(0);
+  };
 
   const handleExerciseSelect = (id: number, duration: number) => {
-    resetTimer()
-    setActiveExercise(id)
-    setMaxTime(duration)
-  }
+    resetTimer();
+    setActiveExercise(id);
+    setMaxTime(duration);
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = seconds % 60
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
-  const currentExercises = activeTab === "breathing" ? breathingExercises : mouthExercises
-  const activeExerciseData = currentExercises.find((ex) => ex.id === activeExercise)
+  const currentExercises =
+    activeTab === "breathing" ? breathingExercises : mouthExercises;
+  const activeExerciseData = currentExercises.find(
+    (ex) => ex.id === activeExercise
+  );
 
   return (
     <div className="w-full min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-5 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">Vokal Gelişim Egzersizleri</h1>
-          
+          <h1 className="text-3xl font-bold text-slate-900 sm:text-4xl">
+            Vokal Gelişim Egzersizleri
+          </h1>
         </div>
 
         {/* Tabs */}
@@ -451,12 +540,14 @@ export default function TurkishVocalExercises() {
           <div className="bg-white rounded-full p-1 shadow-md flex">
             <button
               onClick={() => {
-                setActiveTab("breathing")
-                setActiveExercise(null)
-                resetTimer()
+                setActiveTab("breathing");
+                setActiveExercise(null);
+                resetTimer();
               }}
               className={`flex items-center px-6 py-3 rounded-full text-sm font-medium transition-all ${
-                activeTab === "breathing" ? "bg-teal-500 text-white shadow-sm" : "text-slate-700 hover:bg-slate-100"
+                activeTab === "breathing"
+                  ? "bg-teal-500 text-white shadow-sm"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               <Wind className="h-4 w-4 mr-2" />
@@ -464,12 +555,14 @@ export default function TurkishVocalExercises() {
             </button>
             <button
               onClick={() => {
-                setActiveTab("mouth")
-                setActiveExercise(null)
-                resetTimer()
+                setActiveTab("mouth");
+                setActiveExercise(null);
+                resetTimer();
               }}
               className={`flex items-center px-6 py-3 rounded-full text-sm font-medium transition-all ${
-                activeTab === "mouth" ? "bg-purple-500 text-white shadow-sm" : "text-slate-700 hover:bg-slate-100"
+                activeTab === "mouth"
+                  ? "bg-purple-500 text-white shadow-sm"
+                  : "text-slate-700 hover:bg-slate-100"
               }`}
             >
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -505,21 +598,33 @@ export default function TurkishVocalExercises() {
               {currentExercises.map((exercise) => (
                 <button
                   key={exercise.id}
-                  onClick={() => handleExerciseSelect(exercise.id, exercise.duration)}
+                  onClick={() =>
+                    handleExerciseSelect(exercise.id, exercise.duration)
+                  }
                   className={`w-full text-left px-6 py-4 hover:bg-slate-50 transition-colors flex items-center ${
-                    activeExercise === exercise.id ? (activeTab === "breathing" ? "bg-teal-50" : "bg-purple-50") : ""
+                    activeExercise === exercise.id
+                      ? activeTab === "breathing"
+                        ? "bg-teal-50"
+                        : "bg-purple-50"
+                      : ""
                   }`}
                 >
                   <div
                     className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                      activeTab === "breathing" ? "bg-teal-100 text-teal-700" : "bg-purple-100 text-purple-700"
+                      activeTab === "breathing"
+                        ? "bg-teal-100 text-teal-700"
+                        : "bg-purple-100 text-purple-700"
                     }`}
                   >
                     {exercise.id}
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-medium text-slate-900">{exercise.title}</h3>
-                    <p className="text-sm text-slate-500 mt-1 line-clamp-1">{exercise.description}</p>
+                    <h3 className="font-medium text-slate-900">
+                      {exercise.title}
+                    </h3>
+                    <p className="text-sm text-slate-500 mt-1 line-clamp-1">
+                      {exercise.description}
+                    </p>
                   </div>
                   <ChevronRight
                     className={`h-5 w-5 ${activeTab === "breathing" ? "text-teal-500" : "text-purple-500"}`}
@@ -548,38 +653,51 @@ export default function TurkishVocalExercises() {
                   >
                     <h2
                       className={`text-lg font-semibold ${
-                        activeTab === "breathing" ? "text-teal-800" : "text-purple-800"
+                        activeTab === "breathing"
+                          ? "text-teal-800"
+                          : "text-purple-800"
                       }`}
                     >
-                      Egzersiz {activeExerciseData?.id}: {activeExerciseData?.title}
+                      Egzersiz {activeExerciseData?.id}:{" "}
+                      {activeExerciseData?.title}
                     </h2>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-1 text-slate-500" />
-                      <span className="text-sm text-slate-500">{activeExerciseData?.duration}s</span>
+                      <span className="text-sm text-slate-500">
+                        {activeExerciseData?.duration}s
+                      </span>
                     </div>
                   </div>
 
                   <div className="p-6">
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Açıklama</h3>
-                      <p className="text-slate-700">{activeExerciseData?.description}</p>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        Açıklama
+                      </h3>
+                      <p className="text-slate-700">
+                        {activeExerciseData?.description}
+                      </p>
                     </div>
 
-                    {activeTab === "mouth" && activeExerciseData && "practice" in activeExerciseData && (
-                      <div className="mb-6">
-                        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
-                          Uygulama Metni
-                        </h3>
-                        <div
-                          className={`p-4 rounded-lg bg-purple-50 border border-purple-100 text-center font-medium text-purple-800 whitespace-pre-line`}
-                        >
-                          {(activeExerciseData as MouthExercise).practice}
+                    {activeTab === "mouth" &&
+                      activeExerciseData &&
+                      "practice" in activeExerciseData && (
+                        <div className="mb-6">
+                          <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
+                            Uygulama Metni
+                          </h3>
+                          <div
+                            className={`p-4 rounded-lg bg-purple-50 border border-purple-100 text-center font-medium text-purple-800 whitespace-pre-line`}
+                          >
+                            {(activeExerciseData as MouthExercise).practice}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
                     <div className="mb-6">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Adımlar</h3>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        Adımlar
+                      </h3>
                       <div className="space-y-2">
                         {activeExerciseData?.steps.map((step, index) => (
                           <div
@@ -602,7 +720,9 @@ export default function TurkishVocalExercises() {
                     </div>
 
                     <div className="mb-8">
-                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Faydalar</h3>
+                      <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">
+                        Faydalar
+                      </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         {activeExerciseData?.benefits.map((benefit, index) => (
                           <div
@@ -611,10 +731,14 @@ export default function TurkishVocalExercises() {
                           >
                             <CheckCircle
                               className={`h-4 w-4 mr-2 ${
-                                activeTab === "breathing" ? "text-teal-500" : "text-purple-500"
+                                activeTab === "breathing"
+                                  ? "text-teal-500"
+                                  : "text-purple-500"
                               }`}
                             />
-                            <span className="text-sm text-slate-700">{benefit}</span>
+                            <span className="text-sm text-slate-700">
+                              {benefit}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -633,7 +757,9 @@ export default function TurkishVocalExercises() {
                       <div className="w-full bg-slate-200 rounded-full h-2.5 mb-4">
                         <div
                           className={`h-2.5 rounded-full ${
-                            activeTab === "breathing" ? "bg-teal-500" : "bg-purple-500"
+                            activeTab === "breathing"
+                              ? "bg-teal-500"
+                              : "bg-purple-500"
                           }`}
                           style={{ width: `${(timer / maxTime) * 100}%` }}
                         ></div>
@@ -682,7 +808,9 @@ export default function TurkishVocalExercises() {
                 >
                   <div
                     className={`w-20 h-20 rounded-full flex items-center justify-center mb-6 ${
-                      activeTab === "breathing" ? "bg-teal-100" : "bg-purple-100"
+                      activeTab === "breathing"
+                        ? "bg-teal-100"
+                        : "bg-purple-100"
                     }`}
                   >
                     {activeTab === "breathing" ? (
@@ -691,13 +819,18 @@ export default function TurkishVocalExercises() {
                       <MessageSquare className="h-10 w-10 text-purple-600" />
                     )}
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-800 mb-2">Bir Egzersiz Seçin</h3>
+                  <h3 className="text-xl font-semibold text-slate-800 mb-2">
+                    Bir Egzersiz Seçin
+                  </h3>
                   <p className="text-slate-600 text-center mb-6 max-w-md">
-                    Detayları görüntülemek ve pratik yapmaya başlamak için listeden bir egzersiz seçin
+                    Detayları görüntülemek ve pratik yapmaya başlamak için
+                    listeden bir egzersiz seçin
                   </p>
                   <div
                     className={`flex items-center text-sm ${
-                      activeTab === "breathing" ? "text-teal-600" : "text-purple-600"
+                      activeTab === "breathing"
+                        ? "text-teal-600"
+                        : "text-purple-600"
                     }`}
                   >
                     <Info className="h-4 w-4 mr-2" />
@@ -721,7 +854,8 @@ export default function TurkishVocalExercises() {
               Eğitim Videoları
             </h2>
             <p className="text-sm text-slate-600 mt-1">
-              Egzersizleri doğru şekilde yapmayı öğrenmek için bu videoları izleyin
+              Egzersizleri doğru şekilde yapmayı öğrenmek için bu videoları
+              izleyin
             </p>
           </div>
           <div className="p-6">
@@ -729,14 +863,20 @@ export default function TurkishVocalExercises() {
               <div className="space-y-4">
                 <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
                   <video controls className="w-full h-full object-cover">
-                    <source src="/armoni-nefes2.mp4" type="video/mp4" />
+                    <source
+                      src="https://sistem.e-kekemelik.com/uye/ses/armoni-nefes2.mp4#t=0.5"
+                      type="video/mp4"
+                    />
                     Tarayıcınız video oynatmayı desteklemiyor.
                   </video>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-medium text-slate-700">Nefes Egzersizleri Rehberi</h3>
+                  <h3 className="font-medium text-slate-700">
+                    Nefes Egzersizleri Rehberi
+                  </h3>
                   <p className="text-sm text-slate-500">
-                    Doğru nefes tekniklerini öğrenin ve diyafram nefesini nasıl kullanacağınızı keşfedin
+                    Doğru nefes tekniklerini öğrenin ve diyafram nefesini nasıl
+                    kullanacağınızı keşfedin
                   </p>
                 </div>
               </div>
@@ -744,14 +884,20 @@ export default function TurkishVocalExercises() {
               <div className="space-y-4">
                 <div className="aspect-video bg-slate-100 rounded-lg overflow-hidden">
                   <video controls className="w-full h-full object-cover">
-                    <source src="/armoni-agiz-proje2.mp4" type="video/mp4" />
+                    <source
+                      src="https://sistem.e-kekemelik.com/uye/ses/armoni-agiz-proje2.mp4#t=0.5"
+                      type="video/mp4"
+                    />
                     Tarayıcınız video oynatmayı desteklemiyor.
                   </video>
                 </div>
                 <div className="space-y-2">
-                  <h3 className="font-medium text-slate-700">Ağız Gelişim Teknikleri</h3>
+                  <h3 className="font-medium text-slate-700">
+                    Ağız Gelişim Teknikleri
+                  </h3>
                   <p className="text-sm text-slate-500">
-                    Artikülasyon egzersizlerini nasıl yapacağınızı ve ağız kaslarınızı nasıl güçlendireceğinizi öğrenin
+                    Artikülasyon egzersizlerini nasıl yapacağınızı ve ağız
+                    kaslarınızı nasıl güçlendireceğinizi öğrenin
                   </p>
                 </div>
               </div>
@@ -774,10 +920,13 @@ export default function TurkishVocalExercises() {
                   <Wind className="h-6 w-6 text-teal-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Nefes Tekniği</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">
+                    Nefes Tekniği
+                  </h3>
                   <p className="text-slate-600">
-                    Her zaman diyaframınızdan nefes alın, göğsünüzden değil. Nefes aldığınızda karnınız şişmeli,
-                    omuzlarınız yükselmemeli.
+                    Her zaman diyaframınızdan nefes alın, göğsünüzden değil.
+                    Nefes aldığınızda karnınız şişmeli, omuzlarınız
+                    yükselmemeli.
                   </p>
                 </div>
               </div>
@@ -786,10 +935,12 @@ export default function TurkishVocalExercises() {
                   <Clock className="h-6 w-6 text-purple-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Düzenli Pratik</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">
+                    Düzenli Pratik
+                  </h3>
                   <p className="text-slate-600">
-                    Bu egzersizleri günde 10-15 dakika pratik edin. Doğru tekniği geliştirmek için süreklilik süreden
-                    daha önemlidir.
+                    Bu egzersizleri günde 10-15 dakika pratik edin. Doğru
+                    tekniği geliştirmek için süreklilik süreden daha önemlidir.
                   </p>
                 </div>
               </div>
@@ -798,10 +949,13 @@ export default function TurkishVocalExercises() {
                   <Smile className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Rahat Duruş</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">
+                    Rahat Duruş
+                  </h3>
                   <p className="text-slate-600">
-                    Bu egzersizleri yaparken çenenizi, boynunuzu ve omuzlarınızı rahat tutun. Gerginlik doğru hava
-                    akışını ve artikülasyonu kısıtlar.
+                    Bu egzersizleri yaparken çenenizi, boynunuzu ve omuzlarınızı
+                    rahat tutun. Gerginlik doğru hava akışını ve artikülasyonu
+                    kısıtlar.
                   </p>
                 </div>
               </div>
@@ -810,10 +964,13 @@ export default function TurkishVocalExercises() {
                   <ArrowRight className="h-6 w-6 text-blue-600" />
                 </div>
                 <div>
-                  <h3 className="font-medium text-slate-900 mb-2">Aşamalı Zorluk</h3>
+                  <h3 className="font-medium text-slate-900 mb-2">
+                    Aşamalı Zorluk
+                  </h3>
                   <p className="text-slate-600">
-                    Basit egzersizlerle başlayın ve zorluğu kademeli olarak artırın. Daha karmaşık kalıplara geçmeden
-                    önce temelleri öğrenin.
+                    Basit egzersizlerle başlayın ve zorluğu kademeli olarak
+                    artırın. Daha karmaşık kalıplara geçmeden önce temelleri
+                    öğrenin.
                   </p>
                 </div>
               </div>
@@ -822,5 +979,5 @@ export default function TurkishVocalExercises() {
         </div>
       </div>
     </div>
-  )
+  );
 }

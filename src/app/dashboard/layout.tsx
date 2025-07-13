@@ -25,6 +25,7 @@ import {
   ChartColumnIncreasing,
   MessageCircleHeart,
   UserSearch,
+  Video,
 } from "lucide-react";
 
 interface LayoutProps {
@@ -167,6 +168,11 @@ export default function DashboardLayout({ children }: LayoutProps) {
       icon: <Speech className="h-5 w-5" />,
     },
     {
+      name: "Eğitici Videolar",
+      href: "/dashboard/egitici-videolar",
+      icon: <Video className="h-5 w-5" />,
+    },
+    {
       name: "Armoni Haberler",
       href: "/dashboard/armoni-haberler",
       icon: <Newspaper className="h-5 w-5" />,
@@ -203,7 +209,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           },
         ]
       : []),
-      ...(userData?.role === "admin"
+    ...(userData?.role === "admin"
       ? [
           {
             name: "Öğrenci Profili",
