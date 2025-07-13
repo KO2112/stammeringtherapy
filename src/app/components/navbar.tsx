@@ -224,42 +224,27 @@ const Navbar = () => {
 
         {/* Mobile Navigation Menu */}
         <div
-          className={`mobile-menu lg:hidden fixed inset-x-0 top-full transition-all duration-300 ease-in-out ${
+          className={`mobile-menu lg:hidden fixed inset-x-0 top-16 z-50 transition-all duration-300 ease-in-out ${
             isMenuOpen
               ? "opacity-100 translate-y-0 pointer-events-auto"
               : "opacity-0 -translate-y-4 pointer-events-none"
           }`}
         >
-          <div
-            className={`mx-4 mt-2 rounded-2xl shadow-2xl overflow-hidden ${
-              isScrolled ? "bg-white" : "bg-blue-900"
-            }`}
-          >
-            <div className="px-4 py-6 space-y-2">
+          <div className="relative mx-4 mt-2 rounded-2xl shadow-2xl overflow-y-auto bg-white border border-blue-100 max-h-[80vh]">
+            <div className="px-4 py-6 space-y-2 text-blue-900">
               {navItems.map((item) => (
                 <Link
                   key={item.path}
                   href={item.path}
                   className={`flex items-center justify-between p-4 rounded-xl transition-all duration-200 ${
                     isActive(item.path)
-                      ? isScrolled
-                        ? "bg-blue-600 text-white shadow-md"
-                        : "bg-blue-700 text-white shadow-md"
-                      : isScrolled
-                        ? "bg-blue-50 text-blue-700 hover:bg-blue-100"
-                        : "bg-blue-800/60 text-white hover:bg-blue-800"
+                      ? "bg-blue-600 text-white shadow-md"
+                      : "hover:bg-blue-50"
                   }`}
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   <div className="flex items-center">
-                    <span
-                      className={`p-2 rounded-lg mr-3 ${
-                        isActive(item.path)
-                          ? "bg-white/20"
-                          : isScrolled
-                            ? "bg-blue-100"
-                            : "bg-white/20"
-                      }`}
-                    >
+                    <span className="p-2 rounded-lg mr-3 bg-blue-100">
                       {item.icon}
                     </span>
                     <span className="font-medium">{item.name}</span>
