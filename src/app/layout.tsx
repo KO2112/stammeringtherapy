@@ -7,8 +7,9 @@ import LayoutClientWrapper from "@/app/components/LayoutClientWrapper";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Stammering Therapy | Speech Therapy App",
-  description: "Professional stammering therapy services providing expert speech therapy for fluency control and communication skills improvement.",
+  title: "E-Kekemelik | Armoni Dil ve Konuşma Merkezi",
+  description:
+    "Armoni Dil ve Konuşma Merkezi tarafından sunulan, bilimsel temelli kekemelik terapisi uygulaması ve profesyonel konuşma terapisi hizmetleri.",
 };
 
 export default function RootLayout({
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="tr">
       <body className={geist.className}>
         <LayoutClientWrapper>{children}</LayoutClientWrapper>
       </body>

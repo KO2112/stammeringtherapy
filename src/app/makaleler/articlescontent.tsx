@@ -73,7 +73,7 @@ export default function ArticlesPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{article.title}</h3>
                 <p className="text-gray-600 mb-4">{article.excerpt}</p>
                 <Link
-                  href={`/articles/${article.slug}`}
+                  href={`/makaleler/${article.slug}`}
                   className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group"
                 >
                   Devamını oku

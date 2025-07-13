@@ -1,60 +1,87 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import Image from "next/image"
-import { usePathname } from "next/navigation"
-import { ChevronRight, Menu, X, Mic, BookOpen, Users, MessageSquare, Home } from 'lucide-react'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  ChevronRight,
+  Menu,
+  X,
+  Mic,
+  BookOpen,
+  Users,
+  MessageSquare,
+  Home,
+} from "lucide-react";
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled] = useState(false)
-  const pathname = usePathname()
-  const isHomePage = pathname === "/"
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
 
   // Navigation items with icons - Translated to Turkish
   const navItems = [
     { name: "Ana Sayfa", path: "/", icon: <Home className="w-5 h-5" /> },
-    { name: "Hizmetler", path: "/services", icon: <Mic className="w-5 h-5" /> },
-    { name: "Makaleler", path: "/articles", icon: <BookOpen className="w-5 h-5" /> },
-    { name: "Hakkımızda", path: "/about", icon: <Users className="w-5 h-5" /> },
-    { name: "İletişim", path: "/contact", icon: <MessageSquare className="w-5 h-5" /> },
-  ]
-
-  
+    {
+      name: "Hizmetler",
+      path: "/hizmetlerimiz",
+      icon: <Mic className="w-5 h-5" />,
+    },
+    {
+      name: "Makaleler",
+      path: "/makaleler",
+      icon: <BookOpen className="w-5 h-5" />,
+    },
+    {
+      name: "Hakkımızda",
+      path: "/hakkimizda",
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      name: "İletişim",
+      path: "/iletisim",
+      icon: <MessageSquare className="w-5 h-5" />,
+    },
+  ];
 
   // Close mobile menu on route change
   useEffect(() => {
-    setIsMenuOpen(false)
-  }, [pathname])
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   // Close mobile menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as Element
-      if (isMenuOpen && !target.closest('.mobile-menu') && !target.closest('.menu-button')) {
-        setIsMenuOpen(false)
+      const target = event.target as Element;
+      if (
+        isMenuOpen &&
+        !target.closest(".mobile-menu") &&
+        !target.closest(".menu-button")
+      ) {
+        setIsMenuOpen(false);
       }
-    }
+    };
 
     if (isMenuOpen) {
-      document.addEventListener('click', handleClickOutside)
-      document.body.style.overflow = 'hidden'
+      document.addEventListener("click", handleClickOutside);
+      document.body.style.overflow = "hidden";
     } else {
-      document.body.style.overflow = 'unset'
+      document.body.style.overflow = "unset";
     }
 
     return () => {
-      document.removeEventListener('click', handleClickOutside)
-      document.body.style.overflow = 'unset'
-    }
-  }, [isMenuOpen])
+      document.removeEventListener("click", handleClickOutside);
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
 
   // Check if a link is active
   const isActive = (path: string) => {
-    if (path === "/") return pathname === "/"
-    return pathname.startsWith(path)
-  }
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path);
+  };
 
   return (
     <>
@@ -83,19 +110,23 @@ const Navbar = () => {
                       priority
                     />
                   </div>
-                  
+
                   {/* Logo Text */}
-                  <div className={`text-left leading-tight ${
-                    isScrolled 
-                      ? "text-blue-900" 
-                      : "text-white"
-                  }`}>
-                    <div className="text-base sm:text-lg font-bold">Armoni Eğitim Merkezi</div>
-                    <div className={`text-sm sm:text-base font-semibold ${
-                      isScrolled 
-                        ? "text-blue-600" 
-                        : "text-blue-200"
-                    }`}>E-Kekemelik</div>
+                  <div
+                    className={`text-left leading-tight ${
+                      isScrolled ? "text-blue-900" : "text-white"
+                    }`}
+                  >
+                    <div className="text-base sm:text-lg font-bold">
+                      Armoni Eğitim Merkezi
+                    </div>
+                    <div
+                      className={`text-sm sm:text-base font-semibold ${
+                        isScrolled ? "text-blue-600" : "text-blue-200"
+                      }`}
+                    >
+                      E-Kekemelik
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -105,7 +136,9 @@ const Navbar = () => {
             <div className="hidden lg:flex items-center space-x-2">
               <nav
                 className={`flex items-center rounded-full px-8 py-2 ${
-                  isScrolled ? "bg-blue-50/80 backdrop-blur-sm" : "bg-blue-800/70 backdrop-blur-sm"
+                  isScrolled
+                    ? "bg-blue-50/80 backdrop-blur-sm"
+                    : "bg-blue-800/70 backdrop-blur-sm"
                 }`}
               >
                 {navItems.map((item) => (
@@ -140,7 +173,9 @@ const Navbar = () => {
                 {/* Animated background effect */}
                 <span
                   className={`absolute inset-0 w-full h-full ${
-                    isScrolled ? "bg-gradient-to-r from-blue-500 to-blue-700" : "bg-blue-100"
+                    isScrolled
+                      ? "bg-gradient-to-r from-blue-500 to-blue-700"
+                      : "bg-blue-100"
                   } transform scale-x-0 origin-left transition-transform duration-500 group-hover:scale-x-100`}
                 ></span>
 
@@ -149,10 +184,14 @@ const Navbar = () => {
                   <span className="mr-2 font-semibold">E-Kekemelik</span>
                   <span
                     className={`flex items-center justify-center w-6 h-6 rounded-full ${
-                      isScrolled ? "bg-white/30 group-hover:bg-white/50" : "bg-blue-200 group-hover:bg-blue-300"
+                      isScrolled
+                        ? "bg-white/30 group-hover:bg-white/50"
+                        : "bg-blue-200 group-hover:bg-blue-300"
                     } transition-all duration-300 transform group-hover:translate-x-1`}
                   >
-                    <ChevronRight className={`w-4 h-4 ${isScrolled ? "text-white" : "text-blue-700"}`} />
+                    <ChevronRight
+                      className={`w-4 h-4 ${isScrolled ? "text-white" : "text-blue-700"}`}
+                    />
                   </span>
                 </span>
 
@@ -166,12 +205,18 @@ const Navbar = () => {
               <button
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 className={`menu-button p-2 rounded-full transition-all duration-300 ${
-                  isScrolled ? "bg-blue-100 text-blue-700" : "bg-white/20 text-white"
-                } ${isMenuOpen ? 'transform rotate-180' : ''}`}
+                  isScrolled
+                    ? "bg-blue-100 text-blue-700"
+                    : "bg-white/20 text-white"
+                } ${isMenuOpen ? "transform rotate-180" : ""}`}
                 aria-expanded={isMenuOpen}
                 aria-label="Menüyü aç/kapat"
               >
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </button>
             </div>
           </div>
@@ -180,14 +225,16 @@ const Navbar = () => {
         {/* Mobile Navigation Menu */}
         <div
           className={`mobile-menu lg:hidden fixed inset-x-0 top-full transition-all duration-300 ease-in-out ${
-            isMenuOpen 
-              ? 'opacity-100 translate-y-0 pointer-events-auto' 
-              : 'opacity-0 -translate-y-4 pointer-events-none'
+            isMenuOpen
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 -translate-y-4 pointer-events-none"
           }`}
         >
-          <div className={`mx-4 mt-2 rounded-2xl shadow-2xl overflow-hidden ${
-            isScrolled ? "bg-white" : "bg-blue-900"
-          }`}>
+          <div
+            className={`mx-4 mt-2 rounded-2xl shadow-2xl overflow-hidden ${
+              isScrolled ? "bg-white" : "bg-blue-900"
+            }`}
+          >
             <div className="px-4 py-6 space-y-2">
               {navItems.map((item) => (
                 <Link
@@ -204,13 +251,15 @@ const Navbar = () => {
                   }`}
                 >
                   <div className="flex items-center">
-                    <span className={`p-2 rounded-lg mr-3 ${
-                      isActive(item.path)
-                        ? "bg-white/20"
-                        : isScrolled 
-                          ? "bg-blue-100" 
-                          : "bg-white/20"
-                    }`}>
+                    <span
+                      className={`p-2 rounded-lg mr-3 ${
+                        isActive(item.path)
+                          ? "bg-white/20"
+                          : isScrolled
+                            ? "bg-blue-100"
+                            : "bg-white/20"
+                      }`}
+                    >
                       {item.icon}
                     </span>
                     <span className="font-medium">{item.name}</span>
@@ -242,13 +291,13 @@ const Navbar = () => {
 
       {/* Backdrop for mobile menu */}
       {isMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMenuOpen(false)}
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

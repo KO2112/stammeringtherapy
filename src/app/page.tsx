@@ -1,134 +1,131 @@
-import type { Metadata } from "next/types"
-import Script from "next/script"
-import BannerSlider from "./components/bannerslider"
-import TryTheAppNow from "./components/trytheappnow"
-import StammeringTherapyTechniques from "./components/enhanced"
-import AboutUs from "./components/AboutUs"
-
+import type { Metadata } from "next/types";
+import Script from "next/script";
+import BannerSlider from "./components/bannerslider";
+import TryTheAppNow from "./components/trytheappnow";
+import StammeringTherapyTechniques from "./components/enhanced";
+import AboutUs from "./components/AboutUs";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.stammeringtherapy.com"),
-  title: "Stammering Therapy App | Professional Speech Therapy Solutions",
-  description: "Professional stammering therapy app providing evidence-based techniques, exercises, and support for people who stammer. Private speech therapy services available.",
+  metadataBase: new URL("https://e-kekemelik.com"),
+  title: "E-Kekemelik | Armoni Dil ve Konuşma Merkezi",
+  description:
+    "Armoni Dil ve Konuşma Merkezi tarafından sunulan, bilimsel temelli kekemelik terapisi uygulaması. Kanıta dayalı teknikler, egzersizler ve profesyonel destek ile kekemelik tedavisinde yanınızdayız.",
   keywords: [
-    "stammering therapy",
-    "stuttering treatment",
-    "speech therapy",
-    "fluency techniques",
-    "speech exercises",
-    "private stammering therapy",
-    "speech fluency app",
-    "speech impediment help",
-    "stammering support",
-    "speech therapy techniques",
-    "fluency shaping",
-    "stammering app",
-    "speech therapy app",
-    "stuttering app"
+    "kekemelik terapisi",
+    "kekemelik tedavisi",
+    "konuşma terapisi",
+    "akıcılık teknikleri",
+    "konuşma egzersizleri",
+    "özel kekemelik terapisi",
+    "konuşma uygulaması",
+    "kekemelik desteği",
+    "terapi teknikleri",
+    "akıcılık geliştirme",
+    "kekemelik uygulaması",
+    "konuşma bozukluğu",
+    "dil ve konuşma merkezi",
   ],
-  authors: [
-    { name: "Stammering Therapy Team" }
-  ],
-  creator: "Stammering Therapy",
-  publisher: "Stammering Therapy Ltd",
+  authors: [{ name: "Armoni Dil ve Konuşma Merkezi" }],
+  creator: "Armoni Dil ve Konuşma Merkezi",
+  publisher: "Armoni Dil ve Konuşma Merkezi",
   alternates: {
     canonical: "/",
   },
   openGraph: {
     type: "website",
-    locale: "en_GB",
-    url: "https://www.stammeringtherapy.com",
-    title: "Stammering Therapy App | Professional Speech Therapy Solutions",
-    description: "Evidence-based stammering therapy techniques and private speech therapy services to help you speak with confidence.",
-    siteName: "Stammering Therapy",
+    locale: "tr_TR",
+    url: "https://e-kekemelik.com",
+    title: "E-Kekemelik | Armoni Dil ve Konuşma Merkezi",
+    description:
+      "Bilimsel temelli kekemelik terapisi teknikleri ve profesyonel konuşma terapisi hizmetleri ile akıcı konuşmaya ulaşın.",
+    siteName: "E-Kekemelik",
     images: [
       {
-        url: "https://stammeringtherapy.netlify.app/_next/image?url=%2FStammering-Therapy-logo.png&w=1920&q=75",
+        url: "https://e-kekemelik.com/Stammering-Therapy-logo.png",
         width: 1200,
         height: 630,
-        alt: "Stammering Therapy App Interface",
+        alt: "E-Kekemelik Uygulaması Arayüzü",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Stammering Therapy App | Professional Speech Therapy Solutions",
-    description: "Evidence-based stammering therapy techniques and private speech therapy services to help you speak with confidence.",
-    creator: "@stammeringapp",
-    images: ["https://stammeringtherapy.netlify.app/_next/image?url=%2FStammering-Therapy-logo.png&w=1920&q=75"],
+    title: "E-Kekemelik | Armoni Dil ve Konuşma Merkezi",
+    description:
+      "Bilimsel temelli kekemelik terapisi teknikleri ve profesyonel konuşma terapisi hizmetleri ile akıcı konuşmaya ulaşın.",
+    creator: "@armonikekemelik",
+    images: ["https://e-kekemelik.com/Stammering-Therapy-logo.png"],
   },
   verification: {
     google: "google-site-verification-code",
   },
-  category: "Health & Wellness",
-}
+  category: "Sağlık & Danışmanlık",
+};
 
 export default function Home() {
   return (
     <>
       <div className="bg-white">
         <main>
-          <BannerSlider/>
+          <BannerSlider />
           <TryTheAppNow />
-          <StammeringTherapyTechniques/>
-          <AboutUs/>
+          <StammeringTherapyTechniques />
+          <AboutUs />
         </main>
       </div>
-      
-      
+
       <Script id="schema-stammering-therapy" type="application/ld+json">
         {`
           {
             "@context": "https://schema.org",
             "@type": "MedicalBusiness",
-            "name": "Stammering Therapy",
-            "url": "https://www.stammeringtherapy.com",
-            "logo": "https://www.stammeringtherapy.com/logo.png",
-            "description": "Professional stammering therapy services and digital app providing evidence-based techniques for people who stammer.",
+            "name": "Armoni Dil ve Konuşma Merkezi",
+            "url": "https://e-kekemelik.com",
+            "logo": "https://e-kekemelik.com/Stammering-Therapy-logo.png",
+            "description": "Armoni Dil ve Konuşma Merkezi tarafından sunulan, bilimsel temelli kekemelik terapisi ve dijital uygulama. Kanıta dayalı teknikler ve profesyonel destek.",
             "address": {
               "@type": "PostalAddress",
-              "streetAddress": "43 Gamble Avenue",
-              "addressLocality": "Fleckney",
-              "addressRegion": "Leicestershire",
+              "streetAddress": "",
+              "addressLocality": "İzmir",
+              "addressRegion": "",
               "postalCode": "",
-              "addressCountry": "GB"
+              "addressCountry": "TR"
             },
-            "telephone": "07419208820",
+            "telephone": "0 (232) 421 51 45",
+            "email": "info@armonikekemeliktedavisi.com",
             "openingHoursSpecification": [
               {
                 "@type": "OpeningHoursSpecification",
-                "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                "dayOfWeek": ["Pazartesi", "Salı", "Çarşamba", "Perşembe", "Cuma"],
                 "opens": "09:00",
                 "closes": "17:30"
               }
             ],
             "sameAs": [
-              "https://www.facebook.com/stammeringtherapy",
-              "https://www.twitter.com/stammeringapp",
-              "https://www.instagram.com/stammeringtherapy",
-              "https://www.linkedin.com/company/stammering-therapy"
+              "https://www.facebook.com/armonikekemeliktedavisi",
+              "https://twitter.com/armonikekemelik",
+              "https://www.instagram.com/armoni_dilkonusma/",
+              "https://www.youtube.com/channel/UCXb3uyDjRtTipQs8Dtf7GSw"
             ],
-            "medicalSpecialty": "Speech-Language Pathology"
+            "medicalSpecialty": "Dil ve Konuşma Terapisi"
           }
         `}
       </Script>
-      
-      
+
       <Script id="schema-stammering-app" type="application/ld+json">
         {`
           {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "Stammering Therapy App",
-            "applicationCategory": "HealthApplication",
-            "browserRequirements": "Requires JavaScript. Requires HTML5.",
-            "operatingSystem": "All",
-            "description": "A comprehensive stammering therapy web application providing evidence-based techniques, daily exercises, and progress tracking for people who stammer. Accessible on both mobile and desktop devices."
+            "name": "E-Kekemelik Uygulaması",
+            "applicationCategory": "Sağlık Uygulaması",
+            "browserRequirements": "JavaScript ve HTML5 gerektirir.",
+            "operatingSystem": "Tümü",
+            "description": "Kekemelik için kapsamlı bir web uygulaması: bilimsel teknikler, günlük egzersizler ve ilerleme takibi. Hem mobil hem masaüstü için erişilebilir."
           }
         `}
       </Script>
-      
-      
+
       <Script id="schema-stammering-faqs" type="application/ld+json">
         {`
           {
@@ -137,34 +134,34 @@ export default function Home() {
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "What causes stammering?",
+                "name": "Kekemeliğin nedenleri nelerdir?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Stammering is typically caused by a combination of genetic, neurological, and environmental factors. Research suggests that differences in brain structure and function related to speech processing play a significant role."
+                  "text": "Kekemelik genetik, nörolojik ve çevresel faktörlerin birleşimiyle ortaya çıkar. Araştırmalar, konuşma ile ilgili beyin yapısı ve işlevlerindeki farklılıkların önemli rol oynadığını göstermektedir."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Can stammering be cured?",
+                "name": "Kekemelik tamamen geçer mi?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "While there is no definitive 'cure' for stammering, many people achieve significant improvement or even complete fluency through therapy techniques, consistent practice, and psychological support. Our app provides evidence-based methods to help manage stammering effectively."
+                  "text": "Kekemelik için kesin bir 'tedavi' olmasa da, birçok kişi terapi teknikleri, düzenli pratik ve psikolojik destek ile önemli ilerleme kaydedebilir. Uygulamamız, kekemeliği yönetmek için bilimsel yöntemler sunar."
                 }
               },
               {
                 "@type": "Question",
-                "name": "How does the Stammering Therapy App work?",
+                "name": "E-Kekemelik uygulaması nasıl çalışır?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Our app provides daily exercises based on proven speech therapy techniques, progress tracking, real-time feedback, and community support. It includes breathing exercises, fluency shaping techniques, cognitive behavioral therapy approaches, and situation-specific practice scenarios."
+                  "text": "Uygulamamız, kanıta dayalı konuşma terapisi tekniklerine dayalı günlük egzersizler, ilerleme takibi, anlık geri bildirim ve topluluk desteği sunar. Nefes egzersizleri, akıcılık teknikleri, bilişsel davranışçı terapi yaklaşımları ve çeşitli pratik senaryolar içerir."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Is private stammering therapy more effective than using an app?",
+                "name": "Özel kekemelik terapisi mi, uygulama mı daha etkili?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Both approaches have benefits. Private therapy offers personalized guidance and feedback from a qualified speech therapist. Our app provides consistent daily practice, accessibility, and affordability. Many users achieve the best results by combining both approaches."
+                  "text": "Her iki yaklaşımın da avantajları vardır. Özel terapi, uzman bir terapistten kişiselleştirilmiş rehberlik ve geri bildirim sağlar. Uygulamamız ise düzenli pratik, erişilebilirlik ve uygun maliyet sunar. En iyi sonuçlar genellikle her iki yöntemin birlikte kullanılmasıyla elde edilir."
                 }
               }
             ]
