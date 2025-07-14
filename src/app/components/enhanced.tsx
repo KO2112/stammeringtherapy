@@ -170,7 +170,7 @@ const StammeringTherapyTechniques = () => {
         {/* Call to action */}
         <div className="mt-16 text-center">
           <a 
-            href="/services" 
+            href="/hizmetlerimiz" 
             className="inline-flex items-center px-6 py-3 text-lg font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
           >
             Hizmetlerimiz Hakkında Daha Fazla Bilgi Alın

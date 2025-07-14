@@ -88,13 +88,13 @@ const AboutPage = () => {
 
             <div className="mt-8 flex flex-wrap justify-center gap-4">
               <Link
-                href="/services"
+                href="/hizmetlerimiz"
                 className="px-6 py-3 bg-white text-blue-800 rounded-full font-medium hover:bg-blue-50 transition-all duration-300 shadow-lg"
               >
                 Hizmetlerimiz
               </Link>
               <Link
-                href="/contact"
+                href="/iletisim"
                 className="px-6 py-3 bg-transparent border-2 border-white text-white rounded-full font-medium hover:bg-white/10 transition-all duration-300"
               >
                 İletişim
@@ -296,7 +296,7 @@ const AboutPage = () => {
                 </ul>
 
                 <Link
-                  href="/services"
+                  href="/hizmetlerimiz"
                   className="inline-flex items-center px-4 py-2 bg-blue-700 text-white rounded-lg hover:bg-blue-800 transition-colors text-sm"
                 >
                   Terapi hizmetlerimizi görüntüleyin
@@ -328,7 +328,7 @@ const AboutPage = () => {
               Uygulamayı Deneyin
             </Link>
             <Link
-              href="/contact"
+              href="/iletisim"
               className="inline-flex items-center justify-center px-6 py-3 border-2 border-white text-white rounded-lg hover:bg-white hover:text-blue-700 transition-all duration-300"
             >
               <MessageSquare className="w-5 h-5 mr-2" />

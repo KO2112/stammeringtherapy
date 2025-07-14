@@ -101,7 +101,7 @@ export default function ServicesPage() {
                 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <Link
-                    href="/e-stammering"
+                    href="/signin"
                     className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow hover:shadow-lg"
                   >
                     Uygulamayı Deneyin
@@ -284,13 +284,13 @@ export default function ServicesPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
             <Link 
-              href="/e-stammering" 
+              href="/signin" 
               className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all duration-300 shadow hover:shadow-lg"
             >
               Uygulamayı Deneyin
             </Link>
             <Link 
-              href="/contact" 
+              href="/iletisim" 
               className="inline-flex items-center justify-center px-6 py-3 text-lg font-medium rounded-lg border-2 border-blue-600 text-blue-700 hover:bg-blue-50 transition-all duration-300"
             >
               Terapi Planlayın

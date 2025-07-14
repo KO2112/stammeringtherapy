@@ -62,7 +62,7 @@ export default function ArticlesPage() {
               className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition-all duration-300 hover:shadow-lg"
             >
               <div className="h-48 bg-blue-100 relative">
-                <Image src="/StammeringTherapy.png" alt={article.title} fill className="object-cover" />
+                <Image src="/Stammering-Therapy-logo.png" alt={article.title} fill className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="flex items-center text-sm text-gray-500 mb-2">

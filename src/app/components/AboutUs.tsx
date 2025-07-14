@@ -98,7 +98,7 @@ const AboutUs = () => {
             
             <div className="mt-6 flex space-x-4">
               <Link 
-                href="/about" 
+                href="/hakkimizda" 
                 className="inline-flex items-center px-5 py-3 text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition-all duration-300 shadow hover:shadow-lg"
               >
                 Hakkımızda Daha Fazla Bilgi
@@ -114,7 +114,7 @@ const AboutUs = () => {
               </Link>
               
               <Link 
-                href="/contact" 
+                href="/iletisim" 
                 className="inline-flex items-center px-5 py-3 text-base font-medium rounded-lg text-blue-700 bg-blue-100 hover:bg-blue-200 transition-all duration-300 shadow hover:shadow-lg"
               >
                 Ekibimizle İletişime Geçin
@@ -139,7 +139,7 @@ const AboutUs = () => {
                   Uygulamayı Deneyin
                 </Link>
                 <Link 
-                  href="/contact" 
+                  href="/iletisim" 
                   className="inline-flex items-center justify-center px-5 py-3 text-base font-medium rounded-lg border-2 border-white text-white hover:bg-blue-700 transition-all duration-300"
                 >
                   Seans Planlayın
