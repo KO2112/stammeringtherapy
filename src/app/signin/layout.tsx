@@ -5,8 +5,8 @@ import { Geist } from "next/font/google";
 const geist = Geist({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "FluentVoice | Stammering Therapy",
-  description: "Sign in to your stammering therapy account",
+  title: "E-Kekemelik - Giriş Yap",
+  description: "E-Kekemelik uygulamasına giriş yapın",
 };
 
 export default function AuthLayout({
