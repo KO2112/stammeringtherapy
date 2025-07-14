@@ -14,16 +14,16 @@ const BannerSlider = () => {
 
   const slides: Slide[] = [
     {
-      title: "Armoni Kekemelik Tedavisi",
-      subtitle: "Kekemelik zorluklarını aşmak için profesyonel destek",
-      bgGradient: "from-blue-600 via-blue-700 to-blue-800",
-      animation: "slide1",
-    },
-    {
       title: "E-Kekemelik",
       subtitle: "Teknikleri pratik yapın ve evinizde ilerlemenizi takip edin",
       bgGradient: "from-blue-500 via-blue-600 to-blue-700",
       animation: "slide2",
+    },
+    {
+      title: "Armoni Kekemelik Tedavisi",
+      subtitle: "Kekemelik zorluklarını aşmak için profesyonel destek",
+      bgGradient: "from-blue-600 via-blue-700 to-blue-800",
+      animation: "slide1",
     },
     {
       title: "Topluluk Desteği",
