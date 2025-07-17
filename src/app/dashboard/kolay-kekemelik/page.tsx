@@ -15,7 +15,18 @@ import {
   getDoc,
 } from "firebase/firestore";
 import type { User as FirebaseUser } from "firebase/auth";
-import { Plus, BookOpen, Edit, Trash2, Save, X, Search } from "lucide-react";
+import { Plus, Edit, Trash2, Save, X } from "lucide-react";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import type { Timestamp } from "firebase/firestore";
+import { FileText, FileVideo, File } from "lucide-react";
+
+interface Dokuman {
+  id: string;
+  title: string;
+  files: DokumanFile[];
+  createdAt?: Timestamp | Date;
+  addedBy?: string;
+}
 
 interface WordEntry {
   id?: string;
@@ -23,6 +34,39 @@ interface WordEntry {
   kirmiziAlan: string;
   stammered: string;
 }
+
+// 1. Add Turkish alphabet and new tab
+const TURKISH_ALPHABET = [
+  "A",
+  "B",
+  "C",
+  "Ç",
+  "D",
+  "E",
+  "F",
+  "G",
+  "Ğ",
+  "H",
+  "I",
+  "İ",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "Ö",
+  "P",
+  "R",
+  "S",
+  "Ş",
+  "T",
+  "U",
+  "Ü",
+  "V",
+  "Y",
+  "Z",
+];
 
 const TABS = [
   {
@@ -35,7 +79,35 @@ const TABS = [
     label: "Tekrarlayarak Kolay Kekemelik",
     description: "Kelime başındaki harfleri tekrarlayarak kekemelik",
   },
+  {
+    key: "dokumanlar",
+    label: "Videolar ve Dokumanlar",
+    description: "Video, PDF, Word ve diğer dokümanlar",
+  },
 ];
+
+interface DokumanFile {
+  name: string;
+  url: string;
+  type: string;
+}
+
+// Helper to get icon by file type
+function getFileIcon(type: string) {
+  if (type.startsWith("video/"))
+    return <FileVideo className="w-5 h-5 text-blue-500" />;
+  if (type === "application/pdf")
+    return <File className="w-5 h-5 text-red-500" />;
+  if (
+    type === "application/msword" ||
+    type ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  )
+    return <File className="w-5 h-5 text-blue-700" />;
+  if (type.startsWith("text/"))
+    return <FileText className="w-5 h-5 text-slate-500" />;
+  return <File className="w-5 h-5 text-slate-400" />;
+}
 
 export default function KolayKekemelikPage() {
   const [user, setUser] = useState<FirebaseUser | null>(null);
@@ -56,25 +128,24 @@ export default function KolayKekemelikPage() {
     stammered: "",
   });
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedLetter, setSelectedLetter] = useState<string | null>(null);
+  const [dokumanlar, setDokumanlar] = useState<Dokuman[]>([]);
+  const [dokumanUploadFiles, setDokumanUploadFiles] = useState<File[]>([]);
+  const [dokumanUploadLoading, setDokumanUploadLoading] = useState(false);
+  const [dokumanUploadTitle, setDokumanUploadTitle] = useState("");
+  const [showDokumanUploadForm, setShowDokumanUploadForm] = useState(false);
 
   const isAdmin = userRole === "admin";
   const allWords =
     activeTab === "uzatarak" ? uzatarakWords : tekrarlayarakWords;
 
-  // Sort words alphabetically and filter by search term
-  const sortedWords = allWords
-    .sort((a, b) => a.word.localeCompare(b.word, "tr"))
-    .filter(
-      (word) =>
-        searchTerm === "" ||
-        word.word.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        word.stammered.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  // Show all words when searching, otherwise limit to 10
-  const displayWords =
-    searchTerm === "" ? sortedWords.slice(0, 10) : sortedWords;
+  // 3. Filter words by selected letter
+  const filteredWords = selectedLetter
+    ? allWords.filter(
+        (w) =>
+          w.word && w.word[0]?.toLocaleUpperCase("tr-TR") === selectedLetter
+      )
+    : [];
 
   // Load words from Firestore
   const loadWords = async () => {
@@ -106,6 +177,70 @@ export default function KolayKekemelikPage() {
     }
   };
 
+  // 3. Load dokumanlar from Firestore for the third tab
+  const loadDokumanlar = async () => {
+    try {
+      const dokumanlarQuery = query(collection(db, "dokumanlar"));
+      const snapshot = await getDocs(dokumanlarQuery);
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Dokuman[];
+      setDokumanlar(data);
+    } catch (error) {
+      console.error("Error loading dokumanlar:", error);
+    }
+  };
+
+  // Delete a single file from a dokuman
+  const handleDeleteFileFromDokuman = async (
+    doc: Dokuman,
+    fileToDelete: DokumanFile
+  ) => {
+    if (!isAdmin) return;
+    if (
+      !confirm(
+        `Bu dosyayı silmek istediğinizden emin misiniz? (${fileToDelete.name})`
+      )
+    )
+      return;
+    try {
+      // Delete file from storage
+      try {
+        const { storage } = await import("../../../../firebase");
+        const { ref, deleteObject } = await import("firebase/storage");
+        const fileRef = ref(
+          storage,
+          fileToDelete.url
+            .replace(/^https?:\/\/[^/]+\/o\//, "")
+            .replace(/\?.*$/, "")
+            .replace(/%2F/g, "/")
+        );
+        await deleteObject(fileRef);
+      } catch {}
+      // Remove file from Firestore document
+      const remainingFiles = doc.files.filter(
+        (f) => f.url !== fileToDelete.url
+      );
+      const {
+        doc: docRef,
+        updateDoc,
+        deleteDoc,
+      } = await import("firebase/firestore");
+      if (remainingFiles.length === 0) {
+        await deleteDoc(docRef(db, "dokumanlar", doc.id));
+      } else {
+        await updateDoc(docRef(db, "dokumanlar", doc.id), {
+          files: remainingFiles,
+        });
+      }
+      loadDokumanlar();
+    } catch (error) {
+      alert("Dosya silinemedi");
+      console.error("Error deleting file from dokuman:", error);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setUser(user);
@@ -128,6 +263,12 @@ export default function KolayKekemelikPage() {
     loadWords();
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === "dokumanlar") {
+      loadDokumanlar();
+    }
+  }, [activeTab]);
 
   const handleAddWord = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -217,6 +358,47 @@ export default function KolayKekemelikPage() {
     }
   };
 
+  // 4. Handle dokuman upload
+  const handleDokumanFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setDokumanUploadFiles(Array.from(e.target.files));
+    }
+  };
+
+  const handleDokumanUpload = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAdmin || dokumanUploadFiles.length === 0 || !dokumanUploadTitle)
+      return;
+    setDokumanUploadLoading(true);
+    try {
+      const uploadedUrls: DokumanFile[] = [];
+      for (const file of dokumanUploadFiles) {
+        const timestamp = Date.now();
+        const fileName = `${timestamp}_${file.name}`;
+        const storageRef = ref(
+          (await import("../../../../firebase")).storage,
+          `dokumanlar/${fileName}`
+        );
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        uploadedUrls.push({ name: file.name, url, type: file.type });
+      }
+      await addDoc(collection(db, "dokumanlar"), {
+        title: dokumanUploadTitle,
+        files: uploadedUrls,
+        createdAt: serverTimestamp(),
+        addedBy: user?.uid || "",
+      });
+      setDokumanUploadFiles([]);
+      setDokumanUploadTitle("");
+      loadDokumanlar();
+    } catch (error) {
+      console.error("Error uploading dokuman:", error);
+    } finally {
+      setDokumanUploadLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -252,7 +434,7 @@ export default function KolayKekemelikPage() {
               setActiveTab(tab.key);
               setShowAddForm(false);
               setEditingWord(null);
-              setSearchTerm(""); // Clear search when switching tabs
+              setSelectedLetter(null);
             }}
             className={`px-4 py-2 sm:px-6 sm:py-3 rounded-full text-sm sm:text-base font-medium transition-all duration-200 ${
               activeTab === tab.key
@@ -263,20 +445,6 @@ export default function KolayKekemelikPage() {
             {tab.label}
           </button>
         ))}
-      </div>
-
-      {/* Search Box */}
-      <div className="mx-4 sm:mx-8 mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
-          <input
-            type="text"
-            placeholder="Kelime arayın..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent bg-white shadow-sm"
-          />
-        </div>
       </div>
 
       {/* Main Content */}
@@ -293,7 +461,7 @@ export default function KolayKekemelikPage() {
                 {TABS.find((tab) => tab.key === activeTab)?.description}
               </p>
             </div>
-            {isAdmin && (
+            {isAdmin && activeTab !== "dokumanlar" && (
               <button
                 onClick={() => setShowAddForm(!showAddForm)}
                 className="mt-4 sm:mt-0 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 transition-colors duration-200"
@@ -377,121 +545,322 @@ export default function KolayKekemelikPage() {
             </div>
           )}
 
-          {/* Card List */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
-            {displayWords.map((entry) => (
-              <div
-                key={entry.id}
-                className="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 hover:shadow-md transition-all duration-200"
-              >
-                {editingWord === entry.id ? (
-                  // Edit Form
-                  <div className="space-y-3">
-                    <input
-                      type="text"
-                      value={editForm.word}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, word: e.target.value })
-                      }
-                      className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
-                      placeholder="Kelime"
-                    />
-                    <div className="grid grid-cols-2 gap-2">
-                      <input
-                        type="text"
-                        value={editForm.kirmiziAlan}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            kirmiziAlan: e.target.value,
-                          })
-                        }
-                        className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
-                        placeholder="Kırmızı Alan"
-                      />
-                      <input
-                        type="text"
-                        value={editForm.stammered}
-                        onChange={(e) =>
-                          setEditForm({
-                            ...editForm,
-                            stammered: e.target.value,
-                          })
-                        }
-                        className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
-                        placeholder="Kekemelik Versiyonu"
-                      />
+          {/* Alphabet and Word List for First Two Tabs */}
+          {activeTab !== "dokumanlar" && (
+            <>
+              <div className="mb-6 grid grid-cols-8 sm:grid-cols-14 gap-2">
+                {TURKISH_ALPHABET.map((letter) => (
+                  <button
+                    key={letter}
+                    onClick={() => setSelectedLetter(letter)}
+                    className={`px-3 py-2 rounded-lg font-bold text-lg transition-all duration-150 ${
+                      selectedLetter === letter
+                        ? "bg-teal-600 text-white shadow"
+                        : "bg-slate-100 text-slate-700 hover:bg-teal-100"
+                    }`}
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+              {selectedLetter && (
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="font-medium text-teal-700">
+                    Seçili Harf:
+                  </span>
+                  <span className="font-bold text-lg">{selectedLetter}</span>
+                  <button
+                    onClick={() => setSelectedLetter(null)}
+                    className="ml-2 px-2 py-1 text-xs bg-slate-200 rounded hover:bg-slate-300"
+                  >
+                    Temizle
+                  </button>
+                </div>
+              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4">
+                {filteredWords.length > 0 ? (
+                  filteredWords.map((entry) => (
+                    <div
+                      key={entry.id}
+                      className="bg-white rounded-xl shadow-sm border border-slate-200 p-3 sm:p-4 hover:shadow-md transition-all duration-200"
+                    >
+                      {editingWord === entry.id ? (
+                        // Edit Form
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={editForm.word}
+                            onChange={(e) =>
+                              setEditForm({ ...editForm, word: e.target.value })
+                            }
+                            className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
+                            placeholder="Kelime"
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input
+                              type="text"
+                              value={editForm.kirmiziAlan}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  kirmiziAlan: e.target.value,
+                                })
+                              }
+                              className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
+                              placeholder="Kırmızı Alan"
+                            />
+                            <input
+                              type="text"
+                              value={editForm.stammered}
+                              onChange={(e) =>
+                                setEditForm({
+                                  ...editForm,
+                                  stammered: e.target.value,
+                                })
+                              }
+                              className="w-full px-2 py-1 text-sm border border-slate-300 rounded focus:ring-1 focus:ring-teal-500"
+                              placeholder="Kekemelik Versiyonu"
+                            />
+                          </div>
+                          <div className="flex justify-center gap-2">
+                            <button
+                              onClick={() => handleSaveEdit(entry.id!)}
+                              className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors duration-200"
+                            >
+                              <Save className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setEditingWord(null);
+                                setEditForm({
+                                  word: "",
+                                  kirmiziAlan: "",
+                                  stammered: "",
+                                });
+                              }}
+                              className="p-1.5 text-slate-400 hover:bg-slate-50 rounded transition-colors duration-200"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        // Display Mode
+                        <div className="text-center">
+                          <div className="text-base sm:text-lg font-semibold text-slate-900 mb-2">
+                            {entry.word}
+                          </div>
+                          <div className="flex justify-center text-base sm:text-lg font-medium mb-3">
+                            <span className="text-red-600 font-mono">
+                              {entry.kirmiziAlan || ""}
+                            </span>
+                            <span className="font-mono text-black">
+                              {entry.stammered}
+                            </span>
+                          </div>
+                          {isAdmin && (
+                            <div className="flex justify-center gap-2">
+                              <button
+                                onClick={() => handleEditWord(entry)}
+                                className="p-1.5 sm:p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteWord(entry.id!)}
+                                className="p-1.5 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    <div className="flex justify-center gap-2">
-                      <button
-                        onClick={() => handleSaveEdit(entry.id!)}
-                        className="p-1.5 text-green-600 hover:bg-green-50 rounded transition-colors duration-200"
-                      >
-                        <Save className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setEditingWord(null);
-                          setEditForm({
-                            word: "",
-                            kirmiziAlan: "",
-                            stammered: "",
-                          });
-                        }}
-                        className="p-1.5 text-slate-400 hover:bg-slate-50 rounded transition-colors duration-200"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
+                  ))
                 ) : (
-                  // Display Mode
-                  <div className="text-center">
-                    <div className="text-base sm:text-lg font-semibold text-slate-900 mb-2">
-                      {entry.word}
-                    </div>
-                    <div className="flex justify-center text-base sm:text-lg font-medium mb-3">
-                      <span className="text-red-600 font-mono">
-                        {entry.kirmiziAlan || ""}
-                      </span>
-                      <span className="font-mono text-black">
-                        {entry.stammered}
-                      </span>
-                    </div>
-                    {isAdmin && (
-                      <div className="flex justify-center gap-2">
-                        <button
-                          onClick={() => handleEditWord(entry)}
-                          className="p-1.5 sm:p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors duration-200"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteWord(entry.id!)}
-                          className="p-1.5 sm:p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
+                  <div className="col-span-full text-center py-8 text-slate-400">
+                    {selectedLetter
+                      ? "Bu harfle başlayan kelime bulunamadı."
+                      : "Bir harf seçin."}
                   </div>
                 )}
               </div>
-            ))}
-          </div>
+            </>
+          )}
 
-          {/* Empty State */}
-          {displayWords.length === 0 && (
-            <div className="text-center py-12">
-              <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500 text-lg">Henüz kelime eklenmemiş</p>
+          {/* Videolar ve Dokumanlar Tab */}
+          {activeTab === "dokumanlar" && (
+            <>
               {isAdmin && (
-                <p className="text-slate-400 text-sm mt-2">
-                  İlk kelimeyi eklemek için &quot;Kelime Ekle&quot; butonunu
-                  kullanın
-                </p>
+                <div className="mb-8">
+                  {!showDokumanUploadForm && (
+                    <button
+                      type="button"
+                      onClick={() => setShowDokumanUploadForm(true)}
+                      className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors mb-4"
+                    >
+                      <Plus className="h-4 w-4" /> Dosya Ekle
+                    </button>
+                  )}
+                  {showDokumanUploadForm && (
+                    <form
+                      onSubmit={handleDokumanUpload}
+                      className="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200"
+                    >
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Başlık *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={dokumanUploadTitle}
+                          onChange={(e) =>
+                            setDokumanUploadTitle(e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                          placeholder="Doküman başlığı"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                          Dosya Yükle *
+                        </label>
+                        <input
+                          type="file"
+                          multiple
+                          onChange={handleDokumanFileChange}
+                          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        />
+                        <p className="text-xs text-slate-500 mt-1">
+                          Her türlü dosya yükleyebilirsiniz (video, PDF, Word,
+                          vb.)
+                        </p>
+                        {dokumanUploadFiles.length > 0 && (
+                          <div className="mt-2 space-y-2">
+                            <p className="text-sm text-slate-600">
+                              Seçilen dosyalar ({dokumanUploadFiles.length}):
+                            </p>
+                            {dokumanUploadFiles.map((file, idx) => (
+                              <div
+                                key={idx}
+                                className="flex items-center gap-2 bg-slate-100 p-2 rounded"
+                              >
+                                <span className="text-sm text-slate-700">
+                                  {file.name}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          type="submit"
+                          disabled={dokumanUploadLoading}
+                          className="flex items-center gap-2 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {dokumanUploadLoading ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white"></div>
+                          ) : (
+                            <Plus className="h-4 w-4" />
+                          )}
+                          Ekle
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowDokumanUploadForm(false);
+                            setDokumanUploadFiles([]);
+                            setDokumanUploadTitle("");
+                          }}
+                          className="px-6 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          İptal
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
-            </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {dokumanlar.flatMap((doc) =>
+                  (doc.files || []).map((file, idx) => (
+                    <div
+                      key={doc.id + "-" + idx}
+                      className="bg-white rounded-xl border border-slate-200 p-6 flex flex-col items-center w-full max-w-[800px] mx-auto"
+                    >
+                      {/* Dokuman title above preview */}
+                      <div className="font-semibold text-slate-900 text-lg mb-2 text-center w-full">
+                        {doc.title}
+                      </div>
+                      {/* Fixed-size, centered preview box */}
+                      <div className="w-full h-[350px] flex items-center justify-center bg-slate-100 rounded-lg border mb-4 overflow-hidden">
+                        {file.type.startsWith("image/") ? (
+                          <img
+                            src={file.url}
+                            alt={file.name}
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        ) : file.type.startsWith("video/") ? (
+                          <video
+                            src={file.url}
+                            controls
+                            className="max-w-full max-h-full object-contain bg-black"
+                          />
+                        ) : file.type === "application/pdf" ? (
+                          <iframe
+                            src={file.url}
+                            title={file.name}
+                            className="w-full h-full bg-white"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center w-full h-full">
+                            <div className="mb-2" style={{ fontSize: 64 }}>
+                              {getFileIcon(file.type)}
+                            </div>
+                            <div className="text-slate-500 text-base">
+                              Önizleme yok
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <div className="w-full flex flex-col items-center">
+                        <div className="truncate font-medium text-slate-800 text-base mb-2 text-center w-full">
+                          {file.name}
+                        </div>
+                        <div className="flex gap-3">
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-teal-700 hover:underline text-base px-4 py-2 rounded border border-teal-100 bg-teal-50 font-semibold"
+                            title="İncele"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            İncele
+                          </a>
+                          {isAdmin && (
+                            <button
+                              onClick={() =>
+                                handleDeleteFileFromDokuman(doc, file)
+                              }
+                              className="text-red-600 hover:text-red-800 text-base px-4 py-2 rounded border border-red-100 bg-red-50 font-semibold"
+                              title="Dosyayı Sil"
+                            >
+                              Sil
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </>
           )}
         </div>
       </div>

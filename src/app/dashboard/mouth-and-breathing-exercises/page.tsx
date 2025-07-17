@@ -478,7 +478,7 @@ export default function TurkishVocalExercises() {
       clearInterval(timerRef.current);
     }
     setIsPlaying(true);
-    setTimer(0);
+    // setTimer(0); // Remove this line to resume from current timer value
     timerRef.current = setInterval(() => {
       setTimer((prev) => {
         if (prev >= maxTime) {
@@ -512,6 +512,25 @@ export default function TurkishVocalExercises() {
     resetTimer();
     setActiveExercise(id);
     setMaxTime(duration);
+  };
+
+  // Add handler for next exercise
+  const handleNextExercise = () => {
+    if (activeExercise !== null) {
+      const currentIdx = currentExercises.findIndex(
+        (ex) => ex.id === activeExercise
+      );
+      const nextIdx = currentIdx + 1;
+      if (nextIdx < currentExercises.length) {
+        handleExerciseSelect(
+          currentExercises[nextIdx].id,
+          currentExercises[nextIdx].duration
+        );
+      } else {
+        // Optionally wrap to first exercise, or do nothing
+        // handleExerciseSelect(currentExercises[0].id, currentExercises[0].duration);
+      }
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -595,7 +614,7 @@ export default function TurkishVocalExercises() {
             </div>
 
             <div className="divide-y divide-slate-200 max-h-[600px] overflow-y-auto">
-              {currentExercises.map((exercise) => (
+              {currentExercises.map((exercise, idx) => (
                 <button
                   key={exercise.id}
                   onClick={() =>
@@ -616,11 +635,11 @@ export default function TurkishVocalExercises() {
                         : "bg-purple-100 text-purple-700"
                     }`}
                   >
-                    {exercise.id}
+                    {idx + 1}
                   </div>
                   <div className="flex-1">
                     <h3 className="font-medium text-slate-900">
-                      {exercise.title}
+                      Egzersiz {idx + 1}
                     </h3>
                     <p className="text-sm text-slate-500 mt-1 line-clamp-1">
                       {exercise.description}
@@ -658,8 +677,10 @@ export default function TurkishVocalExercises() {
                           : "text-purple-800"
                       }`}
                     >
-                      Egzersiz {activeExerciseData?.id}:{" "}
-                      {activeExerciseData?.title}
+                      Egzersiz{" "}
+                      {currentExercises.findIndex(
+                        (ex) => ex.id === activeExerciseData?.id
+                      ) + 1}
                     </h2>
                     <div className="flex items-center">
                       <Clock className="h-4 w-4 mr-1 text-slate-500" />
@@ -792,6 +813,20 @@ export default function TurkishVocalExercises() {
                         >
                           <Repeat className="h-4 w-4 mr-2" />
                           Sıfırla
+                        </button>
+                        <button
+                          onClick={handleNextExercise}
+                          className={`px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center font-medium text-slate-700 ${activeExercise !== null && currentExercises.findIndex((ex) => ex.id === activeExercise) === currentExercises.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                          disabled={
+                            activeExercise === null ||
+                            currentExercises.findIndex(
+                              (ex) => ex.id === activeExercise
+                            ) ===
+                              currentExercises.length - 1
+                          }
+                        >
+                          <ChevronRight className="h-4 w-4 mr-2" />
+                          Sonraki Egzersiz
                         </button>
                       </div>
                     </div>
