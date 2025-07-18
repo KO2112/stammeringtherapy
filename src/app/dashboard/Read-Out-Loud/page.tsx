@@ -31,6 +31,10 @@ import {
   query,
   serverTimestamp,
   getDoc,
+  startAfter,
+  limit,
+  QueryDocumentSnapshot,
+  DocumentData,
 } from "firebase/firestore";
 import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "../../../../firebase";
@@ -76,9 +80,17 @@ export default function ReadOutLoudPage() {
   const [newStoryContent, setNewStoryContent] = useState("");
   const [newStoryMinutes, setNewStoryMinutes] = useState<number>(3);
 
+  const STORIES_PER_PAGE = 3;
   const [stories, setStories] = useState<Story[]>([]);
   const [storiesLoading, setStoriesLoading] = useState(true);
+  const [lastVisible, setLastVisible] =
+    useState<QueryDocumentSnapshot<DocumentData> | null>(null); // Firestore doc snapshot
+  const [hasMore, setHasMore] = useState(true);
   const [saving, setSaving] = useState(false);
+
+  // Add a key for localStorage
+  const STORIES_CACHE_KEY = "readOutLoudStoriesCache";
+  const HAS_MORE_CACHE_KEY = "readOutLoudHasMoreCache";
 
   // Listen to authentication state changes
   useEffect(() => {
@@ -144,27 +156,108 @@ export default function ReadOutLoudPage() {
     checkAdminRole();
   }, [user, authLoading]);
 
-  // Load stories from Firebase on component mount
+  // On mount, check localStorage for cached stories
   useEffect(() => {
-    loadStories();
+    let cachedStories: Story[] | null = null;
+    try {
+      const cachedStoriesRaw = localStorage.getItem(STORIES_CACHE_KEY);
+      if (cachedStoriesRaw) {
+        cachedStories = JSON.parse(cachedStoriesRaw);
+      }
+    } catch {
+      // Corrupted cache, clear it
+      localStorage.removeItem(STORIES_CACHE_KEY);
+      localStorage.removeItem(HAS_MORE_CACHE_KEY);
+      cachedStories = null;
+    }
+    const cachedHasMore = localStorage.getItem(HAS_MORE_CACHE_KEY);
+    if (
+      cachedStories &&
+      Array.isArray(cachedStories) &&
+      cachedStories.length > 0
+    ) {
+      setStories(cachedStories);
+      setHasMore(cachedHasMore === "true");
+      setStoriesLoading(false);
+      fetchLastVisible(cachedStories);
+    } else {
+      loadStories(true);
+    }
   }, []);
 
-  const loadStories = async () => {
+  // Helper to fetch lastVisible doc for pagination after reload
+  const fetchLastVisible = async (cachedStories: Story[]) => {
+    if (!cachedStories.length) return;
+    const storiesRef = collection(db, "stories");
+    const q = query(
+      storiesRef,
+      orderBy("createdAt", "desc"),
+      limit(cachedStories.length)
+    );
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.docs.length > 0) {
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      setLastVisible(lastDoc);
+    } else {
+      setLastVisible(null);
+    }
+  };
+
+  // On every successful load, update localStorage
+  const updateCache = (stories: Story[], hasMore: boolean) => {
+    localStorage.setItem(STORIES_CACHE_KEY, JSON.stringify(stories));
+    localStorage.setItem(HAS_MORE_CACHE_KEY, hasMore ? "true" : "false");
+  };
+
+  // Update loadStories to update cache after loading
+  const loadStories = async (initial = false) => {
     try {
       setStoriesLoading(true);
       const storiesRef = collection(db, "stories");
-      const q = query(storiesRef, orderBy("createdAt", "desc"));
+      let q;
+      let newStories: Story[] = [];
+      if (initial) {
+        q = query(
+          storiesRef,
+          orderBy("createdAt", "desc"),
+          limit(STORIES_PER_PAGE)
+        );
+      } else {
+        if (!lastVisible) return;
+        q = query(
+          storiesRef,
+          orderBy("createdAt", "desc"),
+          startAfter(lastVisible),
+          limit(STORIES_PER_PAGE)
+        );
+      }
       const querySnapshot = await getDocs(q);
       const storiesData: Story[] = [];
-
       querySnapshot.forEach((doc) => {
         storiesData.push({
           id: doc.id,
           ...doc.data(),
         } as Story);
       });
-
-      setStories(storiesData);
+      if (initial) {
+        setStories(storiesData);
+        newStories = storiesData;
+        // Update cache immediately for initial load
+        updateCache(newStories, querySnapshot.size === STORIES_PER_PAGE);
+      } else {
+        setStories((prev) => {
+          const combined = [...prev, ...storiesData];
+          // Update cache inside callback to ensure it's the latest
+          updateCache(combined, querySnapshot.size === STORIES_PER_PAGE);
+          return combined;
+        });
+      }
+      // Update lastVisible for next page
+      const lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+      setLastVisible(lastDoc);
+      // If less than requested, no more to load
+      const more = querySnapshot.size === STORIES_PER_PAGE;
+      setHasMore(more);
     } catch (error) {
       console.error("Error loading stories:", error);
     } finally {
@@ -520,71 +613,88 @@ export default function ReadOutLoudPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {stories.map((story) => (
-                  <div
-                    key={story.id}
-                    className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 relative group"
-                  >
-                    {adminCheck.isAdmin && (
-                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                        <div className="flex space-x-1">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditStory(story);
-                            }}
-                            className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
-                            aria-label="Edit story"
-                          >
-                            <Edit className="h-3 w-3" />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDeleteStory(story.id);
-                            }}
-                            className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
-                            aria-label="Delete story"
-                          >
-                            <Trash2 className="h-3 w-3" />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <div onClick={() => handleSelectStory(story.id)}>
-                      <div className="h-40 bg-gray-200 dark:bg-gray-700 relative">
-                        <img
-                          src={story.image || "/Stammering-Therapy-logo.png"}
-                          alt={story.title}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
-                          <div className="flex justify-between items-center">
-                            <span className="flex items-center text-white text-sm">
-                              <Clock className="h-4 w-4 mr-1" />
-                              {story.estimatedMinutes} dakika
-                            </span>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {stories.map((story) => (
+                    <div
+                      key={story.id}
+                      className="bg-white dark:bg-gray-800 rounded-xl shadow-md overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:-translate-y-1 relative group"
+                    >
+                      {adminCheck.isAdmin && (
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          <div className="flex space-x-1">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditStory(story);
+                              }}
+                              className="p-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+                              aria-label="Edit story"
+                            >
+                              <Edit className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteStory(story.id);
+                              }}
+                              className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors"
+                              aria-label="Delete story"
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </button>
                           </div>
                         </div>
-                      </div>
+                      )}
 
-                      <div className="p-5">
-                        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
-                          {story.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">
-                          {story.content.split("\n")[0]}
-                        </p>
-                        <button className="flex items-center text-teal-600 dark:text-teal-400 font-medium hover:text-teal-700 dark:hover:text-teal-300">
-                          Okumaya Başla <ArrowRight className="ml-1 h-4 w-4" />
-                        </button>
+                      <div onClick={() => handleSelectStory(story.id)}>
+                        <div className="h-40 bg-gray-200 dark:bg-gray-700 relative">
+                          <img
+                            src={story.image || "/Stammering-Therapy-logo.png"}
+                            alt={story.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <div className="flex justify-between items-center">
+                              <span className="flex items-center text-white text-sm">
+                                <Clock className="h-4 w-4 mr-1" />
+                                {story.estimatedMinutes} dakika
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-5">
+                          <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
+                            {story.title}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-300 line-clamp-2 mb-4">
+                            {story.content.split("\n")[0]}
+                          </p>
+                          <button className="flex items-center text-teal-600 dark:text-teal-400 font-medium hover:text-teal-700 dark:hover:text-teal-300">
+                            Okumaya Başla{" "}
+                            <ArrowRight className="ml-1 h-4 w-4" />
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+                {hasMore && (
+                  <div className="flex justify-center mt-8">
+                    <button
+                      onClick={() => loadStories(false)}
+                      className="px-6 py-3 bg-teal-600 hover:bg-teal-700 text-white rounded-lg font-semibold text-lg shadow-md disabled:opacity-50"
+                      disabled={storiesLoading}
+                    >
+                      {storiesLoading ? (
+                        <Loader2 className="h-5 w-5 animate-spin inline-block mr-2" />
+                      ) : null}
+                      Daha Fazla Yükle
+                    </button>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </div>
         ) : (
