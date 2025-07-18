@@ -1,40 +1,95 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack, ChevronRight} from "lucide-react"
-import Link from "next/link"
-import { auth, db } from "../../../../../firebase"
-import { onAuthStateChanged, type User } from "firebase/auth"
-import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
+import { useState, useRef, useEffect } from "react";
+import {
+  Play,
+  Pause,
+  Volume2,
+  ArrowLeft,
+  SkipForward,
+  SkipBack,
+  ChevronRight,
+} from "lucide-react";
+import Link from "next/link";
+import { auth, db } from "../../../../../firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 interface TextSegment {
-  text: string
-  duration: number
-  begin: number
-  index: number
-  isTitle?: boolean
-  isCenter?: boolean
+  text: string;
+  duration: number;
+  begin: number;
+  index: number;
+  isTitle?: boolean;
+  isCenter?: boolean;
 }
 
 export default function KirZincirleriniPage() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [activeIndex, setActiveIndex] = useState(-1)
-  const [audioDuration, setAudioDuration] = useState(0)
- const [user, setUser] = useState<User | null>(null)
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  
   const textSegments: TextSegment[] = [
     { text: "", duration: 0.154, begin: 0.5, index: 0 },
 
     // Title
-    { text: "Kır", duration: 0.53, begin: 0.5, index: 1, isTitle: true, isCenter: true },
-    { text: " Zin", duration: 0.53, begin: 0.75, index: 2, isTitle: true, isCenter: true },
-    { text: "cir", duration: 0.53, begin: 1.0, index: 3, isTitle: true, isCenter: true },
-    { text: "le", duration: 0.53, begin: 1.25, index: 4, isTitle: true, isCenter: true },
-    { text: "ri", duration: 0.53, begin: 1.5, index: 5, isTitle: true, isCenter: true },
-    { text: "ni", duration: 0.53, begin: 1.75, index: 6, isTitle: true, isCenter: true },
+    {
+      text: "Kır",
+      duration: 0.53,
+      begin: 0.5,
+      index: 1,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: " Zin",
+      duration: 0.53,
+      begin: 0.75,
+      index: 2,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "cir",
+      duration: 0.53,
+      begin: 1.0,
+      index: 3,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "le",
+      duration: 0.53,
+      begin: 1.25,
+      index: 4,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "ri",
+      duration: 0.53,
+      begin: 1.5,
+      index: 5,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "ni",
+      duration: 0.53,
+      begin: 1.75,
+      index: 6,
+      isTitle: true,
+      isCenter: true,
+    },
 
     // First paragraph
     { text: "Bey", duration: 0.53, begin: 3.25, index: 7 },
@@ -488,132 +543,143 @@ export default function KirZincirleriniPage() {
     { text: "le", duration: 0.53, begin: 178.25, index: 455 },
     { text: "ri", duration: 0.53, begin: 178.5, index: 456 },
     { text: "ni…", duration: 0.53, begin: 178.75, index: 457 },
-  ]
+  ];
 
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Handle audio metadata loaded to get duration
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      setAudioDuration(audioRef.current.duration)
+      setAudioDuration(audioRef.current.duration);
     }
-  }
-// First useEffect: Listen for auth changes
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser)
-  })
-  return () => unsubscribe()
-}, [])
+  };
+  // First useEffect: Listen for auth changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
-// Second useEffect: Track visit when user is available
-useEffect(() => {
-  const trackVisit = async () => {
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid))
-        if (!userDoc.exists()) return
+  // Second useEffect: Track visit when user is available
+  useEffect(() => {
+    const trackVisit = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (!userDoc.exists()) return;
 
-        const userData = userDoc.data()
-        const username = userData.username || userData.firstName || "Unknown"
+          const userData = userDoc.data();
+          const username = userData.username || userData.firstName || "Unknown";
 
-        // Get story ID from current URL (last part)
-        const currentPath = window.location.pathname
-        const storyId = currentPath.split('/').pop() || 'unknown'
-        
-        // Convert kebab-case to Title Case for display
-        const storyName = storyId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+          // Get story ID from current URL (last part)
+          const currentPath = window.location.pathname;
+          const storyId = currentPath.split("/").pop() || "unknown";
 
-        await addDoc(collection(db, "storyVisits"), {
-          userId: user.uid,
-          username: username,
-          storyName: storyName,
-          storyId: storyId,
-          visitedAt: serverTimestamp(),
-        })
-        
-        console.log(`✅ Visit tracked: ${storyName}`)
-      } catch (error) {
-        console.error("❌ Error:", error)
+          // Convert kebab-case to Title Case for display
+          const storyName = storyId
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+          await addDoc(collection(db, "storyVisits"), {
+            userId: user.uid,
+            username: username,
+            storyName: storyName,
+            storyId: storyId,
+            visitedAt: serverTimestamp(),
+          });
+
+          console.log(`✅ Visit tracked: ${storyName}`);
+        } catch (error) {
+          console.error("❌ Error:", error);
+        }
       }
-    }
-  }
-  trackVisit()
-}, [user])
+    };
+    trackVisit();
+  }, [user]);
   const handlePlayPause = () => {
-    if (!audioRef.current) return
+    if (!audioRef.current) return;
 
     if (isPlaying) {
-      audioRef.current.pause()
+      audioRef.current.pause();
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
     } else {
-      audioRef.current.play()
+      audioRef.current.play();
       intervalRef.current = setInterval(() => {
         if (audioRef.current) {
-          const time = audioRef.current.currentTime
-          setCurrentTime(time)
+          const time = audioRef.current.currentTime;
+          setCurrentTime(time);
           const activeSegment = textSegments.find(
-            (segment) => time >= segment.begin && time < segment.begin + segment.duration,
-          )
+            (segment) =>
+              time >= segment.begin && time < segment.begin + segment.duration
+          );
           if (activeSegment) {
-            setActiveIndex(activeSegment.index)
+            setActiveIndex(activeSegment.index);
           }
         }
-      }, 50)
+      }, 50);
     }
-    setIsPlaying(!isPlaying)
-  }
-  
+    setIsPlaying(!isPlaying);
+  };
+
   const handleSkipForward = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current?.duration || 0)
+      audioRef.current.currentTime = Math.min(
+        audioRef.current.currentTime + 10,
+        audioRef.current?.duration || 0
+      );
     }
-  }
+  };
 
   const handleSkipBackward = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 10, 0)
+      audioRef.current.currentTime = Math.max(
+        audioRef.current.currentTime - 10,
+        0
+      );
     }
-  }
+  };
 
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return
+    if (!audioRef.current) return;
 
-    const progressBar = e.currentTarget
-    const rect = progressBar.getBoundingClientRect()
-    const clickX = e.clientX - rect.left
-    const progressWidth = rect.width
-    const clickPercentage = clickX / progressWidth
-    const newTime = clickPercentage * (audioRef.current.duration || 0)
-    audioRef.current.currentTime = newTime
-    setCurrentTime(newTime)
-  }
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const progressWidth = rect.width;
+    const clickPercentage = clickX / progressWidth;
+    const newTime = clickPercentage * (audioRef.current.duration || 0);
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
 
   const handleAudioEnded = () => {
-    setIsPlaying(false)
-    setActiveIndex(-1)
+    setIsPlaying(false);
+    setActiveIndex(-1);
     if (intervalRef.current) {
-      clearInterval(intervalRef.current)
+      clearInterval(intervalRef.current);
     }
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   const renderTextSegments = () => {
-    const titleSegments = textSegments.filter((segment) => segment.isTitle)
-    const bodySegments = textSegments.filter((segment) => !segment.isTitle && segment.text.trim())
+    const titleSegments = textSegments.filter((segment) => segment.isTitle);
+    const bodySegments = textSegments.filter(
+      (segment) => !segment.isTitle && segment.text.trim()
+    );
 
     return (
       <div className="space-y-8">
@@ -623,9 +689,9 @@ useEffect(() => {
             {titleSegments.map((segment) => (
               <span
                 key={segment.index}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 font-extrabold ${
                   activeIndex === segment.index
-                    ? "text-black font-extrabold underline decoration-2 decoration-black opacity-100"
+                    ? "text-black underline decoration-2 decoration-black opacity-100"
                     : segment.index < activeIndex
                       ? "text-black opacity-100"
                       : "text-slate-900 opacity-40"
@@ -642,12 +708,12 @@ useEffect(() => {
             {bodySegments.map((segment) => (
               <span
                 key={segment.index}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 font-bold ${
                   activeIndex === segment.index
-                    ? "text-black font-bold underline decoration-2 decoration-black opacity-100"
+                    ? "text-black underline decoration-2 decoration-black opacity-100"
                     : segment.index < activeIndex
                       ? "text-black opacity-100"
-                      : "text-slate-700 opacity-40"
+                      : "text-slate-700 opacity-70"
                 }`}
               >
                 {segment.text}
@@ -656,8 +722,8 @@ useEffect(() => {
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -665,21 +731,26 @@ useEffect(() => {
       <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7x1 mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard/stories" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/dashboard/stories"
+              className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+            >
               <ArrowLeft className="h-5 w-5 mr-2" />
               <span className="hidden sm:inline">Hikayelere Dön</span>
               <span className="sm:hidden">Geri</span>
             </Link>
 
             {/* Navigation Buttons */}
-<div className="flex items-center space-x-5">
-  
-  <Link href="/dashboard/stories/bir-balikci-hikayesi" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
-    <span className="hidden sm:inline">Sonraki Hikaye</span>
-    <span className="sm:hidden">Sonraki</span>
-    <ChevronRight className="h-4 w-4 ml-1" />
-  </Link>
-</div>
+            <div className="flex items-center space-x-5">
+              <Link
+                href="/dashboard/stories/bir-balikci-hikayesi"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <span className="hidden sm:inline">Sonraki Hikaye</span>
+                <span className="sm:hidden">Sonraki</span>
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
 
             <div className="flex items-center text-sm text-slate-500">
               <Volume2 className="h-4 w-4 mr-2" />
@@ -696,8 +767,17 @@ useEffect(() => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Left Section - Title and Time */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0">
-              <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">Sesli Okuma</h2>
-              <div className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded">
+              <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">
+                Sesli Okuma
+              </h2>
+              <div
+                className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded"
+                style={{
+                  minWidth: "110px",
+                  textAlign: "center",
+                  display: "inline-block",
+                }}
+              >
                 {formatTime(currentTime)} / {formatTime(audioDuration)}
               </div>
             </div>
@@ -720,7 +800,11 @@ useEffect(() => {
                 }`}
                 title={isPlaying ? "Duraklat" : "Oynat"}
               >
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5 ml-0.5" />
+                )}
               </button>
               <button
                 onClick={handleSkipForward}
@@ -760,9 +844,8 @@ useEffect(() => {
         </div>
 
         {/* Story Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">{renderTextSegments()}</div>
+        {renderTextSegments()}
       </div>
     </div>
-  )
+  );
 }
-

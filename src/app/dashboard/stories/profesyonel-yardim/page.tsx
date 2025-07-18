@@ -1,791 +1,856 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Play, Pause, Volume2, ArrowLeft, SkipForward, SkipBack,ChevronLeft, ChevronRight} from "lucide-react"
-import Link from "next/link"
-import { auth, db } from "../../../../../firebase"
-import { onAuthStateChanged, type User } from "firebase/auth"
-import { collection, addDoc, serverTimestamp, doc, getDoc } from "firebase/firestore"
+import { useState, useRef, useEffect } from "react";
+import {
+  Play,
+  Pause,
+  Volume2,
+  ArrowLeft,
+  SkipForward,
+  SkipBack,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import Link from "next/link";
+import { auth, db } from "../../../../../firebase";
+import { onAuthStateChanged, type User } from "firebase/auth";
+import {
+  collection,
+  addDoc,
+  serverTimestamp,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 interface TextSegment {
-  text: string
-  duration: number
-  begin: number
-  index: number
-  isTitle?: boolean
-  isCenter?: boolean
+  text: string;
+  duration: number;
+  begin: number;
+  index: number;
+  isTitle?: boolean;
+  isCenter?: boolean;
 }
 
 export default function KirZincirleriniPage() {
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [currentTime, setCurrentTime] = useState(0)
-  const [activeIndex, setActiveIndex] = useState(-1)
-  const [audioDuration, setAudioDuration] = useState(0)
- const [user, setUser] = useState<User | null>(null)
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [audioDuration, setAudioDuration] = useState(0);
+  const [user, setUser] = useState<User | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Story text segments with timing data - COMPLETE VERSION
   const textSegments: TextSegment[] = [
-  
-  
-  // Title
-  { text: "Pro", duration: 0.28, begin: 0.700, index: 1, isTitle: true, isCenter: true },
-  { text: "fes", duration: 0.38, begin: 1.000, index: 2, isTitle: true, isCenter: true },
-  { text: "yo", duration: 0.38, begin: 1.250, index: 3, isTitle: true, isCenter: true },
-  { text: "nel", duration: 0.28, begin: 1.500, index: 4, isTitle: true, isCenter: true },
-  { text: " Yar", duration: 0.38, begin: 1.850, index: 5, isTitle: true, isCenter: true },
-  { text: "dım", duration: 0.38, begin: 2.150, index: 6, isTitle: true, isCenter: true },
-  
-  // Story content
-  { text: " Genç", duration: 0.28, begin: 3.250, index: 7 },
-  { text: " ka", duration: 0.28, begin: 3.500, index: 8 },
-  { text: "dın", duration: 0.28, begin: 3.750, index: 9 },
-  { text: " iş", duration: 0.28, begin: 4.250, index: 10 },
-  { text: "ye", duration: 0.28, begin: 4.500, index: 11 },
-  { text: "rin", duration: 0.28, begin: 4.750, index: 12 },
-  { text: "de", duration: 0.28, begin: 5.000, index: 13 },
-  { text: " kö", duration: 0.28, begin: 5.250, index: 14 },
-  { text: "tü", duration: 0.28, begin: 5.500, index: 15 },
-  { text: " bir", duration: 0.28, begin: 5.750, index: 16 },
-  { text: " ha", duration: 0.28, begin: 6.000, index: 17 },
-  { text: "ber", duration: 0.28, begin: 6.250, index: 18 },
-  { text: " a", duration: 0.28, begin: 6.500, index: 19 },
-  { text: "lır.", duration: 0.28, begin: 6.750, index: 20 },
-  { text: " Kü", duration: 0.28, begin: 7.500, index: 21 },
-  { text: "çük", duration: 0.28, begin: 7.750, index: 22 },
-  { text: " kı", duration: 0.28, begin: 8.000, index: 23 },
-  { text: "zı", duration: 0.28, begin: 8.250, index: 24 },
-  { text: "nın", duration: 0.28, begin: 8.500, index: 25 },
-  { text: " ba", duration: 0.28, begin: 8.750, index: 26 },
-  { text: "kı", duration: 0.28, begin: 9.000, index: 27 },
-  { text: "cı", duration: 0.28, begin: 9.250, index: 28 },
-  { text: "sı", duration: 0.28, begin: 9.500, index: 29 },
-  { text: " te", duration: 0.28, begin: 10.250, index: 30 },
-  { text: "le", duration: 0.28, begin: 10.500, index: 31 },
-  { text: "fon", duration: 0.28, begin: 10.750, index: 32 },
-  { text: "da", duration: 0.28, begin: 11.000, index: 33 },
-  { text: " ço", duration: 0.28, begin: 11.250, index: 34 },
-  { text: "cu", duration: 0.28, begin: 11.500, index: 35 },
-  { text: "ğun", duration: 0.28, begin: 11.750, index: 36 },
-  { text: " çok", duration: 0.28, begin: 12.000, index: 37 },
-  { text: " a", duration: 0.28, begin: 12.250, index: 38 },
-  { text: "teş", duration: 0.28, begin: 12.500, index: 39 },
-  { text: "len", duration: 0.28, begin: 12.750, index: 40 },
-  { text: "di", duration: 0.28, begin: 13.000, index: 41 },
-  { text: "ği", duration: 0.28, begin: 13.250, index: 42 },
-  { text: "ni", duration: 0.28, begin: 13.500, index: 43 },
-  { text: " mut", duration: 0.28, begin: 14.000, index: 44 },
-  { text: "la", duration: 0.28, begin: 14.250, index: 45 },
-  { text: "ka", duration: 0.28, begin: 14.500, index: 46 },
-  { text: " e", duration: 0.28, begin: 15.000, index: 47 },
-  { text: "ve", duration: 0.28, begin: 15.250, index: 48 },
-  { text: " gel", duration: 0.28, begin: 15.750, index: 49 },
-  { text: "me", duration: 0.28, begin: 16.000, index: 50 },
-  { text: "si", duration: 0.28, begin: 16.250, index: 51 },
-  { text: " ge", duration: 0.28, begin: 16.500, index: 52 },
-  { text: "rek", duration: 0.28, begin: 16.700, index: 53 },
-  { text: "ti", duration: 0.28, begin: 16.900, index: 54 },
-  { text: "ği", duration: 0.28, begin: 17.200, index: 55 },
-  { text: "ni", duration: 0.28, begin: 17.500, index: 56 },
-  { text: " bil", duration: 0.28, begin: 17.700, index: 57 },
-  { text: "di", duration: 0.28, begin: 17.900, index: 58 },
-  { text: "rir.", duration: 0.28, begin: 18.250, index: 59 },
-  { text: " He", duration: 0.28, begin: 19.000, index: 60 },
-  { text: "men", duration: 0.28, begin: 19.250, index: 61 },
-  { text: " i", duration: 0.28, begin: 19.500, index: 62 },
-  { text: "şin", duration: 0.28, begin: 19.750, index: 63 },
-  { text: "den", duration: 0.28, begin: 20.000, index: 64 },
-  { text: " i", duration: 0.28, begin: 20.250, index: 65 },
-  { text: "zin", duration: 0.28, begin: 20.500, index: 66 },
-  { text: " a", duration: 0.28, begin: 20.750, index: 67 },
-  { text: "lır", duration: 0.28, begin: 21.000, index: 68 },
-  { text: " ve", duration: 0.28, begin: 21.250, index: 69 },
-  { text: " a", duration: 0.28, begin: 21.750, index: 70 },
-  { text: "teş", duration: 0.28, begin: 22.000, index: 71 },
-  { text: " dü", duration: 0.28, begin: 22.250, index: 72 },
-  { text: "şü", duration: 0.28, begin: 22.500, index: 73 },
-  { text: "rü", duration: 0.28, begin: 22.750, index: 74 },
-  { text: "cü", duration: 0.28, begin: 23.000, index: 75 },
-  { text: " bir", duration: 0.28, begin: 23.250, index: 76 },
-  { text: " i", duration: 0.28, begin: 23.500, index: 77 },
-  { text: "laç", duration: 0.28, begin: 23.750, index: 78 },
-  { text: " i", duration: 0.28, begin: 24.000, index: 79 },
-  { text: "çin", duration: 0.28, begin: 24.250, index: 80 },
-  { text: " en", duration: 0.28, begin: 24.750, index: 81 },
-  { text: " ya", duration: 0.28, begin: 25.000, index: 82 },
-  { text: "kın", duration: 0.28, begin: 25.250, index: 83 },
-  { text: " ec", duration: 0.28, begin: 25.500, index: 84 },
-  { text: "za", duration: 0.28, begin: 25.750, index: 85 },
-  { text: "ne", duration: 0.28, begin: 26.000, index: 86 },
-  { text: "ye", duration: 0.28, begin: 26.250, index: 87 },
-  { text: " ko", duration: 0.28, begin: 26.500, index: 88 },
-  { text: "şar.", duration: 0.28, begin: 26.750, index: 89 },
-  { text: " A", duration: 0.28, begin: 28.000, index: 90 },
-  { text: "ra", duration: 0.28, begin: 28.250, index: 91 },
-  { text: "ba", duration: 0.28, begin: 28.500, index: 92 },
-  { text: "sı", duration: 0.28, begin: 28.750, index: 93 },
-  { text: "nın", duration: 0.28, begin: 29.000, index: 94 },
-  { text: " ya", duration: 0.28, begin: 29.250, index: 95 },
-  { text: "nı", duration: 0.28, begin: 29.500, index: 96 },
-  { text: "na", duration: 0.28, begin: 29.750, index: 97 },
-  { text: " gel", duration: 0.28, begin: 30.000, index: 98 },
-  { text: "di", duration: 0.28, begin: 30.250, index: 99 },
-  { text: "ğin", duration: 0.28, begin: 30.500, index: 100 },
-  { text: "de", duration: 0.28, begin: 30.750, index: 101 },
-  { text: " a", duration: 0.28, begin: 31.250, index: 102 },
-  { text: "ra", duration: 0.28, begin: 31.500, index: 103 },
-  { text: "ba", duration: 0.28, begin: 31.750, index: 104 },
-  { text: "yı", duration: 0.28, begin: 32.000, index: 105 },
-  { text: " a", duration: 0.28, begin: 32.250, index: 106 },
-  { text: "nah", duration: 0.28, begin: 32.500, index: 107 },
-  { text: "ta", duration: 0.28, begin: 32.750, index: 108 },
-  { text: "rı", duration: 0.28, begin: 33.000, index: 109 },
-  { text: " i", duration: 0.28, begin: 33.500, index: 110 },
-  { text: "çin", duration: 0.28, begin: 33.750, index: 111 },
-  { text: "dey", duration: 0.28, begin: 34.000, index: 112 },
-  { text: "ken", duration: 0.28, begin: 34.250, index: 113 },
-  { text: " ki", duration: 0.28, begin: 34.500, index: 114 },
-  { text: "lit", duration: 0.28, begin: 34.750, index: 115 },
-  { text: "le", duration: 0.28, begin: 35.000, index: 116 },
-  { text: "di", duration: 0.28, begin: 35.250, index: 117 },
-  { text: "ği", duration: 0.28, begin: 35.500, index: 118 },
-  { text: "nin", duration: 0.28, begin: 35.750, index: 119 },
-  { text: " far", duration: 0.28, begin: 36.000, index: 120 },
-  { text: "kı", duration: 0.28, begin: 36.250, index: 121 },
-  { text: "na", duration: 0.28, begin: 36.500, index: 122 },
-  { text: " va", duration: 0.28, begin: 36.750, index: 123 },
-  { text: "rır.", duration: 0.28, begin: 37.000, index: 124 },
-  { text: " E", duration: 0.28, begin: 37.500, index: 125 },
-  { text: "ve", duration: 0.28, begin: 37.750, index: 126 },
-  { text: " he", duration: 0.28, begin: 38.000, index: 127 },
-  { text: "men", duration: 0.28, begin: 38.250, index: 128 },
-  { text: " ye", duration: 0.28, begin: 38.500, index: 129 },
-  { text: "tiş", duration: 0.28, begin: 38.750, index: 130 },
-  { text: "me", duration: 0.28, begin: 39.000, index: 131 },
-  { text: "si", duration: 0.28, begin: 39.250, index: 132 },
-  { text: " ge", duration: 0.28, begin: 39.500, index: 133 },
-  { text: "rek", duration: 0.28, begin: 39.750, index: 134 },
-  { text: "mek", duration: 0.28, begin: 40.000, index: 135 },
-  { text: "te", duration: 0.28, begin: 40.250, index: 136 },
-  { text: "dir", duration: 0.28, begin: 40.500, index: 137 },
-  { text: " a", duration: 0.28, begin: 41.000, index: 138 },
-  { text: "ma", duration: 0.28, begin: 41.250, index: 139 },
-  { text: " na", duration: 0.28, begin: 41.750, index: 140 },
-  { text: "sıl?", duration: 0.28, begin: 41.808, index: 141 },
-  { text: " E", duration: 0.28, begin: 43.500, index: 142 },
-  { text: "vi", duration: 0.28, begin: 43.750, index: 143 },
-  { text: "ni", duration: 0.28, begin: 44.000, index: 144 },
-  { text: " a", duration: 0.28, begin: 44.250, index: 145 },
-  { text: "rar,", duration: 0.28, begin: 44.500, index: 146 },
-  { text: " an", duration: 0.28, begin: 45.000, index: 147 },
-  { text: "cak", duration: 0.28, begin: 45.250, index: 148 },
-  { text: " ço", duration: 0.28, begin: 45.500, index: 149 },
-  { text: "cuk", duration: 0.28, begin: 45.750, index: 150 },
-  { text: " ba", duration: 0.28, begin: 46.250, index: 151 },
-  { text: "kı", duration: 0.28, begin: 46.500, index: 152 },
-  { text: "cı", duration: 0.28, begin: 46.750, index: 153 },
-  { text: "sı", duration: 0.28, begin: 47.000, index: 154 },
-  { text: "nın", duration: 0.28, begin: 47.250, index: 155 },
-  { text: " ver", duration: 0.28, begin: 47.500, index: 156 },
-  { text: "di", duration: 0.28, begin: 47.750, index: 157 },
-  { text: "ği", duration: 0.28, begin: 48.000, index: 158 },
-  { text: " ha", duration: 0.28, begin: 48.250, index: 159 },
-  { text: "ber", duration: 0.28, begin: 48.500, index: 160 },
-  { text: " da", duration: 0.28, begin: 49.250, index: 161 },
-  { text: "ha", duration: 0.28, begin: 49.500, index: 162 },
-  { text: " kö", duration: 0.28, begin: 49.750, index: 163 },
-  { text: "tü", duration: 0.28, begin: 50.000, index: 164 },
-  { text: "dür.", duration: 0.28, begin: 50.250, index: 165 },
-  { text: " Kı", duration: 0.28, begin: 50.750, index: 166 },
-  { text: "zın", duration: 0.28, begin: 51.000, index: 167 },
-  { text: " a", duration: 0.28, begin: 51.250, index: 168 },
-  { text: "te", duration: 0.28, begin: 51.500, index: 169 },
-  { text: "şi", duration: 0.28, begin: 51.750, index: 170 },
-  { text: " bi", duration: 0.28, begin: 52.000, index: 171 },
-  { text: "raz", duration: 0.28, begin: 52.250, index: 172 },
-  { text: " da", duration: 0.28, begin: 52.500, index: 173 },
-  { text: "ha", duration: 0.28, begin: 52.750, index: 174 },
-  { text: " yük", duration: 0.28, begin: 53.000, index: 175 },
-  { text: "sel", duration: 0.28, begin: 53.250, index: 176 },
-  { text: "miş", duration: 0.28, begin: 53.500, index: 177 },
-  { text: "tir.", duration: 0.28, begin: 53.750, index: 178 },
-  { text: " Bu", duration: 0.28, begin: 54.750, index: 179 },
-  { text: " a", duration: 0.28, begin: 55.000, index: 180 },
-  { text: "ra", duration: 0.28, begin: 55.250, index: 181 },
-  { text: "da", duration: 0.28, begin: 55.500, index: 182 },
-  { text: " ka", duration: 0.28, begin: 55.750, index: 183 },
-  { text: "dın", duration: 0.28, begin: 56.000, index: 184 },
-  { text: " i", duration: 0.28, begin: 56.750, index: 185 },
-  { text: "çin", duration: 0.28, begin: 57.000, index: 186 },
-  { text: "de", duration: 0.28, begin: 57.250, index: 187 },
-  { text: " bu", duration: 0.28, begin: 57.500, index: 188 },
-  { text: "lun", duration: 0.28, begin: 57.750, index: 189 },
-  { text: "du", duration: 0.28, begin: 58.000, index: 190 },
-  { text: "ğu", duration: 0.28, begin: 58.250, index: 191 },
-  { text: " du", duration: 0.28, begin: 58.500, index: 192 },
-  { text: "ru", duration: 0.28, begin: 58.750, index: 193 },
-  { text: "mu", duration: 0.28, begin: 59.000, index: 194 },
-  { text: " ba", duration: 0.28, begin: 59.200, index: 195 },
-  { text: "kı", duration: 0.28, begin: 59.400, index: 196 },
-  { text: "cı", duration: 0.28, begin: 59.600, index: 197 },
-  { text: "ya", duration: 0.28, begin: 59.800, index: 198 },
-  { text: " an", duration: 0.28, begin: 60.000, index: 199 },
-  { text: "la", duration: 0.28, begin: 60.200, index: 200 },
-  { text: "tır.", duration: 0.28, begin: 60.400, index: 201 },
-  { text: " Ba", duration: 0.28, begin: 61.250, index: 202 },
-  { text: "kı", duration: 0.28, begin: 61.500, index: 203 },
-  { text: "cı", duration: 0.28, begin: 61.750, index: 204 },
-  { text: " a", duration: 0.28, begin: 62.250, index: 205 },
-  { text: "ra", duration: 0.28, begin: 62.500, index: 206 },
-  { text: "ba", duration: 0.28, begin: 62.750, index: 207 },
-  { text: "nın", duration: 0.28, begin: 63.000, index: 208 },
-  { text: " ki", duration: 0.28, begin: 63.200, index: 209 },
-  { text: "li", duration: 0.28, begin: 63.400, index: 210 },
-  { text: "di", duration: 0.28, begin: 63.600, index: 211 },
-  { text: "ni", duration: 0.28, begin: 63.800, index: 212 },
-  { text: " a", duration: 0.28, begin: 64.200, index: 213 },
-  { text: "ça", duration: 0.28, begin: 64.400, index: 214 },
-  { text: "bi", duration: 0.28, begin: 64.600, index: 215 },
-  { text: "le", duration: 0.28, begin: 64.800, index: 216 },
-  { text: "cek", duration: 0.28, begin: 65.000, index: 217 },
-  { text: " bir", duration: 0.28, begin: 65.200, index: 218 },
-  { text: " ser", duration: 0.28, begin: 65.600, index: 219 },
-  { text: "vis", duration: 0.28, begin: 65.800, index: 220 },
-  { text: " bul", duration: 0.28, begin: 66.000, index: 221 },
-  { text: " ma", duration: 0.28, begin: 66.200, index: 222 },
-  { text: "sı", duration: 0.28, begin: 66.400, index: 223 },
-  { text: "nı", duration: 0.28, begin: 66.600, index: 224 },
-  { text: " ya", duration: 0.28, begin: 67.800, index: 225 },
-  { text: "da", duration: 0.28, begin: 68.000, index: 226 },
-  { text: " ça", duration: 0.28, begin: 68.200, index: 227 },
-  { text: "kı,", duration: 0.28, begin: 68.400, index: 228 },
-  { text: " bı", duration: 0.28, begin: 69.600, index: 229 },
-  { text: "çak", duration: 0.28, begin: 69.800, index: 230 },
-  { text: " gi", duration: 0.28, begin: 70.000, index: 231 },
-  { text: "bi", duration: 0.28, begin: 70.200, index: 232 },
-  { text: " bir", duration: 0.28, begin: 70.400, index: 233 },
-  { text: "şey", duration: 0.28, begin: 70.600, index: 234 },
-  { text: "le", duration: 0.28, begin: 70.800, index: 235 },
-  { text: " ken", duration: 0.28, begin: 71.600, index: 236 },
-  { text: "di", duration: 0.28, begin: 71.800, index: 237 },
-  { text: "si", duration: 0.28, begin: 72.000, index: 238 },
-  { text: "nin", duration: 0.28, begin: 72.200, index: 239 },
-  { text: " aç", duration: 0.28, begin: 72.600, index: 240 },
-  { text: "ma", duration: 0.28, begin: 72.800, index: 241 },
-  { text: "yı", duration: 0.28, begin: 73.000, index: 242 },
-  { text: " de", duration: 0.28, begin: 73.200, index: 243 },
-  { text: "ne", duration: 0.28, begin: 73.400, index: 244 },
-  { text: "me", duration: 0.28, begin: 73.600, index: 245 },
-  { text: "si", duration: 0.28, begin: 73.800, index: 246 },
-  { text: "ni", duration: 0.28, begin: 74.000, index: 247 },
-  { text: " söy", duration: 0.28, begin: 74.400, index: 248 },
-  { text: "ler.", duration: 0.28, begin: 74.600, index: 249 },
-  { text: " Ya", duration: 0.28, begin: 76.000, index: 250 },
-  { text: "kın", duration: 0.28, begin: 76.250, index: 251 },
-  { text: "da", duration: 0.28, begin: 76.500, index: 252 },
-  { text: " bu", duration: 0.28, begin: 76.750, index: 253 },
-  { text: "lu", duration: 0.28, begin: 77.000, index: 254 },
-  { text: "nan", duration: 0.28, begin: 77.250, index: 255 },
-  { text: " bir", duration: 0.28, begin: 77.500, index: 256 },
-  { text: " mar", duration: 0.28, begin: 77.750, index: 257 },
-  { text: "ket", duration: 0.28, begin: 78.000, index: 258 },
-  { text: "ten", duration: 0.28, begin: 78.250, index: 259 },
-  { text: " kü", duration: 0.28, begin: 79.250, index: 260 },
-  { text: "çük", duration: 0.28, begin: 79.500, index: 261 },
-  { text: " bir", duration: 0.28, begin: 79.750, index: 262 },
-  { text: " ça", duration: 0.28, begin: 80.000, index: 263 },
-  { text: "kı", duration: 0.28, begin: 80.250, index: 264 },
-  { text: " a", duration: 0.28, begin: 80.500, index: 265 },
-  { text: "lır", duration: 0.28, begin: 80.750, index: 266 },
-  { text: " ve", duration: 0.28, begin: 81.000, index: 267 },
-  { text: " a", duration: 0.28, begin: 81.750, index: 268 },
-  { text: "ra", duration: 0.28, begin: 82.000, index: 269 },
-  { text: "ba", duration: 0.28, begin: 82.250, index: 270 },
-  { text: "nın", duration: 0.28, begin: 82.500, index: 271 },
-  { text: " ya", duration: 0.28, begin: 82.750, index: 272 },
-  { text: "nı", duration: 0.28, begin: 83.000, index: 273 },
-  { text: "na", duration: 0.28, begin: 83.250, index: 274 },
-  { text: " gi", duration: 0.28, begin: 83.500, index: 275 },
-  { text: "der.", duration: 0.28, begin: 83.750, index: 276 },
-  { text: " A", duration: 0.28, begin: 85.000, index: 277 },
-  { text: "ma", duration: 0.28, begin: 85.250, index: 278 },
-  { text: " bu", duration: 0.28, begin: 86.000, index: 279 },
-  { text: "nun", duration: 0.28, begin: 86.250, index: 280 },
-  { text: " na", duration: 0.28, begin: 86.500, index: 281 },
-  { text: "sıl", duration: 0.28, begin: 86.750, index: 282 },
-  { text: " kul", duration: 0.28, begin: 87.000, index: 283 },
-  { text: "la", duration: 0.28, begin: 87.200, index: 284 },
-  { text: "nı", duration: 0.28, begin: 87.400, index: 285 },
-  { text: "la", duration: 0.28, begin: 87.600, index: 286 },
-  { text: "ca", duration: 0.28, begin: 87.800, index: 287 },
-  { text: "ğı", duration: 0.28, begin: 88.000, index: 288 },
-  { text: "nı", duration: 0.28, begin: 88.200, index: 289 },
-  { text: " bi", duration: 0.28, begin: 88.400, index: 290 },
-  { text: "le", duration: 0.28, begin: 88.600, index: 291 },
-  { text: "mez.", duration: 0.28, begin: 88.800, index: 292 },
-  { text: " A", duration: 0.28, begin: 89.750, index: 293 },
-  { text: "ra", duration: 0.28, begin: 90.000, index: 294 },
-  { text: "ba", duration: 0.28, begin: 90.250, index: 295 },
-  { text: "nın", duration: 0.28, begin: 90.500, index: 296 },
-  { text: " ka", duration: 0.28, begin: 90.700, index: 297 },
-  { text: "pı", duration: 0.28, begin: 90.900, index: 298 },
-  { text: "la", duration: 0.28, begin: 91.100, index: 299 },
-  { text: "rı", duration: 0.28, begin: 91.300, index: 300 },
-  { text: "nı", duration: 0.28, begin: 91.500, index: 301 },
-  { text: " zor", duration: 0.28, begin: 91.800, index: 302 },
-  { text: "lar,", duration: 0.28, begin: 92.000, index: 303 },
-  { text: " sal", duration: 0.28, begin: 92.800, index: 304 },
-  { text: "lar", duration: 0.28, begin: 93.000, index: 305 },
-  { text: " a", duration: 0.28, begin: 94.000, index: 306 },
-  { text: "ma", duration: 0.28, begin: 94.250, index: 307 },
-  { text: " hiç", duration: 0.28, begin: 94.500, index: 308 },
-  { text: " bir", duration: 0.28, begin: 94.750, index: 309 },
-  { text: " so", duration: 0.28, begin: 95.000, index: 310 },
-  { text: "nuç", duration: 0.28, begin: 95.250, index: 311 },
-  { text: " yok", duration: 0.28, begin: 95.500, index: 312 },
-  { text: "tur.", duration: 0.28, begin: 95.750, index: 313 },
-  { text: " Ba", duration: 0.28, begin: 97.200, index: 314 },
-  { text: "şı", duration: 0.28, begin: 97.400, index: 315 },
-  { text: "nı", duration: 0.28, begin: 97.600, index: 316 },
-  { text: " gök", duration: 0.28, begin: 97.800, index: 317 },
-  { text: "yü", duration: 0.28, begin: 98.000, index: 318 },
-  { text: "zü", duration: 0.28, begin: 98.200, index: 319 },
-  { text: "ne", duration: 0.28, begin: 98.400, index: 320 },
-  { text: " doğ", duration: 0.28, begin: 98.600, index: 321 },
-  { text: "ru", duration: 0.28, begin: 98.800, index: 322 },
-  { text: " çe", duration: 0.28, begin: 99.000, index: 323 },
-  { text: "vi", duration: 0.28, begin: 99.200, index: 324 },
-  { text: "rir:", duration: 0.28, begin: 99.400, index: 325 },
-  { text: " \"Tan", duration: 0.28, begin: 100.750, index: 326 },
-  { text: "rım,", duration: 0.28, begin: 101.000, index: 327 },
-  { text: " lüt", duration: 0.28, begin: 102.000, index: 328 },
-  { text: "fen", duration: 0.28, begin: 102.250, index: 329 },
-  { text: " kü", duration: 0.28, begin: 102.500, index: 330 },
-  { text: "çük", duration: 0.28, begin: 102.750, index: 331 },
-  { text: " kı", duration: 0.28, begin: 103.000, index: 332 },
-  { text: "zı", duration: 0.28, begin: 103.250, index: 333 },
-  { text: "ma", duration: 0.28, begin: 103.500, index: 334 },
-  { text: " u", duration: 0.28, begin: 103.750, index: 335 },
-  { text: "laş", duration: 0.28, begin: 104.000, index: 336 },
-  { text: "mam", duration: 0.28, begin: 104.250, index: 337 },
-  { text: " i", duration: 0.28, begin: 104.500, index: 338 },
-  { text: "çin", duration: 0.28, begin: 104.750, index: 339 },
-  { text: " ba", duration: 0.28, begin: 105.250, index: 340 },
-  { text: "na", duration: 0.28, begin: 105.500, index: 341 },
-  { text: " yar", duration: 0.28, begin: 105.750, index: 342 },
-  { text: "dım", duration: 0.28, begin: 106.000, index: 343 },
-  { text: " et\"", duration: 0.28, begin: 106.250, index: 344 },
-  { text: " Bu", duration: 0.28, begin: 107.500, index: 345 },
-  { text: " a", duration: 0.28, begin: 107.750, index: 346 },
-  { text: "ra", duration: 0.28, begin: 108.000, index: 347 },
-  { text: "da", duration: 0.28, begin: 108.250, index: 348 },
-  { text: " ça", duration: 0.28, begin: 109.000, index: 349 },
-  { text: "kıy", duration: 0.28, begin: 109.250, index: 350 },
-  { text: "la", duration: 0.28, begin: 109.500, index: 351 },
-  { text: " ka", duration: 0.28, begin: 109.750, index: 352 },
-  { text: "pı", duration: 0.28, begin: 110.000, index: 353 },
-  { text: "yı", duration: 0.28, begin: 110.250, index: 354 },
-  { text: " kur", duration: 0.28, begin: 110.400, index: 355 },
-  { text: "ca", duration: 0.28, begin: 110.600, index: 356 },
-  { text: "la", duration: 0.28, begin: 110.800, index: 357 },
-  { text: "ma", duration: 0.28, begin: 111.000, index: 358 },
-  { text: "ya", duration: 0.28, begin: 111.200, index: 359 },
-  { text: " de", duration: 0.28, begin: 111.400, index: 360 },
-  { text: "vam", duration: 0.28, begin: 111.600, index: 361 },
-  { text: " e", duration: 0.28, begin: 111.800, index: 362 },
-  { text: "der.", duration: 0.28, begin: 112.000, index: 363 },
-  { text: " O", duration: 0.28, begin: 113.200, index: 364 },
-  { text: " sı", duration: 0.28, begin: 113.400, index: 365 },
-  { text: "ra", duration: 0.28, begin: 113.600, index: 366 },
-  { text: "da", duration: 0.28, begin: 113.800, index: 367 },
-  { text: " yol", duration: 0.28, begin: 114.600, index: 368 },
-  { text: "dan", duration: 0.28, begin: 114.800, index: 369 },
-  { text: " geç", duration: 0.28, begin: 115.000, index: 370 },
-  { text: "mek", duration: 0.28, begin: 115.250, index: 371 },
-  { text: "te", duration: 0.28, begin: 115.500, index: 372 },
-  { text: " o", duration: 0.28, begin: 115.750, index: 373 },
-  { text: "lan", duration: 0.28, begin: 116.000, index: 374 },
-  { text: " sa", duration: 0.28, begin: 117.000, index: 375 },
-  { text: "kal", duration: 0.28, begin: 117.250, index: 376 },
-  { text: "la", duration: 0.28, begin: 117.500, index: 377 },
-  { text: "rı", duration: 0.28, begin: 117.750, index: 378 },
-  { text: " u", duration: 0.28, begin: 118.000, index: 379 },
-  { text: "za", duration: 0.28, begin: 118.250, index: 380 },
-  { text: "mış,", duration: 0.28, begin: 118.500, index: 381 },
-  { text: " üs", duration: 0.28, begin: 119.500, index: 382 },
-  { text: "tü", duration: 0.28, begin: 119.750, index: 383 },
-  { text: " ba", duration: 0.28, begin: 120.000, index: 384 },
-  { text: "şı", duration: 0.28, begin: 120.250, index: 385 },
-  { text: " ba", duration: 0.28, begin: 120.500, index: 386 },
-  { text: "kım", duration: 0.28, begin: 120.750, index: 387 },
-  { text: "sız", duration: 0.28, begin: 121.000, index: 388 },
-  { text: " bir", duration: 0.28, begin: 121.200, index: 389 },
-  { text: " a", duration: 0.28, begin: 121.400, index: 390 },
-  { text: "dam", duration: 0.28, begin: 121.600, index: 391 },
-  { text: " du", duration: 0.28, begin: 121.800, index: 392 },
-  { text: "rup", duration: 0.28, begin: 122.000, index: 393 },
-  { text: " ka", duration: 0.28, begin: 122.750, index: 394 },
-  { text: "dı", duration: 0.28, begin: 123.000, index: 395 },
-  { text: "nı", duration: 0.28, begin: 123.250, index: 396 },
-  { text: " iz", duration: 0.28, begin: 123.500, index: 397 },
-  { text: "ler", duration: 0.28, begin: 123.750, index: 398 },
-  { text: " ve:", duration: 0.28, begin: 124.250, index: 399 },
-  { text: " \"Ha", duration: 0.28, begin: 125.250, index: 400 },
-  { text: "nım", duration: 0.28, begin: 125.500, index: 401 },
-  { text: " e", duration: 0.28, begin: 125.750, index: 402 },
-  { text: "fen", duration: 0.28, begin: 126.000, index: 403 },
-  { text: "di,", duration: 0.28, begin: 126.250, index: 404 },
-  { text: " is", duration: 0.28, begin: 127.000, index: 405 },
-  { text: "ter", duration: 0.28, begin: 127.250, index: 406 },
-  { text: "se", duration: 0.28, begin: 127.500, index: 407 },
-  { text: "niz", duration: 0.28, begin: 127.750, index: 408 },
-  { text: " yar", duration: 0.28, begin: 128.250, index: 409 },
-  { text: "dım", duration: 0.28, begin: 128.500, index: 410 },
-  { text: "cı", duration: 0.28, begin: 128.750, index: 411 },
-  { text: " o", duration: 0.28, begin: 129.000, index: 412 },
-  { text: "la", duration: 0.28, begin: 129.250, index: 413 },
-  { text: "bi", duration: 0.28, begin: 129.500, index: 414 },
-  { text: "li", duration: 0.28, begin: 129.750, index: 415 },
-  { text: "rim\"", duration: 0.28, begin: 130.000, index: 416 },
-  { text: " der.", duration: 0.28, begin: 130.250, index: 417 },
-  { text: " Ka", duration: 0.28, begin: 131.500, index: 418 },
-  { text: "dın:", duration: 0.28, begin: 131.750, index: 419 },
-  { text: " \"Tan", duration: 0.28, begin: 132.500, index: 420 },
-  { text: "rım", duration: 0.28, begin: 132.750, index: 421 },
-  { text: " gön", duration: 0.28, begin: 133.500, index: 422 },
-  { text: "der", duration: 0.28, begin: 133.750, index: 423 },
-  { text: "di", duration: 0.28, begin: 134.000, index: 424 },
-  { text: "ğin", duration: 0.28, begin: 134.250, index: 425 },
-  { text: " yar", duration: 0.28, begin: 134.500, index: 426 },
-  { text: "dım", duration: 0.28, begin: 134.750, index: 427 },
-  { text: " bu", duration: 0.28, begin: 135.000, index: 428 },
-  { text: " mu?\"", duration: 0.28, begin: 135.250, index: 429 },
-  { text: " di", duration: 0.28, begin: 135.750, index: 430 },
-  { text: "ye", duration: 0.28, begin: 136.000, index: 431 },
-  { text: " dü", duration: 0.28, begin: 136.250, index: 432 },
-  { text: "şü", duration: 0.28, begin: 136.500, index: 433 },
-  { text: "nür.", duration: 0.28, begin: 136.750, index: 434 },
-  { text: " Kı", duration: 0.28, begin: 137.750, index: 435 },
-  { text: "lık", duration: 0.28, begin: 138.000, index: 436 },
-  { text: "sız", duration: 0.28, begin: 138.250, index: 437 },
-  { text: " a", duration: 0.28, begin: 138.500, index: 438 },
-  { text: "dam", duration: 0.28, begin: 138.750, index: 439 },
-  { text: " bir", duration: 0.28, begin: 139.500, index: 440 },
-  { text: " kaç", duration: 0.28, begin: 139.750, index: 441 },
-  { text: " da", duration: 0.28, begin: 140.000, index: 442 },
-  { text: "ki", duration: 0.28, begin: 140.250, index: 443 },
-  { text: "ka", duration: 0.28, begin: 140.500, index: 444 },
-  { text: " i", duration: 0.28, begin: 140.750, index: 445 },
-  { text: "çin", duration: 0.28, begin: 141.000, index: 446 },
-  { text: "de", duration: 0.28, begin: 141.250, index: 447 },
-  { text: " a", duration: 0.28, begin: 141.750, index: 448 },
-  { text: "ra", duration: 0.28, begin: 142.000, index: 449 },
-  { text: "ba", duration: 0.28, begin: 142.250, index: 450 },
-  { text: "nın", duration: 0.28, begin: 142.500, index: 451 },
-  { text: " ki", duration: 0.28, begin: 142.750, index: 452 },
-  { text: "li", duration: 0.28, begin: 143.000, index: 453 },
-  { text: "di", duration: 0.28, begin: 143.250, index: 454 },
-  { text: "ni", duration: 0.28, begin: 143.500, index: 455 },
-  { text: " aç", duration: 0.28, begin: 143.750, index: 456 },
-  { text: "ma", duration: 0.28, begin: 144.000, index: 457 },
-  { text: "yı", duration: 0.28, begin: 144.250, index: 458 },
-  { text: " ba", duration: 0.28, begin: 144.500, index: 459 },
-  { text: "şa", duration: 0.28, begin: 144.750, index: 460 },
-  { text: "rır.", duration: 0.28, begin: 145.000, index: 461 },
-  { text: " Ka", duration: 0.28, begin: 146.000, index: 462 },
-  { text: "dın", duration: 0.28, begin: 146.250, index: 463 },
-  { text: " şaş", duration: 0.28, begin: 146.750, index: 464 },
-  { text: "kın", duration: 0.28, begin: 147.000, index: 465 },
-  { text: "lık", duration: 0.28, begin: 147.250, index: 466 },
-  { text: "la", duration: 0.28, begin: 147.500, index: 467 },
-  { text: " a", duration: 0.28, begin: 148.250, index: 468 },
-  { text: "da", duration: 0.28, begin: 148.500, index: 469 },
-  { text: "ma", duration: 0.28, begin: 148.750, index: 470 },
-  { text: " te", duration: 0.28, begin: 149.000, index: 471 },
-  { text: "şek", duration: 0.28, begin: 149.250, index: 472 },
-  { text: "kür", duration: 0.28, begin: 149.500, index: 473 },
-  { text: " e", duration: 0.28, begin: 149.750, index: 474 },
-  { text: "der,", duration: 0.28, begin: 150.000, index: 475 },
-  { text: " kı", duration: 0.28, begin: 151.000, index: 476 },
-  { text: "zı", duration: 0.28, begin: 151.250, index: 477 },
-  { text: "nın", duration: 0.28, begin: 151.500, index: 478 },
-  { text: " du", duration: 0.28, begin: 151.750, index: 479 },
-  { text: "ru", duration: 0.28, begin: 152.000, index: 480 },
-  { text: "mu", duration: 0.28, begin: 152.200, index: 481 },
-  { text: "nu", duration: 0.28, begin: 152.400, index: 482 },
-  { text: " an", duration: 0.28, begin: 152.600, index: 483 },
-  { text: "la", duration: 0.28, begin: 152.800, index: 484 },
-  { text: "tır.", duration: 0.28, begin: 153.000, index: 485 },
-  { text: " He", duration: 0.28, begin: 154.000, index: 486 },
-  { text: "men", duration: 0.28, begin: 154.250, index: 487 },
-  { text: " ye", duration: 0.28, begin: 154.500, index: 488 },
-  { text: "ti", duration: 0.28, begin: 154.700, index: 489 },
-  { text: "şe", duration: 0.28, begin: 154.900, index: 490 },
-  { text: "bi", duration: 0.28, begin: 155.100, index: 491 },
-  { text: "le", duration: 0.28, begin: 155.300, index: 492 },
-  { text: "ce", duration: 0.28, begin: 155.500, index: 493 },
-  { text: "ği", duration: 0.28, begin: 155.700, index: 494 },
-  { text: " i", duration: 0.28, begin: 155.900, index: 495 },
-  { text: "çin", duration: 0.28, begin: 156.100, index: 496 },
-  { text: " min", duration: 0.28, begin: 157.000, index: 497 },
-  { text: "net", duration: 0.28, begin: 157.250, index: 498 },
-  { text: "tar", duration: 0.28, begin: 157.500, index: 499 },
-  { text: " ol", duration: 0.28, begin: 157.750, index: 500 },
-  { text: "du", duration: 0.28, begin: 158.000, index: 501 },
-  { text: "ğu", duration: 0.28, begin: 158.250, index: 502 },
-  { text: "nu", duration: 0.28, begin: 158.500, index: 503 },
-  { text: " be", duration: 0.28, begin: 158.750, index: 504 },
-  { text: "lir", duration: 0.28, begin: 159.000, index: 505 },
-  { text: "tir", duration: 0.28, begin: 159.250, index: 506 },
-  { text: " ve", duration: 0.28, begin: 159.500, index: 507 },
-  { text: " bir", duration: 0.28, begin: 160.500, index: 508 },
-  { text: " mik", duration: 0.28, begin: 160.750, index: 509 },
-  { text: "tar", duration: 0.28, begin: 161.000, index: 510 },
-  { text: " pa", duration: 0.28, begin: 161.250, index: 511 },
-  { text: "ra", duration: 0.28, begin: 161.500, index: 512 },
-  { text: " u", duration: 0.28, begin: 161.750, index: 513 },
-  { text: "za", duration: 0.28, begin: 162.000, index: 514 },
-  { text: "tıp:", duration: 0.28, begin: 162.250, index: 515 },
-  { text: " \"Çok", duration: 0.28, begin: 163.250, index: 516 },
-  { text: " i", duration: 0.28, begin: 163.500, index: 517 },
-  { text: "yi", duration: 0.28, begin: 163.750, index: 518 },
-  { text: " bir", duration: 0.28, begin: 164.000, index: 519 },
-  { text: " in", duration: 0.28, begin: 164.250, index: 520 },
-  { text: "san", duration: 0.28, begin: 164.500, index: 521 },
-  { text: "sı", duration: 0.28, begin: 164.750, index: 522 },
-  { text: "nız\"", duration: 0.28, begin: 165.000, index: 523 },
-  { text: " di", duration: 0.28, begin: 165.500, index: 524 },
-  { text: "ye", duration: 0.28, begin: 165.750, index: 525 },
-  { text: " te", duration: 0.28, begin: 166.000, index: 526 },
-  { text: "şek", duration: 0.28, begin: 166.250, index: 527 },
-  { text: "kür", duration: 0.28, begin: 166.500, index: 528 },
-  { text: " e", duration: 0.28, begin: 166.750, index: 529 },
-  { text: "der.", duration: 0.28, begin: 167.000, index: 530 },
-  { text: " A", duration: 0.28, begin: 167.750, index: 531 },
-  { text: "dam:", duration: 0.28, begin: 168.000, index: 532 },
-  { text: " \"Ha", duration: 0.28, begin: 169.000, index: 533 },
-  { text: "yır,", duration: 0.28, begin: 169.250, index: 534 },
-  { text: " ha", duration: 0.28, begin: 170.200, index: 535 },
-  { text: "nım", duration: 0.28, begin: 170.400, index: 536 },
-  { text: " e", duration: 0.28, begin: 170.600, index: 537 },
-  { text: "fen", duration: 0.28, begin: 170.800, index: 538 },
-  { text: "di", duration: 0.28, begin: 171.000, index: 539 },
-  { text: " ma", duration: 0.28, begin: 171.200, index: 540 },
-  { text: "le", duration: 0.28, begin: 171.400, index: 541 },
-  { text: "sef", duration: 0.28, begin: 171.600, index: 542 },
-  { text: " i", duration: 0.28, begin: 172.000, index: 543 },
-  { text: "yi", duration: 0.28, begin: 172.250, index: 544 },
-  { text: " bir", duration: 0.28, begin: 172.500, index: 545 },
-  { text: " in", duration: 0.28, begin: 172.750, index: 546 },
-  { text: "san", duration: 0.28, begin: 173.000, index: 547 },
-  { text: " de", duration: 0.28, begin: 173.250, index: 548 },
-  { text: "ği", duration: 0.28, begin: 173.500, index: 549 },
-  { text: "lim.", duration: 0.28, begin: 173.750, index: 550 },
-  { text: " A", duration: 0.28, begin: 174.750, index: 551 },
-  { text: "ra", duration: 0.28, begin: 175.000, index: 552 },
-  { text: "ba", duration: 0.28, begin: 175.250, index: 553 },
-  { text: " hır", duration: 0.28, begin: 175.500, index: 554 },
-  { text: "sız", duration: 0.28, begin: 175.750, index: 555 },
-  { text: "lı", duration: 0.28, begin: 176.000, index: 556 },
-  { text: "ğın", duration: 0.28, begin: 176.250, index: 557 },
-  { text: "dan", duration: 0.28, begin: 176.500, index: 558 },
-  { text: " ha", duration: 0.28, begin: 177.250, index: 559 },
-  { text: "pis", duration: 0.28, begin: 177.500, index: 560 },
-  { text: " ha", duration: 0.28, begin: 177.750, index: 561 },
-  { text: "ne", duration: 0.28, begin: 178.000, index: 562 },
-  { text: "den", duration: 0.28, begin: 178.250, index: 563 },
-  { text: " ye", duration: 0.28, begin: 178.500, index: 564 },
-  { text: "ni", duration: 0.28, begin: 178.750, index: 565 },
-  { text: " çık", duration: 0.28, begin: 179.000, index: 566 },
-  { text: "tım.\"", duration: 0.28, begin: 179.250, index: 567 },
-  { text: " Ka", duration: 0.28, begin: 180.500, index: 568 },
-  { text: "dın", duration: 0.28, begin: 180.750, index: 569 },
-  { text: " bir", duration: 0.28, begin: 181.250, index: 570 },
-  { text: " sü", duration: 0.28, begin: 181.500, index: 571 },
-  { text: "re", duration: 0.28, begin: 181.750, index: 572 },
-  { text: " ses", duration: 0.28, begin: 182.250, index: 573 },
-  { text: "siz", duration: 0.28, begin: 182.500, index: 574 },
-  { text: " ka", duration: 0.28, begin: 182.750, index: 575 },
-  { text: "lır.", duration: 0.28, begin: 183.000, index: 576 },
-  { text: " A", duration: 0.28, begin: 184.000, index: 577 },
-  { text: "dam", duration: 0.28, begin: 184.250, index: 578 },
-  { text: " u", duration: 0.28, begin: 184.500, index: 579 },
-  { text: "zak", duration: 0.28, begin: 184.750, index: 580 },
-  { text: "laş", duration: 0.28, begin: 185.000, index: 581 },
-  { text: "tık", duration: 0.28, begin: 185.250, index: 582 },
-  { text: "tan", duration: 0.28, begin: 185.500, index: 583 },
-  { text: " son", duration: 0.28, begin: 185.750, index: 584 },
-  { text: "ra", duration: 0.28, begin: 186.000, index: 585 },
-  { text: " tek", duration: 0.28, begin: 187.000, index: 586 },
-  { text: "rar", duration: 0.28, begin: 187.250, index: 587 },
-  { text: " yü", duration: 0.28, begin: 187.500, index: 588 },
-  { text: "zü", duration: 0.28, begin: 187.750, index: 589 },
-  { text: "nü", duration: 0.28, begin: 188.000, index: 590 },
-  { text: " gök", duration: 0.28, begin: 188.250, index: 591 },
-  { text: "yü", duration: 0.28, begin: 188.500, index: 592 },
-  { text: "zü", duration: 0.28, begin: 188.750, index: 593 },
-  { text: "ne", duration: 0.28, begin: 189.000, index: 594 },
-  { text: " çe", duration: 0.28, begin: 189.250, index: 595 },
-  { text: "vi", duration: 0.28, begin: 189.500, index: 596 },
-  { text: "rir,", duration: 0.28, begin: 189.750, index: 597 },
-  { text: " ken", duration: 0.28, begin: 190.500, index: 598 },
-  { text: "di", duration: 0.28, begin: 190.750, index: 599 },
-  { text: "ni", duration: 0.28, begin: 191.000, index: 600 },
-  { text: " tu", duration: 0.28, begin: 191.250, index: 601 },
-  { text: "ta", duration: 0.28, begin: 191.500, index: 602 },
-  { text: "maz,", duration: 0.28, begin: 191.750, index: 603 },
-  { text: " ağ", duration: 0.28, begin: 192.500, index: 604 },
-  { text: "la", duration: 0.28, begin: 192.750, index: 605 },
-  { text: "ya", duration: 0.28, begin: 193.000, index: 606 },
-  { text: "rak:", duration: 0.28, begin: 193.250, index: 607 },
-  { text: " \"Tan", duration: 0.28, begin: 194.250, index: 608 },
-  { text: "rım,", duration: 0.28, begin: 194.500, index: 609 },
-  { text: " bir", duration: 0.28, begin: 195.250, index: 610 },
-  { text: " pro", duration: 0.28, begin: 195.500, index: 611 },
-  { text: "fes", duration: 0.28, begin: 195.750, index: 612 },
-  { text: "yo", duration: 0.28, begin: 196.000, index: 613 },
-  { text: "nel", duration: 0.28, begin: 196.250, index: 614 },
-  { text: " gön", duration: 0.28, begin: 196.750, index: 615 },
-  { text: "der", duration: 0.28, begin: 197.000, index: 616 },
-  { text: "di", duration: 0.28, begin: 197.250, index: 617 },
-  { text: "ğin", duration: 0.28, begin: 197.500, index: 618 },
-  { text: " i", duration: 0.28, begin: 197.750, index: 619 },
-  { text: "çin", duration: 0.28, begin: 198.000, index: 620 },
-  { text: " çok", duration: 0.28, begin: 198.750, index: 621 },
-  { text: " te", duration: 0.28, begin: 199.000, index: 622 },
-  { text: "şek", duration: 0.28, begin: 199.250, index: 623 },
-  { text: "kür", duration: 0.28, begin: 199.500, index: 624 },
-  { text: " e", duration: 0.28, begin: 199.750, index: 625 },
-  { text: "de", duration: 0.28, begin: 200.000, index: 626 },
-  { text: "rim\"", duration: 0.28, begin: 200.250, index: 627 },
-  { text: " der.", duration: 0.28, begin: 200.750, index: 628 },
-];
-  
+    // Title
+    {
+      text: "Pro",
+      duration: 0.28,
+      begin: 0.7,
+      index: 1,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "fes",
+      duration: 0.38,
+      begin: 1.0,
+      index: 2,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "yo",
+      duration: 0.38,
+      begin: 1.25,
+      index: 3,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "nel",
+      duration: 0.28,
+      begin: 1.5,
+      index: 4,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: " Yar",
+      duration: 0.38,
+      begin: 1.85,
+      index: 5,
+      isTitle: true,
+      isCenter: true,
+    },
+    {
+      text: "dım",
+      duration: 0.38,
+      begin: 2.15,
+      index: 6,
+      isTitle: true,
+      isCenter: true,
+    },
 
- useEffect(() => {
+    // Story content
+    { text: " Genç", duration: 0.28, begin: 3.25, index: 7 },
+    { text: " ka", duration: 0.28, begin: 3.5, index: 8 },
+    { text: "dın", duration: 0.28, begin: 3.75, index: 9 },
+    { text: " iş", duration: 0.28, begin: 4.25, index: 10 },
+    { text: "ye", duration: 0.28, begin: 4.5, index: 11 },
+    { text: "rin", duration: 0.28, begin: 4.75, index: 12 },
+    { text: "de", duration: 0.28, begin: 5.0, index: 13 },
+    { text: " kö", duration: 0.28, begin: 5.25, index: 14 },
+    { text: "tü", duration: 0.28, begin: 5.5, index: 15 },
+    { text: " bir", duration: 0.28, begin: 5.75, index: 16 },
+    { text: " ha", duration: 0.28, begin: 6.0, index: 17 },
+    { text: "ber", duration: 0.28, begin: 6.25, index: 18 },
+    { text: " a", duration: 0.28, begin: 6.5, index: 19 },
+    { text: "lır.", duration: 0.28, begin: 6.75, index: 20 },
+    { text: " Kü", duration: 0.28, begin: 7.5, index: 21 },
+    { text: "çük", duration: 0.28, begin: 7.75, index: 22 },
+    { text: " kı", duration: 0.28, begin: 8.0, index: 23 },
+    { text: "zı", duration: 0.28, begin: 8.25, index: 24 },
+    { text: "nın", duration: 0.28, begin: 8.5, index: 25 },
+    { text: " ba", duration: 0.28, begin: 8.75, index: 26 },
+    { text: "kı", duration: 0.28, begin: 9.0, index: 27 },
+    { text: "cı", duration: 0.28, begin: 9.25, index: 28 },
+    { text: "sı", duration: 0.28, begin: 9.5, index: 29 },
+    { text: " te", duration: 0.28, begin: 10.25, index: 30 },
+    { text: "le", duration: 0.28, begin: 10.5, index: 31 },
+    { text: "fon", duration: 0.28, begin: 10.75, index: 32 },
+    { text: "da", duration: 0.28, begin: 11.0, index: 33 },
+    { text: " ço", duration: 0.28, begin: 11.25, index: 34 },
+    { text: "cu", duration: 0.28, begin: 11.5, index: 35 },
+    { text: "ğun", duration: 0.28, begin: 11.75, index: 36 },
+    { text: " çok", duration: 0.28, begin: 12.0, index: 37 },
+    { text: " a", duration: 0.28, begin: 12.25, index: 38 },
+    { text: "teş", duration: 0.28, begin: 12.5, index: 39 },
+    { text: "len", duration: 0.28, begin: 12.75, index: 40 },
+    { text: "di", duration: 0.28, begin: 13.0, index: 41 },
+    { text: "ği", duration: 0.28, begin: 13.25, index: 42 },
+    { text: "ni", duration: 0.28, begin: 13.5, index: 43 },
+    { text: " mut", duration: 0.28, begin: 14.0, index: 44 },
+    { text: "la", duration: 0.28, begin: 14.25, index: 45 },
+    { text: "ka", duration: 0.28, begin: 14.5, index: 46 },
+    { text: " e", duration: 0.28, begin: 15.0, index: 47 },
+    { text: "ve", duration: 0.28, begin: 15.25, index: 48 },
+    { text: " gel", duration: 0.28, begin: 15.75, index: 49 },
+    { text: "me", duration: 0.28, begin: 16.0, index: 50 },
+    { text: "si", duration: 0.28, begin: 16.25, index: 51 },
+    { text: " ge", duration: 0.28, begin: 16.5, index: 52 },
+    { text: "rek", duration: 0.28, begin: 16.7, index: 53 },
+    { text: "ti", duration: 0.28, begin: 16.9, index: 54 },
+    { text: "ği", duration: 0.28, begin: 17.2, index: 55 },
+    { text: "ni", duration: 0.28, begin: 17.5, index: 56 },
+    { text: " bil", duration: 0.28, begin: 17.7, index: 57 },
+    { text: "di", duration: 0.28, begin: 17.9, index: 58 },
+    { text: "rir.", duration: 0.28, begin: 18.25, index: 59 },
+    { text: " He", duration: 0.28, begin: 19.0, index: 60 },
+    { text: "men", duration: 0.28, begin: 19.25, index: 61 },
+    { text: " i", duration: 0.28, begin: 19.5, index: 62 },
+    { text: "şin", duration: 0.28, begin: 19.75, index: 63 },
+    { text: "den", duration: 0.28, begin: 20.0, index: 64 },
+    { text: " i", duration: 0.28, begin: 20.25, index: 65 },
+    { text: "zin", duration: 0.28, begin: 20.5, index: 66 },
+    { text: " a", duration: 0.28, begin: 20.75, index: 67 },
+    { text: "lır", duration: 0.28, begin: 21.0, index: 68 },
+    { text: " ve", duration: 0.28, begin: 21.25, index: 69 },
+    { text: " a", duration: 0.28, begin: 21.75, index: 70 },
+    { text: "teş", duration: 0.28, begin: 22.0, index: 71 },
+    { text: " dü", duration: 0.28, begin: 22.25, index: 72 },
+    { text: "şü", duration: 0.28, begin: 22.5, index: 73 },
+    { text: "rü", duration: 0.28, begin: 22.75, index: 74 },
+    { text: "cü", duration: 0.28, begin: 23.0, index: 75 },
+    { text: " bir", duration: 0.28, begin: 23.25, index: 76 },
+    { text: " i", duration: 0.28, begin: 23.5, index: 77 },
+    { text: "laç", duration: 0.28, begin: 23.75, index: 78 },
+    { text: " i", duration: 0.28, begin: 24.0, index: 79 },
+    { text: "çin", duration: 0.28, begin: 24.25, index: 80 },
+    { text: " en", duration: 0.28, begin: 24.75, index: 81 },
+    { text: " ya", duration: 0.28, begin: 25.0, index: 82 },
+    { text: "kın", duration: 0.28, begin: 25.25, index: 83 },
+    { text: " ec", duration: 0.28, begin: 25.5, index: 84 },
+    { text: "za", duration: 0.28, begin: 25.75, index: 85 },
+    { text: "ne", duration: 0.28, begin: 26.0, index: 86 },
+    { text: "ye", duration: 0.28, begin: 26.25, index: 87 },
+    { text: " ko", duration: 0.28, begin: 26.5, index: 88 },
+    { text: "şar.", duration: 0.28, begin: 26.75, index: 89 },
+    { text: " A", duration: 0.28, begin: 28.0, index: 90 },
+    { text: "ra", duration: 0.28, begin: 28.25, index: 91 },
+    { text: "ba", duration: 0.28, begin: 28.5, index: 92 },
+    { text: "sı", duration: 0.28, begin: 28.75, index: 93 },
+    { text: "nın", duration: 0.28, begin: 29.0, index: 94 },
+    { text: " ya", duration: 0.28, begin: 29.25, index: 95 },
+    { text: "nı", duration: 0.28, begin: 29.5, index: 96 },
+    { text: "na", duration: 0.28, begin: 29.75, index: 97 },
+    { text: " gel", duration: 0.28, begin: 30.0, index: 98 },
+    { text: "di", duration: 0.28, begin: 30.25, index: 99 },
+    { text: "ğin", duration: 0.28, begin: 30.5, index: 100 },
+    { text: "de", duration: 0.28, begin: 30.75, index: 101 },
+    { text: " a", duration: 0.28, begin: 31.25, index: 102 },
+    { text: "ra", duration: 0.28, begin: 31.5, index: 103 },
+    { text: "ba", duration: 0.28, begin: 31.75, index: 104 },
+    { text: "yı", duration: 0.28, begin: 32.0, index: 105 },
+    { text: " a", duration: 0.28, begin: 32.25, index: 106 },
+    { text: "nah", duration: 0.28, begin: 32.5, index: 107 },
+    { text: "ta", duration: 0.28, begin: 32.75, index: 108 },
+    { text: "rı", duration: 0.28, begin: 33.0, index: 109 },
+    { text: " i", duration: 0.28, begin: 33.5, index: 110 },
+    { text: "çin", duration: 0.28, begin: 33.75, index: 111 },
+    { text: "dey", duration: 0.28, begin: 34.0, index: 112 },
+    { text: "ken", duration: 0.28, begin: 34.25, index: 113 },
+    { text: " ki", duration: 0.28, begin: 34.5, index: 114 },
+    { text: "lit", duration: 0.28, begin: 34.75, index: 115 },
+    { text: "le", duration: 0.28, begin: 35.0, index: 116 },
+    { text: "di", duration: 0.28, begin: 35.25, index: 117 },
+    { text: "ği", duration: 0.28, begin: 35.5, index: 118 },
+    { text: "nin", duration: 0.28, begin: 35.75, index: 119 },
+    { text: " far", duration: 0.28, begin: 36.0, index: 120 },
+    { text: "kı", duration: 0.28, begin: 36.25, index: 121 },
+    { text: "na", duration: 0.28, begin: 36.5, index: 122 },
+    { text: " va", duration: 0.28, begin: 36.75, index: 123 },
+    { text: "rır.", duration: 0.28, begin: 37.0, index: 124 },
+    { text: " E", duration: 0.28, begin: 37.5, index: 125 },
+    { text: "ve", duration: 0.28, begin: 37.75, index: 126 },
+    { text: " he", duration: 0.28, begin: 38.0, index: 127 },
+    { text: "men", duration: 0.28, begin: 38.25, index: 128 },
+    { text: " ye", duration: 0.28, begin: 38.5, index: 129 },
+    { text: "tiş", duration: 0.28, begin: 38.75, index: 130 },
+    { text: "me", duration: 0.28, begin: 39.0, index: 131 },
+    { text: "si", duration: 0.28, begin: 39.25, index: 132 },
+    { text: " ge", duration: 0.28, begin: 39.5, index: 133 },
+    { text: "rek", duration: 0.28, begin: 39.75, index: 134 },
+    { text: "mek", duration: 0.28, begin: 40.0, index: 135 },
+    { text: "te", duration: 0.28, begin: 40.25, index: 136 },
+    { text: "dir", duration: 0.28, begin: 40.5, index: 137 },
+    { text: " a", duration: 0.28, begin: 41.0, index: 138 },
+    { text: "ma", duration: 0.28, begin: 41.25, index: 139 },
+    { text: " na", duration: 0.28, begin: 41.75, index: 140 },
+    { text: "sıl?", duration: 0.28, begin: 41.808, index: 141 },
+    { text: " E", duration: 0.28, begin: 43.5, index: 142 },
+    { text: "vi", duration: 0.28, begin: 43.75, index: 143 },
+    { text: "ni", duration: 0.28, begin: 44.0, index: 144 },
+    { text: " a", duration: 0.28, begin: 44.25, index: 145 },
+    { text: "rar,", duration: 0.28, begin: 44.5, index: 146 },
+    { text: " an", duration: 0.28, begin: 45.0, index: 147 },
+    { text: "cak", duration: 0.28, begin: 45.25, index: 148 },
+    { text: " ço", duration: 0.28, begin: 45.5, index: 149 },
+    { text: "cuk", duration: 0.28, begin: 45.75, index: 150 },
+    { text: " ba", duration: 0.28, begin: 46.25, index: 151 },
+    { text: "kı", duration: 0.28, begin: 46.5, index: 152 },
+    { text: "cı", duration: 0.28, begin: 46.75, index: 153 },
+    { text: "sı", duration: 0.28, begin: 47.0, index: 154 },
+    { text: "nın", duration: 0.28, begin: 47.25, index: 155 },
+    { text: " ver", duration: 0.28, begin: 47.5, index: 156 },
+    { text: "di", duration: 0.28, begin: 47.75, index: 157 },
+    { text: "ği", duration: 0.28, begin: 48.0, index: 158 },
+    { text: " ha", duration: 0.28, begin: 48.25, index: 159 },
+    { text: "ber", duration: 0.28, begin: 48.5, index: 160 },
+    { text: " da", duration: 0.28, begin: 49.25, index: 161 },
+    { text: "ha", duration: 0.28, begin: 49.5, index: 162 },
+    { text: " kö", duration: 0.28, begin: 49.75, index: 163 },
+    { text: "tü", duration: 0.28, begin: 50.0, index: 164 },
+    { text: "dür.", duration: 0.28, begin: 50.25, index: 165 },
+    { text: " Kı", duration: 0.28, begin: 50.75, index: 166 },
+    { text: "zın", duration: 0.28, begin: 51.0, index: 167 },
+    { text: " a", duration: 0.28, begin: 51.25, index: 168 },
+    { text: "te", duration: 0.28, begin: 51.5, index: 169 },
+    { text: "şi", duration: 0.28, begin: 51.75, index: 170 },
+    { text: " bi", duration: 0.28, begin: 52.0, index: 171 },
+    { text: "raz", duration: 0.28, begin: 52.25, index: 172 },
+    { text: " da", duration: 0.28, begin: 52.5, index: 173 },
+    { text: "ha", duration: 0.28, begin: 52.75, index: 174 },
+    { text: " yük", duration: 0.28, begin: 53.0, index: 175 },
+    { text: "sel", duration: 0.28, begin: 53.25, index: 176 },
+    { text: "miş", duration: 0.28, begin: 53.5, index: 177 },
+    { text: "tir.", duration: 0.28, begin: 53.75, index: 178 },
+    { text: " Bu", duration: 0.28, begin: 54.75, index: 179 },
+    { text: " a", duration: 0.28, begin: 55.0, index: 180 },
+    { text: "ra", duration: 0.28, begin: 55.25, index: 181 },
+    { text: "da", duration: 0.28, begin: 55.5, index: 182 },
+    { text: " ka", duration: 0.28, begin: 55.75, index: 183 },
+    { text: "dın", duration: 0.28, begin: 56.0, index: 184 },
+    { text: " i", duration: 0.28, begin: 56.75, index: 185 },
+    { text: "çin", duration: 0.28, begin: 57.0, index: 186 },
+    { text: "de", duration: 0.28, begin: 57.25, index: 187 },
+    { text: " bu", duration: 0.28, begin: 57.5, index: 188 },
+    { text: "lun", duration: 0.28, begin: 57.75, index: 189 },
+    { text: "du", duration: 0.28, begin: 58.0, index: 190 },
+    { text: "ğu", duration: 0.28, begin: 58.25, index: 191 },
+    { text: " du", duration: 0.28, begin: 58.5, index: 192 },
+    { text: "ru", duration: 0.28, begin: 58.75, index: 193 },
+    { text: "mu", duration: 0.28, begin: 59.0, index: 194 },
+    { text: " ba", duration: 0.28, begin: 59.2, index: 195 },
+    { text: "kı", duration: 0.28, begin: 59.4, index: 196 },
+    { text: "cı", duration: 0.28, begin: 59.6, index: 197 },
+    { text: "ya", duration: 0.28, begin: 59.8, index: 198 },
+    { text: " an", duration: 0.28, begin: 60.0, index: 199 },
+    { text: "la", duration: 0.28, begin: 60.2, index: 200 },
+    { text: "tır.", duration: 0.28, begin: 60.4, index: 201 },
+    { text: " Ba", duration: 0.28, begin: 61.25, index: 202 },
+    { text: "kı", duration: 0.28, begin: 61.5, index: 203 },
+    { text: "cı", duration: 0.28, begin: 61.75, index: 204 },
+    { text: " a", duration: 0.28, begin: 62.25, index: 205 },
+    { text: "ra", duration: 0.28, begin: 62.5, index: 206 },
+    { text: "ba", duration: 0.28, begin: 62.75, index: 207 },
+    { text: "nın", duration: 0.28, begin: 63.0, index: 208 },
+    { text: " ki", duration: 0.28, begin: 63.2, index: 209 },
+    { text: "li", duration: 0.28, begin: 63.4, index: 210 },
+    { text: "di", duration: 0.28, begin: 63.6, index: 211 },
+    { text: "ni", duration: 0.28, begin: 63.8, index: 212 },
+    { text: " a", duration: 0.28, begin: 64.2, index: 213 },
+    { text: "ça", duration: 0.28, begin: 64.4, index: 214 },
+    { text: "bi", duration: 0.28, begin: 64.6, index: 215 },
+    { text: "le", duration: 0.28, begin: 64.8, index: 216 },
+    { text: "cek", duration: 0.28, begin: 65.0, index: 217 },
+    { text: " bir", duration: 0.28, begin: 65.2, index: 218 },
+    { text: " ser", duration: 0.28, begin: 65.6, index: 219 },
+    { text: "vis", duration: 0.28, begin: 65.8, index: 220 },
+    { text: " bul", duration: 0.28, begin: 66.0, index: 221 },
+    { text: " ma", duration: 0.28, begin: 66.2, index: 222 },
+    { text: "sı", duration: 0.28, begin: 66.4, index: 223 },
+    { text: "nı", duration: 0.28, begin: 66.6, index: 224 },
+    { text: " ya", duration: 0.28, begin: 67.8, index: 225 },
+    { text: "da", duration: 0.28, begin: 68.0, index: 226 },
+    { text: " ça", duration: 0.28, begin: 68.2, index: 227 },
+    { text: "kı,", duration: 0.28, begin: 68.4, index: 228 },
+    { text: " bı", duration: 0.28, begin: 69.6, index: 229 },
+    { text: "çak", duration: 0.28, begin: 69.8, index: 230 },
+    { text: " gi", duration: 0.28, begin: 70.0, index: 231 },
+    { text: "bi", duration: 0.28, begin: 70.2, index: 232 },
+    { text: " bir", duration: 0.28, begin: 70.4, index: 233 },
+    { text: "şey", duration: 0.28, begin: 70.6, index: 234 },
+    { text: "le", duration: 0.28, begin: 70.8, index: 235 },
+    { text: " ken", duration: 0.28, begin: 71.6, index: 236 },
+    { text: "di", duration: 0.28, begin: 71.8, index: 237 },
+    { text: "si", duration: 0.28, begin: 72.0, index: 238 },
+    { text: "nin", duration: 0.28, begin: 72.2, index: 239 },
+    { text: " aç", duration: 0.28, begin: 72.6, index: 240 },
+    { text: "ma", duration: 0.28, begin: 72.8, index: 241 },
+    { text: "yı", duration: 0.28, begin: 73.0, index: 242 },
+    { text: " de", duration: 0.28, begin: 73.2, index: 243 },
+    { text: "ne", duration: 0.28, begin: 73.4, index: 244 },
+    { text: "me", duration: 0.28, begin: 73.6, index: 245 },
+    { text: "si", duration: 0.28, begin: 73.8, index: 246 },
+    { text: "ni", duration: 0.28, begin: 74.0, index: 247 },
+    { text: " söy", duration: 0.28, begin: 74.4, index: 248 },
+    { text: "ler.", duration: 0.28, begin: 74.6, index: 249 },
+    { text: " Ya", duration: 0.28, begin: 76.0, index: 250 },
+    { text: "kın", duration: 0.28, begin: 76.25, index: 251 },
+    { text: "da", duration: 0.28, begin: 76.5, index: 252 },
+    { text: " bu", duration: 0.28, begin: 76.75, index: 253 },
+    { text: "lu", duration: 0.28, begin: 77.0, index: 254 },
+    { text: "nan", duration: 0.28, begin: 77.25, index: 255 },
+    { text: " bir", duration: 0.28, begin: 77.5, index: 256 },
+    { text: " mar", duration: 0.28, begin: 77.75, index: 257 },
+    { text: "ket", duration: 0.28, begin: 78.0, index: 258 },
+    { text: "ten", duration: 0.28, begin: 78.25, index: 259 },
+    { text: " kü", duration: 0.28, begin: 79.25, index: 260 },
+    { text: "çük", duration: 0.28, begin: 79.5, index: 261 },
+    { text: " bir", duration: 0.28, begin: 79.75, index: 262 },
+    { text: " ça", duration: 0.28, begin: 80.0, index: 263 },
+    { text: "kı", duration: 0.28, begin: 80.25, index: 264 },
+    { text: " a", duration: 0.28, begin: 80.5, index: 265 },
+    { text: "lır", duration: 0.28, begin: 80.75, index: 266 },
+    { text: " ve", duration: 0.28, begin: 81.0, index: 267 },
+    { text: " a", duration: 0.28, begin: 81.75, index: 268 },
+    { text: "ra", duration: 0.28, begin: 82.0, index: 269 },
+    { text: "ba", duration: 0.28, begin: 82.25, index: 270 },
+    { text: "nın", duration: 0.28, begin: 82.5, index: 271 },
+    { text: " ya", duration: 0.28, begin: 82.75, index: 272 },
+    { text: "nı", duration: 0.28, begin: 83.0, index: 273 },
+    { text: "na", duration: 0.28, begin: 83.25, index: 274 },
+    { text: " gi", duration: 0.28, begin: 83.5, index: 275 },
+    { text: "der.", duration: 0.28, begin: 83.75, index: 276 },
+    { text: " A", duration: 0.28, begin: 85.0, index: 277 },
+    { text: "ma", duration: 0.28, begin: 85.25, index: 278 },
+    { text: " bu", duration: 0.28, begin: 86.0, index: 279 },
+    { text: "nun", duration: 0.28, begin: 86.25, index: 280 },
+    { text: " na", duration: 0.28, begin: 86.5, index: 281 },
+    { text: "sıl", duration: 0.28, begin: 86.75, index: 282 },
+    { text: " kul", duration: 0.28, begin: 87.0, index: 283 },
+    { text: "la", duration: 0.28, begin: 87.2, index: 284 },
+    { text: "nı", duration: 0.28, begin: 87.4, index: 285 },
+    { text: "la", duration: 0.28, begin: 87.6, index: 286 },
+    { text: "ca", duration: 0.28, begin: 87.8, index: 287 },
+    { text: "ğı", duration: 0.28, begin: 88.0, index: 288 },
+    { text: "nı", duration: 0.28, begin: 88.2, index: 289 },
+    { text: " bi", duration: 0.28, begin: 88.4, index: 290 },
+    { text: "le", duration: 0.28, begin: 88.6, index: 291 },
+    { text: "mez.", duration: 0.28, begin: 88.8, index: 292 },
+    { text: " A", duration: 0.28, begin: 89.75, index: 293 },
+    { text: "ra", duration: 0.28, begin: 90.0, index: 294 },
+    { text: "ba", duration: 0.28, begin: 90.25, index: 295 },
+    { text: "nın", duration: 0.28, begin: 90.5, index: 296 },
+    { text: " ka", duration: 0.28, begin: 90.7, index: 297 },
+    { text: "pı", duration: 0.28, begin: 90.9, index: 298 },
+    { text: "la", duration: 0.28, begin: 91.1, index: 299 },
+    { text: "rı", duration: 0.28, begin: 91.3, index: 300 },
+    { text: "nı", duration: 0.28, begin: 91.5, index: 301 },
+    { text: " zor", duration: 0.28, begin: 91.8, index: 302 },
+    { text: "lar,", duration: 0.28, begin: 92.0, index: 303 },
+    { text: " sal", duration: 0.28, begin: 92.8, index: 304 },
+    { text: "lar", duration: 0.28, begin: 93.0, index: 305 },
+    { text: " a", duration: 0.28, begin: 94.0, index: 306 },
+    { text: "ma", duration: 0.28, begin: 94.25, index: 307 },
+    { text: " hiç", duration: 0.28, begin: 94.5, index: 308 },
+    { text: " bir", duration: 0.28, begin: 94.75, index: 309 },
+    { text: " so", duration: 0.28, begin: 95.0, index: 310 },
+    { text: "nuç", duration: 0.28, begin: 95.25, index: 311 },
+    { text: " yok", duration: 0.28, begin: 95.5, index: 312 },
+    { text: "tur.", duration: 0.28, begin: 95.75, index: 313 },
+    { text: " Ba", duration: 0.28, begin: 97.2, index: 314 },
+    { text: "şı", duration: 0.28, begin: 97.4, index: 315 },
+    { text: "nı", duration: 0.28, begin: 97.6, index: 316 },
+    { text: " gök", duration: 0.28, begin: 97.8, index: 317 },
+    { text: "yü", duration: 0.28, begin: 98.0, index: 318 },
+    { text: "zü", duration: 0.28, begin: 98.2, index: 319 },
+    { text: "ne", duration: 0.28, begin: 98.4, index: 320 },
+    { text: " doğ", duration: 0.28, begin: 98.6, index: 321 },
+    { text: "ru", duration: 0.28, begin: 98.8, index: 322 },
+    { text: " çe", duration: 0.28, begin: 99.0, index: 323 },
+    { text: "vi", duration: 0.28, begin: 99.2, index: 324 },
+    { text: "rir:", duration: 0.28, begin: 99.4, index: 325 },
+    { text: ' "Tan', duration: 0.28, begin: 100.75, index: 326 },
+    { text: "rım,", duration: 0.28, begin: 101.0, index: 327 },
+    { text: " lüt", duration: 0.28, begin: 102.0, index: 328 },
+    { text: "fen", duration: 0.28, begin: 102.25, index: 329 },
+    { text: " kü", duration: 0.28, begin: 102.5, index: 330 },
+    { text: "çük", duration: 0.28, begin: 102.75, index: 331 },
+    { text: " kı", duration: 0.28, begin: 103.0, index: 332 },
+    { text: "zı", duration: 0.28, begin: 103.25, index: 333 },
+    { text: "ma", duration: 0.28, begin: 103.5, index: 334 },
+    { text: " u", duration: 0.28, begin: 103.75, index: 335 },
+    { text: "laş", duration: 0.28, begin: 104.0, index: 336 },
+    { text: "mam", duration: 0.28, begin: 104.25, index: 337 },
+    { text: " i", duration: 0.28, begin: 104.5, index: 338 },
+    { text: "çin", duration: 0.28, begin: 104.75, index: 339 },
+    { text: " ba", duration: 0.28, begin: 105.25, index: 340 },
+    { text: "na", duration: 0.28, begin: 105.5, index: 341 },
+    { text: " yar", duration: 0.28, begin: 105.75, index: 342 },
+    { text: "dım", duration: 0.28, begin: 106.0, index: 343 },
+    { text: ' et"', duration: 0.28, begin: 106.25, index: 344 },
+    { text: " Bu", duration: 0.28, begin: 107.5, index: 345 },
+    { text: " a", duration: 0.28, begin: 107.75, index: 346 },
+    { text: "ra", duration: 0.28, begin: 108.0, index: 347 },
+    { text: "da", duration: 0.28, begin: 108.25, index: 348 },
+    { text: " ça", duration: 0.28, begin: 109.0, index: 349 },
+    { text: "kıy", duration: 0.28, begin: 109.25, index: 350 },
+    { text: "la", duration: 0.28, begin: 109.5, index: 351 },
+    { text: " ka", duration: 0.28, begin: 109.75, index: 352 },
+    { text: "pı", duration: 0.28, begin: 110.0, index: 353 },
+    { text: "yı", duration: 0.28, begin: 110.25, index: 354 },
+    { text: " kur", duration: 0.28, begin: 110.4, index: 355 },
+    { text: "ca", duration: 0.28, begin: 110.6, index: 356 },
+    { text: "la", duration: 0.28, begin: 110.8, index: 357 },
+    { text: "ma", duration: 0.28, begin: 111.0, index: 358 },
+    { text: "ya", duration: 0.28, begin: 111.2, index: 359 },
+    { text: " de", duration: 0.28, begin: 111.4, index: 360 },
+    { text: "vam", duration: 0.28, begin: 111.6, index: 361 },
+    { text: " e", duration: 0.28, begin: 111.8, index: 362 },
+    { text: "der.", duration: 0.28, begin: 112.0, index: 363 },
+    { text: " O", duration: 0.28, begin: 113.2, index: 364 },
+    { text: " sı", duration: 0.28, begin: 113.4, index: 365 },
+    { text: "ra", duration: 0.28, begin: 113.6, index: 366 },
+    { text: "da", duration: 0.28, begin: 113.8, index: 367 },
+    { text: " yol", duration: 0.28, begin: 114.6, index: 368 },
+    { text: "dan", duration: 0.28, begin: 114.8, index: 369 },
+    { text: " geç", duration: 0.28, begin: 115.0, index: 370 },
+    { text: "mek", duration: 0.28, begin: 115.25, index: 371 },
+    { text: "te", duration: 0.28, begin: 115.5, index: 372 },
+    { text: " o", duration: 0.28, begin: 115.75, index: 373 },
+    { text: "lan", duration: 0.28, begin: 116.0, index: 374 },
+    { text: " sa", duration: 0.28, begin: 117.0, index: 375 },
+    { text: "kal", duration: 0.28, begin: 117.25, index: 376 },
+    { text: "la", duration: 0.28, begin: 117.5, index: 377 },
+    { text: "rı", duration: 0.28, begin: 117.75, index: 378 },
+    { text: " u", duration: 0.28, begin: 118.0, index: 379 },
+    { text: "za", duration: 0.28, begin: 118.25, index: 380 },
+    { text: "mış,", duration: 0.28, begin: 118.5, index: 381 },
+    { text: " üs", duration: 0.28, begin: 119.5, index: 382 },
+    { text: "tü", duration: 0.28, begin: 119.75, index: 383 },
+    { text: " ba", duration: 0.28, begin: 120.0, index: 384 },
+    { text: "şı", duration: 0.28, begin: 120.25, index: 385 },
+    { text: " ba", duration: 0.28, begin: 120.5, index: 386 },
+    { text: "kım", duration: 0.28, begin: 120.75, index: 387 },
+    { text: "sız", duration: 0.28, begin: 121.0, index: 388 },
+    { text: " bir", duration: 0.28, begin: 121.2, index: 389 },
+    { text: " a", duration: 0.28, begin: 121.4, index: 390 },
+    { text: "dam", duration: 0.28, begin: 121.6, index: 391 },
+    { text: " du", duration: 0.28, begin: 121.8, index: 392 },
+    { text: "rup", duration: 0.28, begin: 122.0, index: 393 },
+    { text: " ka", duration: 0.28, begin: 122.75, index: 394 },
+    { text: "dı", duration: 0.28, begin: 123.0, index: 395 },
+    { text: "nı", duration: 0.28, begin: 123.25, index: 396 },
+    { text: " iz", duration: 0.28, begin: 123.5, index: 397 },
+    { text: "ler", duration: 0.28, begin: 123.75, index: 398 },
+    { text: " ve:", duration: 0.28, begin: 124.25, index: 399 },
+    { text: ' "Ha', duration: 0.28, begin: 125.25, index: 400 },
+    { text: "nım", duration: 0.28, begin: 125.5, index: 401 },
+    { text: " e", duration: 0.28, begin: 125.75, index: 402 },
+    { text: "fen", duration: 0.28, begin: 126.0, index: 403 },
+    { text: "di,", duration: 0.28, begin: 126.25, index: 404 },
+    { text: " is", duration: 0.28, begin: 127.0, index: 405 },
+    { text: "ter", duration: 0.28, begin: 127.25, index: 406 },
+    { text: "se", duration: 0.28, begin: 127.5, index: 407 },
+    { text: "niz", duration: 0.28, begin: 127.75, index: 408 },
+    { text: " yar", duration: 0.28, begin: 128.25, index: 409 },
+    { text: "dım", duration: 0.28, begin: 128.5, index: 410 },
+    { text: "cı", duration: 0.28, begin: 128.75, index: 411 },
+    { text: " o", duration: 0.28, begin: 129.0, index: 412 },
+    { text: "la", duration: 0.28, begin: 129.25, index: 413 },
+    { text: "bi", duration: 0.28, begin: 129.5, index: 414 },
+    { text: "li", duration: 0.28, begin: 129.75, index: 415 },
+    { text: 'rim"', duration: 0.28, begin: 130.0, index: 416 },
+    { text: " der.", duration: 0.28, begin: 130.25, index: 417 },
+    { text: " Ka", duration: 0.28, begin: 131.5, index: 418 },
+    { text: "dın:", duration: 0.28, begin: 131.75, index: 419 },
+    { text: ' "Tan', duration: 0.28, begin: 132.5, index: 420 },
+    { text: "rım", duration: 0.28, begin: 132.75, index: 421 },
+    { text: " gön", duration: 0.28, begin: 133.5, index: 422 },
+    { text: "der", duration: 0.28, begin: 133.75, index: 423 },
+    { text: "di", duration: 0.28, begin: 134.0, index: 424 },
+    { text: "ğin", duration: 0.28, begin: 134.25, index: 425 },
+    { text: " yar", duration: 0.28, begin: 134.5, index: 426 },
+    { text: "dım", duration: 0.28, begin: 134.75, index: 427 },
+    { text: " bu", duration: 0.28, begin: 135.0, index: 428 },
+    { text: ' mu?"', duration: 0.28, begin: 135.25, index: 429 },
+    { text: " di", duration: 0.28, begin: 135.75, index: 430 },
+    { text: "ye", duration: 0.28, begin: 136.0, index: 431 },
+    { text: " dü", duration: 0.28, begin: 136.25, index: 432 },
+    { text: "şü", duration: 0.28, begin: 136.5, index: 433 },
+    { text: "nür.", duration: 0.28, begin: 136.75, index: 434 },
+    { text: " Kı", duration: 0.28, begin: 137.75, index: 435 },
+    { text: "lık", duration: 0.28, begin: 138.0, index: 436 },
+    { text: "sız", duration: 0.28, begin: 138.25, index: 437 },
+    { text: " a", duration: 0.28, begin: 138.5, index: 438 },
+    { text: "dam", duration: 0.28, begin: 138.75, index: 439 },
+    { text: " bir", duration: 0.28, begin: 139.5, index: 440 },
+    { text: " kaç", duration: 0.28, begin: 139.75, index: 441 },
+    { text: " da", duration: 0.28, begin: 140.0, index: 442 },
+    { text: "ki", duration: 0.28, begin: 140.25, index: 443 },
+    { text: "ka", duration: 0.28, begin: 140.5, index: 444 },
+    { text: " i", duration: 0.28, begin: 140.75, index: 445 },
+    { text: "çin", duration: 0.28, begin: 141.0, index: 446 },
+    { text: "de", duration: 0.28, begin: 141.25, index: 447 },
+    { text: " a", duration: 0.28, begin: 141.75, index: 448 },
+    { text: "ra", duration: 0.28, begin: 142.0, index: 449 },
+    { text: "ba", duration: 0.28, begin: 142.25, index: 450 },
+    { text: "nın", duration: 0.28, begin: 142.5, index: 451 },
+    { text: " ki", duration: 0.28, begin: 142.75, index: 452 },
+    { text: "li", duration: 0.28, begin: 143.0, index: 453 },
+    { text: "di", duration: 0.28, begin: 143.25, index: 454 },
+    { text: "ni", duration: 0.28, begin: 143.5, index: 455 },
+    { text: " aç", duration: 0.28, begin: 143.75, index: 456 },
+    { text: "ma", duration: 0.28, begin: 144.0, index: 457 },
+    { text: "yı", duration: 0.28, begin: 144.25, index: 458 },
+    { text: " ba", duration: 0.28, begin: 144.5, index: 459 },
+    { text: "şa", duration: 0.28, begin: 144.75, index: 460 },
+    { text: "rır.", duration: 0.28, begin: 145.0, index: 461 },
+    { text: " Ka", duration: 0.28, begin: 146.0, index: 462 },
+    { text: "dın", duration: 0.28, begin: 146.25, index: 463 },
+    { text: " şaş", duration: 0.28, begin: 146.75, index: 464 },
+    { text: "kın", duration: 0.28, begin: 147.0, index: 465 },
+    { text: "lık", duration: 0.28, begin: 147.25, index: 466 },
+    { text: "la", duration: 0.28, begin: 147.5, index: 467 },
+    { text: " a", duration: 0.28, begin: 148.25, index: 468 },
+    { text: "da", duration: 0.28, begin: 148.5, index: 469 },
+    { text: "ma", duration: 0.28, begin: 148.75, index: 470 },
+    { text: " te", duration: 0.28, begin: 149.0, index: 471 },
+    { text: "şek", duration: 0.28, begin: 149.25, index: 472 },
+    { text: "kür", duration: 0.28, begin: 149.5, index: 473 },
+    { text: " e", duration: 0.28, begin: 149.75, index: 474 },
+    { text: "der,", duration: 0.28, begin: 150.0, index: 475 },
+    { text: " kı", duration: 0.28, begin: 151.0, index: 476 },
+    { text: "zı", duration: 0.28, begin: 151.25, index: 477 },
+    { text: "nın", duration: 0.28, begin: 151.5, index: 478 },
+    { text: " du", duration: 0.28, begin: 151.75, index: 479 },
+    { text: "ru", duration: 0.28, begin: 152.0, index: 480 },
+    { text: "mu", duration: 0.28, begin: 152.2, index: 481 },
+    { text: "nu", duration: 0.28, begin: 152.4, index: 482 },
+    { text: " an", duration: 0.28, begin: 152.6, index: 483 },
+    { text: "la", duration: 0.28, begin: 152.8, index: 484 },
+    { text: "tır.", duration: 0.28, begin: 153.0, index: 485 },
+    { text: " He", duration: 0.28, begin: 154.0, index: 486 },
+    { text: "men", duration: 0.28, begin: 154.25, index: 487 },
+    { text: " ye", duration: 0.28, begin: 154.5, index: 488 },
+    { text: "ti", duration: 0.28, begin: 154.7, index: 489 },
+    { text: "şe", duration: 0.28, begin: 154.9, index: 490 },
+    { text: "bi", duration: 0.28, begin: 155.1, index: 491 },
+    { text: "le", duration: 0.28, begin: 155.3, index: 492 },
+    { text: "ce", duration: 0.28, begin: 155.5, index: 493 },
+    { text: "ği", duration: 0.28, begin: 155.7, index: 494 },
+    { text: " i", duration: 0.28, begin: 155.9, index: 495 },
+    { text: "çin", duration: 0.28, begin: 156.1, index: 496 },
+    { text: " min", duration: 0.28, begin: 157.0, index: 497 },
+    { text: "net", duration: 0.28, begin: 157.25, index: 498 },
+    { text: "tar", duration: 0.28, begin: 157.5, index: 499 },
+    { text: " ol", duration: 0.28, begin: 157.75, index: 500 },
+    { text: "du", duration: 0.28, begin: 158.0, index: 501 },
+    { text: "ğu", duration: 0.28, begin: 158.25, index: 502 },
+    { text: "nu", duration: 0.28, begin: 158.5, index: 503 },
+    { text: " be", duration: 0.28, begin: 158.75, index: 504 },
+    { text: "lir", duration: 0.28, begin: 159.0, index: 505 },
+    { text: "tir", duration: 0.28, begin: 159.25, index: 506 },
+    { text: " ve", duration: 0.28, begin: 159.5, index: 507 },
+    { text: " bir", duration: 0.28, begin: 160.5, index: 508 },
+    { text: " mik", duration: 0.28, begin: 160.75, index: 509 },
+    { text: "tar", duration: 0.28, begin: 161.0, index: 510 },
+    { text: " pa", duration: 0.28, begin: 161.25, index: 511 },
+    { text: "ra", duration: 0.28, begin: 161.5, index: 512 },
+    { text: " u", duration: 0.28, begin: 161.75, index: 513 },
+    { text: "za", duration: 0.28, begin: 162.0, index: 514 },
+    { text: "tıp:", duration: 0.28, begin: 162.25, index: 515 },
+    { text: ' "Çok', duration: 0.28, begin: 163.25, index: 516 },
+    { text: " i", duration: 0.28, begin: 163.5, index: 517 },
+    { text: "yi", duration: 0.28, begin: 163.75, index: 518 },
+    { text: " bir", duration: 0.28, begin: 164.0, index: 519 },
+    { text: " in", duration: 0.28, begin: 164.25, index: 520 },
+    { text: "san", duration: 0.28, begin: 164.5, index: 521 },
+    { text: "sı", duration: 0.28, begin: 164.75, index: 522 },
+    { text: 'nız"', duration: 0.28, begin: 165.0, index: 523 },
+    { text: " di", duration: 0.28, begin: 165.5, index: 524 },
+    { text: "ye", duration: 0.28, begin: 165.75, index: 525 },
+    { text: " te", duration: 0.28, begin: 166.0, index: 526 },
+    { text: "şek", duration: 0.28, begin: 166.25, index: 527 },
+    { text: "kür", duration: 0.28, begin: 166.5, index: 528 },
+    { text: " e", duration: 0.28, begin: 166.75, index: 529 },
+    { text: "der.", duration: 0.28, begin: 167.0, index: 530 },
+    { text: " A", duration: 0.28, begin: 167.75, index: 531 },
+    { text: "dam:", duration: 0.28, begin: 168.0, index: 532 },
+    { text: ' "Ha', duration: 0.28, begin: 169.0, index: 533 },
+    { text: "yır,", duration: 0.28, begin: 169.25, index: 534 },
+    { text: " ha", duration: 0.28, begin: 170.2, index: 535 },
+    { text: "nım", duration: 0.28, begin: 170.4, index: 536 },
+    { text: " e", duration: 0.28, begin: 170.6, index: 537 },
+    { text: "fen", duration: 0.28, begin: 170.8, index: 538 },
+    { text: "di", duration: 0.28, begin: 171.0, index: 539 },
+    { text: " ma", duration: 0.28, begin: 171.2, index: 540 },
+    { text: "le", duration: 0.28, begin: 171.4, index: 541 },
+    { text: "sef", duration: 0.28, begin: 171.6, index: 542 },
+    { text: " i", duration: 0.28, begin: 172.0, index: 543 },
+    { text: "yi", duration: 0.28, begin: 172.25, index: 544 },
+    { text: " bir", duration: 0.28, begin: 172.5, index: 545 },
+    { text: " in", duration: 0.28, begin: 172.75, index: 546 },
+    { text: "san", duration: 0.28, begin: 173.0, index: 547 },
+    { text: " de", duration: 0.28, begin: 173.25, index: 548 },
+    { text: "ği", duration: 0.28, begin: 173.5, index: 549 },
+    { text: "lim.", duration: 0.28, begin: 173.75, index: 550 },
+    { text: " A", duration: 0.28, begin: 174.75, index: 551 },
+    { text: "ra", duration: 0.28, begin: 175.0, index: 552 },
+    { text: "ba", duration: 0.28, begin: 175.25, index: 553 },
+    { text: " hır", duration: 0.28, begin: 175.5, index: 554 },
+    { text: "sız", duration: 0.28, begin: 175.75, index: 555 },
+    { text: "lı", duration: 0.28, begin: 176.0, index: 556 },
+    { text: "ğın", duration: 0.28, begin: 176.25, index: 557 },
+    { text: "dan", duration: 0.28, begin: 176.5, index: 558 },
+    { text: " ha", duration: 0.28, begin: 177.25, index: 559 },
+    { text: "pis", duration: 0.28, begin: 177.5, index: 560 },
+    { text: " ha", duration: 0.28, begin: 177.75, index: 561 },
+    { text: "ne", duration: 0.28, begin: 178.0, index: 562 },
+    { text: "den", duration: 0.28, begin: 178.25, index: 563 },
+    { text: " ye", duration: 0.28, begin: 178.5, index: 564 },
+    { text: "ni", duration: 0.28, begin: 178.75, index: 565 },
+    { text: " çık", duration: 0.28, begin: 179.0, index: 566 },
+    { text: 'tım."', duration: 0.28, begin: 179.25, index: 567 },
+    { text: " Ka", duration: 0.28, begin: 180.5, index: 568 },
+    { text: "dın", duration: 0.28, begin: 180.75, index: 569 },
+    { text: " bir", duration: 0.28, begin: 181.25, index: 570 },
+    { text: " sü", duration: 0.28, begin: 181.5, index: 571 },
+    { text: "re", duration: 0.28, begin: 181.75, index: 572 },
+    { text: " ses", duration: 0.28, begin: 182.25, index: 573 },
+    { text: "siz", duration: 0.28, begin: 182.5, index: 574 },
+    { text: " ka", duration: 0.28, begin: 182.75, index: 575 },
+    { text: "lır.", duration: 0.28, begin: 183.0, index: 576 },
+    { text: " A", duration: 0.28, begin: 184.0, index: 577 },
+    { text: "dam", duration: 0.28, begin: 184.25, index: 578 },
+    { text: " u", duration: 0.28, begin: 184.5, index: 579 },
+    { text: "zak", duration: 0.28, begin: 184.75, index: 580 },
+    { text: "laş", duration: 0.28, begin: 185.0, index: 581 },
+    { text: "tık", duration: 0.28, begin: 185.25, index: 582 },
+    { text: "tan", duration: 0.28, begin: 185.5, index: 583 },
+    { text: " son", duration: 0.28, begin: 185.75, index: 584 },
+    { text: "ra", duration: 0.28, begin: 186.0, index: 585 },
+    { text: " tek", duration: 0.28, begin: 187.0, index: 586 },
+    { text: "rar", duration: 0.28, begin: 187.25, index: 587 },
+    { text: " yü", duration: 0.28, begin: 187.5, index: 588 },
+    { text: "zü", duration: 0.28, begin: 187.75, index: 589 },
+    { text: "nü", duration: 0.28, begin: 188.0, index: 590 },
+    { text: " gök", duration: 0.28, begin: 188.25, index: 591 },
+    { text: "yü", duration: 0.28, begin: 188.5, index: 592 },
+    { text: "zü", duration: 0.28, begin: 188.75, index: 593 },
+    { text: "ne", duration: 0.28, begin: 189.0, index: 594 },
+    { text: " çe", duration: 0.28, begin: 189.25, index: 595 },
+    { text: "vi", duration: 0.28, begin: 189.5, index: 596 },
+    { text: "rir,", duration: 0.28, begin: 189.75, index: 597 },
+    { text: " ken", duration: 0.28, begin: 190.5, index: 598 },
+    { text: "di", duration: 0.28, begin: 190.75, index: 599 },
+    { text: "ni", duration: 0.28, begin: 191.0, index: 600 },
+    { text: " tu", duration: 0.28, begin: 191.25, index: 601 },
+    { text: "ta", duration: 0.28, begin: 191.5, index: 602 },
+    { text: "maz,", duration: 0.28, begin: 191.75, index: 603 },
+    { text: " ağ", duration: 0.28, begin: 192.5, index: 604 },
+    { text: "la", duration: 0.28, begin: 192.75, index: 605 },
+    { text: "ya", duration: 0.28, begin: 193.0, index: 606 },
+    { text: "rak:", duration: 0.28, begin: 193.25, index: 607 },
+    { text: ' "Tan', duration: 0.28, begin: 194.25, index: 608 },
+    { text: "rım,", duration: 0.28, begin: 194.5, index: 609 },
+    { text: " bir", duration: 0.28, begin: 195.25, index: 610 },
+    { text: " pro", duration: 0.28, begin: 195.5, index: 611 },
+    { text: "fes", duration: 0.28, begin: 195.75, index: 612 },
+    { text: "yo", duration: 0.28, begin: 196.0, index: 613 },
+    { text: "nel", duration: 0.28, begin: 196.25, index: 614 },
+    { text: " gön", duration: 0.28, begin: 196.75, index: 615 },
+    { text: "der", duration: 0.28, begin: 197.0, index: 616 },
+    { text: "di", duration: 0.28, begin: 197.25, index: 617 },
+    { text: "ğin", duration: 0.28, begin: 197.5, index: 618 },
+    { text: " i", duration: 0.28, begin: 197.75, index: 619 },
+    { text: "çin", duration: 0.28, begin: 198.0, index: 620 },
+    { text: " çok", duration: 0.28, begin: 198.75, index: 621 },
+    { text: " te", duration: 0.28, begin: 199.0, index: 622 },
+    { text: "şek", duration: 0.28, begin: 199.25, index: 623 },
+    { text: "kür", duration: 0.28, begin: 199.5, index: 624 },
+    { text: " e", duration: 0.28, begin: 199.75, index: 625 },
+    { text: "de", duration: 0.28, begin: 200.0, index: 626 },
+    { text: 'rim"', duration: 0.28, begin: 200.25, index: 627 },
+    { text: " der.", duration: 0.28, begin: 200.75, index: 628 },
+  ];
+
+  useEffect(() => {
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Handle audio metadata loaded to get duration
   const handleLoadedMetadata = () => {
     if (audioRef.current) {
-      setAudioDuration(audioRef.current.duration)
+      setAudioDuration(audioRef.current.duration);
     }
-  }
+  };
 
   const handlePlayPause = () => {
-    if (!audioRef.current) return
+    if (!audioRef.current) return;
 
     if (isPlaying) {
-      audioRef.current.pause()
+      audioRef.current.pause();
       if (intervalRef.current) {
-        clearInterval(intervalRef.current)
+        clearInterval(intervalRef.current);
       }
     } else {
-      audioRef.current.play()
+      audioRef.current.play();
       intervalRef.current = setInterval(() => {
         if (audioRef.current) {
-          const time = audioRef.current.currentTime
-          setCurrentTime(time)
+          const time = audioRef.current.currentTime;
+          setCurrentTime(time);
           const activeSegment = textSegments.find(
-            (segment) => time >= segment.begin && time < segment.begin + segment.duration,
-          )
+            (segment) =>
+              time >= segment.begin && time < segment.begin + segment.duration
+          );
           if (activeSegment) {
-            setActiveIndex(activeSegment.index)
+            setActiveIndex(activeSegment.index);
           }
         }
-      }, 50)
+      }, 50);
     }
-    setIsPlaying(!isPlaying)
-  }
-  
+    setIsPlaying(!isPlaying);
+  };
+
   const handleSkipForward = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = Math.min(audioRef.current.currentTime + 10, audioRef.current?.duration || 0)
+      audioRef.current.currentTime = Math.min(
+        audioRef.current.currentTime + 10,
+        audioRef.current?.duration || 0
+      );
     }
-  }
+  };
 
   const handleSkipBackward = () => {
     if (audioRef.current) {
-      audioRef.current.currentTime = Math.max(audioRef.current.currentTime - 10, 0)
+      audioRef.current.currentTime = Math.max(
+        audioRef.current.currentTime - 10,
+        0
+      );
     }
-  }
-// First useEffect: Listen for auth changes
-useEffect(() => {
-  const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-    setUser(currentUser)
-  })
-  return () => unsubscribe()
-}, [])
+  };
+  // First useEffect: Listen for auth changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
-// Second useEffect: Track visit when user is available
-useEffect(() => {
-  const trackVisit = async () => {
-    if (user) {
-      try {
-        const userDoc = await getDoc(doc(db, "users", user.uid))
-        if (!userDoc.exists()) return
+  // Second useEffect: Track visit when user is available
+  useEffect(() => {
+    const trackVisit = async () => {
+      if (user) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (!userDoc.exists()) return;
 
-        const userData = userDoc.data()
-        const username = userData.username || userData.firstName || "Unknown"
+          const userData = userDoc.data();
+          const username = userData.username || userData.firstName || "Unknown";
 
-        // Get story ID from current URL (last part)
-        const currentPath = window.location.pathname
-        const storyId = currentPath.split('/').pop() || 'unknown'
-        
-        // Convert kebab-case to Title Case for display
-        const storyName = storyId.replace(/-/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())
+          // Get story ID from current URL (last part)
+          const currentPath = window.location.pathname;
+          const storyId = currentPath.split("/").pop() || "unknown";
 
-        await addDoc(collection(db, "storyVisits"), {
-          userId: user.uid,
-          username: username,
-          storyName: storyName,
-          storyId: storyId,
-          visitedAt: serverTimestamp(),
-        })
-        
-        console.log(`✅ Visit tracked: ${storyName}`)
-      } catch (error) {
-        console.error("❌ Error:", error)
+          // Convert kebab-case to Title Case for display
+          const storyName = storyId
+            .replace(/-/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase());
+
+          await addDoc(collection(db, "storyVisits"), {
+            userId: user.uid,
+            username: username,
+            storyName: storyName,
+            storyId: storyId,
+            visitedAt: serverTimestamp(),
+          });
+
+          console.log(`✅ Visit tracked: ${storyName}`);
+        } catch (error) {
+          console.error("❌ Error:", error);
+        }
       }
-    }
-  }
-  trackVisit()
-}, [user])
+    };
+    trackVisit();
+  }, [user]);
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!audioRef.current) return
+    if (!audioRef.current) return;
 
-    const progressBar = e.currentTarget
-    const rect = progressBar.getBoundingClientRect()
-    const clickX = e.clientX - rect.left
-    const progressWidth = rect.width
-    const clickPercentage = clickX / progressWidth
-    const newTime = clickPercentage * (audioRef.current.duration || 0)
-    audioRef.current.currentTime = newTime
-    setCurrentTime(newTime)
-  }
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const progressWidth = rect.width;
+    const clickPercentage = clickX / progressWidth;
+    const newTime = clickPercentage * (audioRef.current.duration || 0);
+    audioRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
 
   const handleAudioEnded = () => {
-    setIsPlaying(false)
-    setActiveIndex(-1)
+    setIsPlaying(false);
+    setActiveIndex(-1);
     if (intervalRef.current) {
-      clearInterval(intervalRef.current)
+      clearInterval(intervalRef.current);
     }
-  }
+  };
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
-    const secs = Math.floor(seconds % 60)
-    return `${mins}:${secs < 10 ? "0" : ""}${secs}`
-  }
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  };
 
   const renderTextSegments = () => {
-    const titleSegments = textSegments.filter((segment) => segment.isTitle)
-    const bodySegments = textSegments.filter((segment) => !segment.isTitle && segment.text.trim())
+    const titleSegments = textSegments.filter((segment) => segment.isTitle);
+    const bodySegments = textSegments.filter(
+      (segment) => !segment.isTitle && segment.text.trim()
+    );
 
     return (
       <div className="space-y-8">
@@ -795,12 +860,12 @@ useEffect(() => {
             {titleSegments.map((segment) => (
               <span
                 key={segment.index}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 font-extrabold ${
                   activeIndex === segment.index
-                    ? "text-black font-extrabold underline decoration-2 decoration-black opacity-100"
+                    ? "text-black underline decoration-2 decoration-black opacity-100"
                     : segment.index < activeIndex
                       ? "text-black opacity-100"
-                      : "text-slate-900 opacity-40"
+                      : "text-slate-900 opacity-70"
                 }`}
               >
                 {segment.text}
@@ -814,12 +879,12 @@ useEffect(() => {
             {bodySegments.map((segment) => (
               <span
                 key={segment.index}
-                className={`transition-all duration-300 ${
+                className={`transition-all duration-300 font-bold ${
                   activeIndex === segment.index
-                    ? "text-black font-bold underline decoration-2 decoration-black opacity-100"
+                    ? "text-black underline decoration-2 decoration-black opacity-100"
                     : segment.index < activeIndex
                       ? "text-black opacity-100"
-                      : "text-slate-700 opacity-40"
+                      : "text-slate-700 opacity-70"
                 }`}
               >
                 {segment.text}
@@ -828,8 +893,8 @@ useEffect(() => {
           </div>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
@@ -837,25 +902,34 @@ useEffect(() => {
       <div className="bg-white shadow-sm border-b border-slate-200">
         <div className="max-w-7x1 mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/dashboard/stories" className="flex items-center text-slate-600 hover:text-slate-900 transition-colors">
+            <Link
+              href="/dashboard/stories"
+              className="flex items-center text-slate-600 hover:text-slate-900 transition-colors"
+            >
               <ArrowLeft className="h-5 w-5 mr-2" />
               <span className="hidden sm:inline">Hikayelere Dön</span>
               <span className="sm:hidden">Geri</span>
             </Link>
 
             {/* Navigation Buttons */}
-<div className="flex items-center space-x-5">
-  <Link href="/dashboard/stories/on-yargi" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
-    <ChevronLeft className="h-4 w-4 mr-1" />
-    <span className="hidden sm:inline">Önceki Hikaye</span>
-    <span className="sm:hidden">Önceki</span>
-  </Link>
-  <Link href="/dashboard/stories/hayallerinizden-vazgecmeyin" className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105">
-    <span className="hidden sm:inline">Sonraki Hikaye</span>
-    <span className="sm:hidden">Sonraki</span>
-    <ChevronRight className="h-4 w-4 ml-1" />
-  </Link>
-</div>
+            <div className="flex items-center space-x-5">
+              <Link
+                href="/dashboard/stories/on-yargi"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Önceki Hikaye</span>
+                <span className="sm:hidden">Önceki</span>
+              </Link>
+              <Link
+                href="/dashboard/stories/hayallerinizden-vazgecmeyin"
+                className="flex items-center px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <span className="hidden sm:inline">Sonraki Hikaye</span>
+                <span className="sm:hidden">Sonraki</span>
+                <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
 
             <div className="flex items-center text-sm text-slate-500">
               <Volume2 className="h-4 w-4 mr-2" />
@@ -872,8 +946,17 @@ useEffect(() => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             {/* Left Section - Title and Time */}
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 min-w-0">
-              <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">Sesli Okuma</h2>
-              <div className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded">
+              <h2 className="text-lg font-semibold text-slate-900 whitespace-nowrap">
+                Sesli Okuma
+              </h2>
+              <div
+                className="text-sm text-slate-500 font-mono bg-slate-50 px-2 py-1 rounded"
+                style={{
+                  minWidth: "110px",
+                  textAlign: "center",
+                  display: "inline-block",
+                }}
+              >
                 {formatTime(currentTime)} / {formatTime(audioDuration)}
               </div>
             </div>
@@ -896,7 +979,11 @@ useEffect(() => {
                 }`}
                 title={isPlaying ? "Duraklat" : "Oynat"}
               >
-                {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5 ml-0.5" />}
+                {isPlaying ? (
+                  <Pause className="h-5 w-5" />
+                ) : (
+                  <Play className="h-5 w-5 ml-0.5" />
+                )}
               </button>
               <button
                 onClick={handleSkipForward}
@@ -936,8 +1023,8 @@ useEffect(() => {
         </div>
 
         {/* Story Content */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">{renderTextSegments()}</div>
+        {renderTextSegments()}
       </div>
     </div>
-  )
+  );
 }
