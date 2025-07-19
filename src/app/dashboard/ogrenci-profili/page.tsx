@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { auth, db } from "../../../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import {
@@ -102,6 +102,10 @@ export default function OgrenciProfiliPage() {
     type: "success",
     message: "",
   });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordSuccess, setPasswordSuccess] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const passwordRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -256,6 +260,38 @@ export default function OgrenciProfiliPage() {
       return `${age} yaşında`;
     } catch {
       return "Geçersiz yaş";
+    }
+  };
+
+  // Password update handler
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordSuccess("");
+    setPasswordError("");
+    setPasswordLoading(true);
+    const newPassword = passwordRef.current?.value || "";
+    if (!selectedStudent?.id || !newPassword) {
+      setPasswordError("Yeni şifre girilmelidir.");
+      setPasswordLoading(false);
+      return;
+    }
+    try {
+      const res = await fetch("/api/update-user-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ uid: selectedStudent.id, newPassword }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPasswordSuccess("Şifre başarıyla güncellendi.");
+        if (passwordRef.current) passwordRef.current.value = "";
+      } else {
+        setPasswordError(data.message || "Şifre güncellenemedi.");
+      }
+    } catch {
+      setPasswordError("Şifre güncellenirken hata oluştu.");
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -824,6 +860,46 @@ export default function OgrenciProfiliPage() {
                           </div>
                         )}
                       </div>
+                    </div>
+
+                    {/* Password Update Form */}
+                    <div className="mt-6">
+                      <h3 className="text-base sm:text-lg font-semibold text-slate-900 mb-2 flex items-center gap-2">
+                        <span>Şifreyi Güncelle</span>
+                      </h3>
+                      <form
+                        onSubmit={handlePasswordUpdate}
+                        className="flex flex-col gap-2 max-w-xs"
+                      >
+                        <input
+                          type="password"
+                          ref={passwordRef}
+                          minLength={6}
+                          placeholder="Yeni şifre (min 6 karakter)"
+                          className="border rounded px-3 py-2 text-sm"
+                          disabled={passwordLoading}
+                          required
+                        />
+                        <button
+                          type="submit"
+                          className="bg-teal-600 text-white rounded px-3 py-2 font-medium hover:bg-teal-700 transition-colors disabled:opacity-60"
+                          disabled={passwordLoading}
+                        >
+                          {passwordLoading
+                            ? "Kaydediliyor..."
+                            : "Şifreyi Güncelle"}
+                        </button>
+                        {passwordSuccess && (
+                          <div className="text-green-600 text-xs mt-1">
+                            {passwordSuccess}
+                          </div>
+                        )}
+                        {passwordError && (
+                          <div className="text-red-600 text-xs mt-1">
+                            {passwordError}
+                          </div>
+                        )}
+                      </form>
                     </div>
 
                     {/* Therapy Application Information */}
