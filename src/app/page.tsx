@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://e-kekemelik.com"),
   title: "E-Kekemelik | Armoni Dil ve Konuşma Merkezi",
   description:
-    "Armoni Dil ve Konuşma Merkezi tarafından sunulan, bilimsel temelli kekemelik terapisi uygulaması. Kanıta dayalı teknikler, egzersizler ve profesyonel destek ile kekemelik tedavisinde yanınızdayız.",
+    "Armoni Dil ve Konuşma Merkezi, bilimsel temelli kekemelik terapi merkezi. Kanıta dayalı teknikler, egzersizler ve profesyonel destek ile kekemelik tedavisinde yanınızdayız.",
   keywords: [
     "kekemelik terapisi",
     "kekemelik tedavisi",

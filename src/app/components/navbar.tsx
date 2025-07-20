@@ -100,6 +100,10 @@ const Navbar = () => {
             <div className="flex-shrink-0 z-10">
               <Link href="/" className="block">
                 <div className="flex items-center space-x-3">
+                  {/* Visually hidden h1 for SEO */}
+                  <h1 className="sr-only">
+                    Armoni egitim merkezi, kekemelik tedavisi, E-kekemelik
+                  </h1>
                   {/* Logo Image */}
                   <div className="relative h-12 w-12 sm:h-16 sm:w-16">
                     <Image
