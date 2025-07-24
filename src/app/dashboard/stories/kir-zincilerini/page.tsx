@@ -292,6 +292,8 @@ export default function KirZincirleriniPage() {
     { text: " öğ", duration: 0.53, begin: 79.0, index: 204 },
     { text: "ret", duration: 0.53, begin: 79.25, index: 205 },
     { text: "miş.", duration: 0.53, begin: 79.5, index: 206 },
+    { text: "<br>", duration: 0, begin: 81.49, index: 206.5 },
+    { text: "<br>", duration: 0, begin: 81.49, index: 206.6 },
     { text: " Sirk", duration: 0.68, begin: 81.5, index: 207 },
     { text: "ler", duration: 0.68, begin: 81.75, index: 208 },
     { text: " de", duration: 0.68, begin: 82.0, index: 209 },
@@ -705,20 +707,24 @@ export default function KirZincirleriniPage() {
         {/* Story Text */}
         <div className="prose prose-lg max-w-none">
           <div className="text-lg md:text-xl leading-relaxed text-slate-700">
-            {bodySegments.map((segment) => (
-              <span
-                key={segment.index}
-                className={`transition-all duration-300 font-bold ${
-                  activeIndex === segment.index
-                    ? "text-black underline decoration-2 decoration-black opacity-100"
-                    : segment.index < activeIndex
-                      ? "text-black opacity-100"
-                      : "text-slate-700 opacity-70"
-                }`}
-              >
-                {segment.text}
-              </span>
-            ))}
+            {bodySegments.map((segment) =>
+              segment.text === "<br>" ? (
+                <br key={segment.index} />
+              ) : (
+                <span
+                  key={segment.index}
+                  className={`transition-all duration-300 font-bold ${
+                    activeIndex === segment.index
+                      ? "text-black underline decoration-2 decoration-black opacity-100"
+                      : segment.index < activeIndex
+                        ? "text-black opacity-100"
+                        : "text-slate-700 opacity-70"
+                  }`}
+                >
+                  {segment.text}
+                </span>
+              )
+            )}
           </div>
         </div>
       </div>

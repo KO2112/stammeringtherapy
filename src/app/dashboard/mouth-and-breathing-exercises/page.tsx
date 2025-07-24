@@ -785,11 +785,11 @@ export default function TurkishVocalExercises() {
                           style={{ width: `${(timer / maxTime) * 100}%` }}
                         ></div>
                       </div>
-                      <div className="flex justify-center space-x-4">
+                      <div className="flex flex-col xs:flex-row sm:flex-row md:flex-row lg:flex-row justify-center items-stretch gap-3 sm:gap-4 md:gap-4 lg:gap-4 w-full">
                         {!isPlaying ? (
                           <button
                             onClick={startTimer}
-                            className={`px-6 py-2 rounded-lg flex items-center font-medium text-white ${
+                            className={`w-full sm:w-auto px-6 py-2 rounded-lg flex items-center justify-center font-medium text-white ${
                               activeTab === "breathing"
                                 ? "bg-teal-500 hover:bg-teal-600"
                                 : "bg-purple-500 hover:bg-purple-600"
@@ -801,7 +801,7 @@ export default function TurkishVocalExercises() {
                         ) : (
                           <button
                             onClick={pauseTimer}
-                            className="px-6 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg flex items-center font-medium text-white"
+                            className="w-full sm:w-auto px-6 py-2 bg-amber-500 hover:bg-amber-600 rounded-lg flex items-center justify-center font-medium text-white"
                           >
                             <Pause className="h-4 w-4 mr-2" />
                             Duraklat
@@ -809,14 +809,14 @@ export default function TurkishVocalExercises() {
                         )}
                         <button
                           onClick={resetTimer}
-                          className="px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center font-medium text-slate-700"
+                          className="w-full sm:w-auto px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center justify-center font-medium text-slate-700"
                         >
                           <Repeat className="h-4 w-4 mr-2" />
                           Sıfırla
                         </button>
                         <button
                           onClick={handleNextExercise}
-                          className={`px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center font-medium text-slate-700 ${activeExercise !== null && currentExercises.findIndex((ex) => ex.id === activeExercise) === currentExercises.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                          className={`w-full sm:w-auto px-6 py-2 bg-slate-200 hover:bg-slate-300 rounded-lg flex items-center justify-center font-medium text-slate-700 ${activeExercise !== null && currentExercises.findIndex((ex) => ex.id === activeExercise) === currentExercises.length - 1 ? "opacity-50 cursor-not-allowed" : ""}`}
                           disabled={
                             activeExercise === null ||
                             currentExercises.findIndex(
