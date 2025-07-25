@@ -342,18 +342,12 @@ const AboutPage = () => {
                 fazla kişinin kekemelik zorluklarını aşmasına ve konuşma güveni
                 kazanmasına yardımcı olduk.
               </p>
-              <Link
-                href="/team"
-                className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium group mt-4"
-              >
-                Ekibimizle tanışın
-                <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              
             </motion.div>
             <motion.div variants={fadeIn} className="relative">
               <div className="h-80 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/placeholder.svg?height=400&width=600"
+                  src="/ekip.jpg"
                   alt="Kekemelik Tedavi Ekibi"
                   fill
                   className="object-cover"
@@ -542,7 +536,7 @@ const AboutPage = () => {
             initial="hidden"
             animate={isVisible.team ? "visible" : "hidden"}
           >
-            {teamMembers.map((member, idx) => (
+            {teamMembers.map((member) => (
               <motion.div key={member.id} variants={fadeIn} className="group">
                 <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 hover:-translate-y-2 min-h-[500px] max-h-[500px] flex flex-col">
                   {/* Card Header with Image */}
